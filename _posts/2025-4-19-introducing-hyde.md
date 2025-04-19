@@ -26,10 +26,10 @@ I am interested in discovering various Haptic Devices for VR and AR devices for 
 (T. Kim, YA. Sim, **Y. Kim**, S. Kim, J. Lee, G. Lee) – CHI’24
 
 [**_Pressure‑Based Menu Selection on a Spherical Tangible Device_**](https://dl.acm.org/doi/10.1145/3613905.3651090)  
-(S. Kim, **Y. Kim**, G. Lee) – CHI’24 LBW
+(S. Kim, **Y. Kim**, G. Lee) – CHI’24 EA
 
 [**_GaitWay: Gait Data‑Based VR Locomotion Prediction System Robust to Visual Distraction_**](https://dl.acm.org/doi/10.1145/3613905.3651073)  
-(**Y. Kim**, S. Hwang, S. Kim) – CHI’24 LBW
+(**Y. Kim**, S. Hwang, S. Kim) – CHI’24 EA
 
 [**_Electrical, Vibrational, and Cooling Stimuli‑Based Redirected Walking: Comparison of Various Vestibular Stimulation‑Based Redirected Walking Systems_**](https://dl.acm.org/doi/10.1145/3544548.3580862)  
 (S. Hwang, J. Lee, **Y. Kim**, Y. Seo, S. Kim) – CHI’23
@@ -37,4 +37,5 @@ I am interested in discovering various Haptic Devices for VR and AR devices for 
 [**_Enhancing Seamless Walking in Virtual Reality: The Application of Bone Conduction Vibration in Redirected Walking_**](https://ieeexplore.ieee.org/document/10316524)
 (S. Hwang, **Y. Kim**, Y. Seo, S. Kim) – ISMAR 2023 (Honorable Mention &#127942;)
 
-
+[**_REVES: Redirection Enhancement Using Four-Pole Vestibular Electrode Stimulation_**](https://dl.acm.org/doi/abs/10.1145/3491101.3519626)
+(S. Hwang, J. Lee, **Y. Kim**, S. Kim) – CHI'22 EA
