@@ -56,8 +56,10 @@ html {
  .avatar {
   display: block;
   margin: 0 auto 1rem;
-  width: 15rem;
-  height: 15rem;
+  width: 100%;
+  max-width: 15rem;
+  height: auto;
+  aspect-ratio: 1 / 1;
   border-radius: 20%;
   object-fit: cover;
 }
