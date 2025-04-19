@@ -6,9 +6,9 @@ highlighter: pygments
 permalink: pretty
 
 # Setup
-title: Hyde
+title: YoungIn Kim
 tagline: 'A Jekyll theme'
-description: 'A brazen two‑column Jekyll theme…'
+description: 'M.S. student in HCIL (KAIST, SoC) Prof. Geehyuk Lee'
 url: https://youngin3737.github.io
 baseurl: ""
 
@@ -21,9 +21,6 @@ plugins:
   - jekyll-paginate
 
 paginate: 5
-
-# Custom vars
-version: 2.1.0
 
 github:
   repo: https://github.com/poole/hyde
