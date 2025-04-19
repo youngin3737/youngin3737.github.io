@@ -35,6 +35,6 @@ I am interested in discovering various Haptic Devices for VR and AR devices for 
 (S. Hwang, J. Lee, **Y. Kim**, Y. Seo, S. Kim) – CHI’23
 
 [**_Enhancing Seamless Walking in Virtual Reality: The Application of Bone Conduction Vibration in Redirected Walking_**](https://ieeexplore.ieee.org/document/10316524)
-(S. Hwang, **Y. Kim**, Y. Seo, S. Kim) – ISMAR 2023 (Honorable Mention :trophy:)
+(S. Hwang, **Y. Kim**, Y. Seo, S. Kim) – ISMAR 2023 (Honorable Mention &#127942;)
 
 
