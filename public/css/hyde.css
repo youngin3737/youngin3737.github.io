@@ -58,7 +58,7 @@ html {
   margin: 0 auto 1rem;
   width: 5rem;
   height: 5rem;
-  border-radius: 50%;
+  border-radius: 20%;
   object-fit: cover;
 }
 
