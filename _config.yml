@@ -19,6 +19,7 @@ author:
 # Plugins (GitHub Pages)
 plugins:
   - jekyll-paginate
+  - jekyll-emoji
 
 paginate: 5
 
