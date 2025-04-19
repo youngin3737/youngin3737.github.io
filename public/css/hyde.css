@@ -56,8 +56,8 @@ html {
  .avatar {
   display: block;
   margin: 0 auto 1rem;
-  width: 5rem;
-  height: 5rem;
+  width: 15rem;
+  height: 15rem;
   border-radius: 20%;
   object-fit: cover;
 }
