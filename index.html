@@ -1,37 +1,891 @@
----
-layout: default
-title: Home
----
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YounginKim</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>    <!-- Google Fonts: Poppins -->
+    <script>
+    tailwind.config = {
+        darkMode: 'class'
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<div class="posts">
-  {% for post in paginator.posts %}
-  <div class="post">
-    <h1 class="post-title">
-      <a href="{{ post.url }}">
-        {{ post.title }}
-      </a>
-    </h1>
+    <style>
+        /* Custom Styles & Animations */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa; /* Default light background */
+        }
+        
+        .dark body {
+            background-color: #111827; /* Default dark background */
+        }
 
-    <span class="post-date">{{ post.date | date_to_string }}</span>
+        /* Keyframes for the moving gradient background */
+        @keyframes moveGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-    {{ post.content }}
-  </div>
-  {% endfor %}
-</div>
+        /* Hero section with a special animated background */
+        #home {
+            background-color: #111827;
+            background-image: radial-gradient(at 8% 13%, hsla(45, 90%, 60%, 0.38) 0px, transparent 50%),
+                              radial-gradient(at 86% 27%, hsla(35, 90%, 65%, 0.35) 0px, transparent 50%),
+                              radial-gradient(at 22% 83%, hsla(283,70%,63%,0.35) 0px, transparent 50%);
+            background-size: 200% 200%;
+            animation: moveGradient 20s ease infinite;
+            position: fixed; /* Make it fixed to stay during scroll-fade */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1; /* Behind the main content */
+        }
+        
+        #home-content-wrapper {
+             transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+        }
 
-<!-- <div class="pagination">
-  {% if paginator.next_page %}
-    <a class="pagination-item older" href="{{ site.baseurl }}page{{paginator.next_page}}">Older</a>
-  {% else %}
-    <span class="pagination-item older">Older</span>
-  {% endif %}
-  {% if paginator.previous_page %}
-    {% if paginator.page == 2 %}
-      <a class="pagination-item newer" href="{{ site.baseurl }}">Newer</a>
-    {% else %}
-      <a class="pagination-item newer" href="{{ site.baseurl }}page{{paginator.previous_page}}">Newer</a>
-    {% endif %}
-  {% else %}
-    <span class="pagination-item newer">Newer</span>
-  {% endif %}
-</div> -->
+        /* This div pushes the main content down by 100vh */
+        #hero-spacer {
+            height: 100vh;
+        }
+
+        /* Main content wrapper that will scroll over the hero */
+        #main-content {
+            position: relative;
+            z-index: 10; /* In front of the hero section */
+        }
+
+        /* Scroll-triggered fade-in animation */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom gradient text for hero section */
+        .gradient-text {
+            background: linear-gradient(90deg, #fde047, #f97316);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+        
+        /* Dynamic Abstract Animation */
+        .abstract-container {
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-10px) scaleY(0.98);
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        margin-top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .abstract-container.show {
+            max-height: 500px; /* Adjust as needed */
+            opacity: 1;
+            transform: translateY(0) scaleY(1);
+            margin-top: 1rem;
+        }
+
+        /* Animated Search Bar */
+        #search-input {
+            width: 0;
+            padding-left: 0;
+            padding-right: 0;
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            outline: none; /* Remove default focus outline */
+        }
+        #search-bar-container.expanded #search-input {
+            width: 280px; /* Expanded width */
+            padding-left: 1.25rem;
+            padding-right: 3rem; /* Space for the icon */
+        }
+        #search-bar-container {
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        /* Add a soft glow when the search bar is focused */
+        #search-bar-container:focus-within {
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.5);
+        }
+
+        /* Publication Item Filter Animation */
+        .publication-item, .year-section, #no-results-message {
+            transition: opacity 0.4s ease, transform 0.4s ease, max-height 0.6s ease, padding 0.6s ease, margin 0.6s ease;
+            overflow: hidden;
+        }
+        .publication-item, .year-section {
+             max-height: 1000px; /* Set a large enough initial height */
+        }
+        .hidden-filter {
+            opacity: 0;
+            transform: scale(0.95);
+            max-height: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            border-width: 0 !important;
+        }
+
+        /* Tag Color System */
+        .tag- { background-color: #6b7280; color: white; }
+        .tag-inputdevice { background-color: #f59e0b; color: white; } /* Amber-500 */
+        .tag-haptic { background-color: #8b5cf6; color: white; } /* Violet-500 */
+        .tag-VRAR { background-color: #10b981; color: white; } /* Emerald-500 */
+        .tag-locomotion { background-color: #ff5cce; color: white; } /* Violet-500 */
+        .tag-MLDL { background-color: #00bbff; color: white; } /* Emerald-500 */
+
+        .tag-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+        .dark .tag-btn {
+            background-color: #374151;
+            color: #d1d5db;
+        }
+        .tag-btn.active {
+            color: white !important;
+        }
+        .tag-btn.active.tag-all { background-color: #4b5563; }
+        .tag-btn.active.tag-inputdevice { background-color: #d97706; } /* Amber-600 */
+        .tag-btn.active.tag-haptic { background-color: #7c3aed; } /* Violet-600 */
+        .tag-btn.active.tag-VRAR { background-color: #059669; } /* Emerald-600 */
+        .tag-btn.active.tag-locomotion { background-color: #943577; } /* Violet-600 */
+        .tag-btn.active.tag-MLDL { background-color: #3d95b4; } /* Emerald-600 */ 
+
+        .dark .tag-btn.active.tag-all { background-color: #6b7280; }
+        .dark .tag-btn.active.tag-inputdevice { background-color: #f59e0b; }
+        .dark .tag-btn.active.tag-haptic { background-color: #8b5cf6; }
+        .dark .tag-btn.active.tag-VRAR { background-color: #10b981; }
+        .tag-btn.active.tag-locomotion { background-color: #ff5cce; } /* Violet-600 */
+        .tag-btn.active.tag-MLDL { background-color: #00bbff; } /* Emerald-600 */
+
+        .publication-tag {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+    <script>
+        // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+        if (localStorage.getItem('color-theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.add('light');
+        }
+    </script>
+</head>
+<body class="light">
+
+    <!-- Header & Navigation -->
+    <header id="header" class="text-white fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold">YoungIn Kim</a>
+            <div class="flex items-center space-x-4">
+                <ul class="hidden md:flex items-center space-x-8">
+                    <li><a href="#about" class="nav-link font-semibold">About</a></li>
+                    <li><a href="#research" class="nav-link font-semibold">Interests</a></li>
+                    <li><a href="#news" class="nav-link font-semibold">News</a></li>
+                    <li><a href="#publications" class="nav-link font-semibold">Publications</a></li>
+                    <li><a href="#contact" class="nav-link font-semibold">Contact</a></li>
+                </ul>
+                <button id="theme-toggle" type="button" class="text-gray-400 hover:text-white focus:outline-none rounded-lg text-sm p-2.5">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                </button>
+                <button id="mobile-menu-button" class="md:hidden">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 bg-gray-800/90 backdrop-blur-sm">
+             <a href="#about" class="block py-2">About</a>
+             <a href="#research" class="block py-2">Interests</a>
+             <a href="#news" class="block py-2">News</a>
+             <a href="#publications" class="block py-2">Publications</a>
+             <a href="#contact" class="block py-2">Contact</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home">
+        <div id="home-content-wrapper" class="h-full flex flex-col items-center justify-center text-white relative z-10">
+            <div class="container mx-auto px-6 text-center flex-grow flex flex-col items-center justify-center">
+                <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4">
+                    Researching Devices that
+                    <br>
+                    <span class="gradient-text"> Making Our Lives Fun</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
+                    HCI researcher exploring novel devices to enhance user experiences in Desktop, Laptop, VR/AR, and so on.
+                </p>
+                <a href="#about" class="mt-8 inline-block bg-amber-500 text-white font-bold rounded-lg px-8 py-3 hover:bg-amber-600 transition-all duration-300 shadow-lg hover:shadow-amber-500/50 transform hover:scale-105">
+                    Explore My Work
+                </a>
+            </div>
+            <!-- Latest News Floating Box -->
+            <a href="#news" class="latest-news-float bg-gray-900/50 hover:bg-gray-900/80 transition-colors w-11/12 md:w-auto max-w-2xl p-4 rounded-xl mb-8">
+                <p class="text-sm font-semibold text-gray-200"><span class="font-bold text-amber-300">Latest News:</span> Our paper "StringTouch" has been accepted to UIST 2025!</p>
+            </a>
+        </div>
+    </section>
+
+    <!-- This div creates space for the fixed hero section -->
+    <div id="hero-spacer"></div>
+
+    <!-- Main Content Wrapper -->
+    <div id="main-content" class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-500">
+        <main>
+            <!-- About Me Section -->
+            <section id="about" class="py-20 fade-in-section">
+                 <div class="container mx-auto px-6">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">About Me</h2>
+                        <div class="w-24 h-1 bg-amber-500 mx-auto mt-4"></div>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center gap-12">
+                        <div class="md:w-1/3 text-center">
+                            <img src="images/kyi_profile.png" alt="Young-in's Portrait" class="rounded-full shadow-lg mx-auto w-64 h-64 object-cover">
+                        </div>
+                        <div class="md:w-2/3">
+                            <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                                Hello, I’m now a Master’s Student in School of Copmuting, KAIST. I am currently part of the 
+                                <a href="https://hcil.kaist.ac.kr/" target="_blank" class="text-amber-500 hover:underline"><strong>Human-Computer Interaction Lab (HCIL)</strong></a>, 
+                                advised by 
+                                <a href="https://cs.kaist.ac.kr/people/view?idx=372&kind=faculty&menu=172" target="_blank" class="text-amber-500 hover:underline"><strong>Prof. Geehyuk Lee</strong></a>.
+                            </p>
+                            <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                                I am recently interested in discovering various <strong>Haptic Devices</strong> for VR and AR devices for more immersive and interesting user experiences.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Research Interests Section -->
+            <section id="research" class="py-20 bg-white dark:bg-gray-800 fade-in-section">
+                <div class="container mx-auto px-6">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Research Interests</h2>
+                        <div class="w-24 h-1 bg-amber-500 mx-auto mt-4"></div>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-8 text-center">
+                        <div class="p-8 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                            <i class="fas fa-keyboard text-4xl text-amber-500 dark:text-amber-400 mb-4"></i>
+                            <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">Input Devices</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Exploring more convenient and useful new input devices.</p>
+                        </div>
+                        <div class="p-8 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                            <i class="fas fa-user-gear text-4xl text-amber-500 dark:text-amber-400 mb-4"></i>
+                            <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">Haptics</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Providing more diverse and realistic haptic feedback, and exploring human perception models of haptics.</p>
+                        </div>
+                        <div class="p-8 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                            <i class="fas fa-vr-cardboard text-4xl text-amber-500 dark:text-amber-400 mb-4"></i>
+                            <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">VR/AR</h3>
+                            <p class="text-gray-600 dark:text-gray-400">Making VR/AR/XR environments more immersive and realistic</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- News Section -->
+            <section id="news" class="py-20 fade-in-section">
+                <div class="container mx-auto px-6">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">News</h2>
+                        <div class="w-24 h-1 bg-amber-500 mx-auto mt-4"></div>
+                    </div>
+                    <div class="max-w-3xl mx-auto">
+                        <div class="space-y-8">
+                            <!-- News Item 1 -->
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">August 14, 2025</p>
+                                <p class="mt-2 text-lg text-gray-800 dark:text-gray-200">Our paper, "StringTouch: A Non-occlusive 3DoF Haptic Interface Using String Structures for Modulating Finger Sensations," was accepted to UIST 2025. Looking forward to presenting our work in Busan!</p>
+                            </div>
+                            <!-- News Item 2 -->
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">June 5, 2025</p>
+                                <p class="mt-2 text-lg text-gray-800 dark:text-gray-200">I will be serving as a reviewer for the UIST 2025 conference. Honored to contribute to the HCI community.</p>
+                            </div>
+                            <!-- News Item 3 -->
+                            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">March 20, 2025</p>
+                                <p class="mt-2 text-lg text-gray-800 dark:text-gray-200">Our paper, "Over the Mouse: Navigating across the GUI with Finger‑Lifting Operation Mouse," was accepted to CHI 2025!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Publications Section -->
+            <section id="publications" class="py-20 bg-white dark:bg-gray-800 fade-in-section">
+                <div class="container mx-auto px-6">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Publications</h2>
+                        <div class="w-24 h-1 bg-amber-500 mx-auto mt-4"></div>
+                    </div>
+
+                    <!-- Search and Filter Controls -->
+                    <div class="flex flex-col md:flex-row justify-center items-center gap-4 mb-12">
+                        <!-- Search Bar -->
+                        <div id="search-bar-container" class="relative flex items-center bg-white dark:bg-gray-700 rounded-full shadow-sm">
+                            <input type="text" id="search-input" placeholder="Search titles..." class="h-12 border-none bg-transparent focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400">
+                            <button id="search-icon" class="absolute right-0 top-0 h-full px-4 text-gray-600 dark:text-gray-300 hover:text-amber-500 dark:hover:text-amber-400 focus:outline-none">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <!-- Tag Filter Buttons -->
+                        <div id="tag-filter-container" class="flex justify-center flex-wrap gap-3">
+                            <button class="tag-btn active tag-all" data-tag="all">All</button>
+                            <button class="tag-btn tag-inputdevice" data-tag="inputdevice">Input Device</button>
+                            <button class="tag-btn tag-haptic" data-tag="haptic">Haptic</button>
+                            <button class="tag-btn tag-VRAR" data-tag="vrar">VR/AR</button>
+                            <button class="tag-btn tag-locomotion" data-tag="locomotion">Locomotion</button>
+                            <button class="tag-btn tag-MLDL" data-tag="mldl">MLDL</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-8">
+                        <!-- Year 2024 -->
+                        <div class="year-section" data-year="2025">
+                            <h3 class="text-2xl font-bold mb-6 text-gray-700 dark:text-gray-300 border-b-2 border-gray-200 dark:border-gray-700 pb-2">2025</h3>
+                            <div class="space-y-8">
+                                <!-- Publication Item 1 -->
+                                <div class="publication-item bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex-col" data-tags="haptic vrar">
+                                    <div class="flex flex-col md:flex-row items-start gap-6">
+                                        <div class="flex-grow">
+                                            <h4 class="publication-title text-xl font-bold text-gray-900 dark:text-white">StringTouch: A Non-occlusive 3DoF Haptic Interface using String Structures for Modulating Finger Sensations</h4>
+                                            <p class="text-gray-700 dark:text-gray-300 mt-1"><strong>Y. Kim</strong>, J.Yim, Y. Yun, D. Ko, G. Lee</p>
+                                            <p class="text-gray-500 dark:text-gray-400 italic mt-1">The 38th Annual ACM Symposium on User Interface Software and Technology (UIST), 2025 (Accepted)</p>
+                                        </div>
+                                        <div class="flex-shrink-0 mt-4 md:mt-0 space-x-2">
+                                             <a href="#" class="bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors">TBD</a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex flex-wrap gap-2 items-center">
+                                        <span class="publication-tag tag-haptic">Haptic</span>
+                                        <span class="publication-tag tag-VRAR">VR/AR</span>
+                                        <button class="abstract-toggle-btn ml-auto bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 px-3 py-1 rounded-full text-sm font-semibold hover:bg-amber-200 dark:hover:bg-amber-900">See Abstract</button>
+                                    </div>
+                                    <div class="abstract-container">
+                                        <div class="p-4 mt-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg border-l-4 border-amber-400">
+                                            <p class="abstract-content text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                Providing realistic and diverse tactile feedback during interactions with objects in virtual and augmented reality, various studies have explored the use of tangible proxies. However, tangible proxies face limitations due to their fixed physical properties, restricting the expression of various stiffness, weights, and shapes. To address these issues, we propose StringTouch, a device modulating sensations from proxies without obstructing the fingers to preserve finger sensitivity. StringTouch modulates sensations utilizing 0.2mm thin nylon threads tactor to deform fingers with 3DoF. In a user study (n = 12), our string structure showed better performance in distinguishing orientation, roughness, and weight than conditions using a 0.1 mm latex finger cot and was comparable to bare fingers in some of the discriminating tasks. Another experiment (n = 12) verified the device's capability to modulate orientation, stiffness, and weight perceptions. Finally, in a user study (n = 10) in proxy-based VR scenarios (pouring water, touching a teddy bear, touching a bottle), participants preferred StringTouch over bare finger interactions, with most of them reporting enhanced presence.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Publication Item 2 -->
+                                <div class="publication-item bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex-col" data-tags="inputdevice">
+                                    <div class="flex flex-col md:flex-row items-start gap-6">
+                                        <div class="flex-grow">
+                                            <h4 class="publication-title text-xl font-bold text-gray-900 dark:text-white">Over the Mouse: Navigating across the GUI with Finger-Lifting Operation Mouse</h4>
+                                            <p class="text-gray-700 dark:text-gray-300 mt-1"><strong>Y. Kim</strong>, Y. Yun, T. Kim, G. Lee</p>
+                                            <p class="text-gray-500 dark:text-gray-400 italic mt-1">ACM Conference on Human Factors in Computing Systems (CHI), 2025</p>
+                                        </div>
+                                        <div class="flex-shrink-0 mt-4 md:mt-0 space-x-2">
+                                             <a href="https://dl.acm.org/doi/full/10.1145/3706598.3713340" class="bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors">DOI</a>
+                                             <a href="assets/overthemouse.pdf" class="bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-800 transition-colors">Paper</a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex flex-wrap gap-2 items-center">
+                                        <span class="publication-tag tag-inputdevice">Input Device</span>
+                                        <button class="abstract-toggle-btn ml-auto bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 px-3 py-1 rounded-full text-sm font-semibold hover:bg-amber-200 dark:hover:bg-amber-900">See Abstract</button>
+                                    </div>
+                                    <div class="abstract-container">
+                                        <div class="p-4 mt-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg border-l-4 border-amber-400">
+                                            <p class="abstract-content text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                Modern GUIs often have a hierarchical structure, i.e., the z-axis of the GUI interaction space. However, conventional mice do not support effective navigation along the z-axis, leading to increased physical movements and cognitive load. To address this inefficiency, we present the OtMouse, a novel mouse that supports finger-lifting operations by detecting finger height through proximity sensors embedded beneath the mouse buttons, and ‘Over the Mouse’ (OtM) interface, a set of interaction techniques along the z-axis of the GUI interaction space with the OtMouse. Initially, We evaluated the performance of finger-lifting operations (n = 8) with the OtMouse for two- and three-level lifting discrimination tasks. Subsequently, we conducted a user study (n = 16) to compare the usability of the OtM interface and traditional mouse interface for three representative tasks: ‘Context Switch,’ ‘Video Preview,’ and ‘Map Zooming.’ The results showed that OtM interface was both qualitatively and quantitatively superior to using traditional mouse in the Context Switch and Video Preview tasks. This research contributes to the ongoing efforts to enhance mouse-based GUI navigation experiences.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                         <!-- Year 2024 -->
+                        <div class="year-section" data-year="2024">
+                            <h3 class="text-2xl font-bold mb-6 text-gray-700 dark:text-gray-300 border-b-2 border-gray-200 dark:border-gray-700 pb-2">2024</h3>
+                            <div class="space-y-8">
+                                <!-- Publication Item 3 -->
+                                <div class="publication-item bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex-col" data-tags="haptic">
+                                    <div class="flex flex-col md:flex-row items-start gap-6">
+                                        <div class="flex-grow">
+                                            <h4 class="publication-title text-xl font-bold text-gray-900 dark:text-white">Effects of Waveform, Time Delay, and Vibration Axis on the Perception of Vibrotactile Compliance Illusions on Smartphone Touchscreens</h4>
+                                            <p class="text-gray-700 dark:text-gray-300 mt-1">J. Han, <strong>Y. Kim</strong>, J. Jung, K. Park, G. Lee</p>
+                                            <p class="text-gray-500 dark:text-gray-400 italic mt-1">International Journal of Human-Computer Interaction (IJHCI), Aug 2024</p>
+                                        </div>
+                                        <div class="flex-shrink-0 mt-4 md:mt-0 space-x-2">
+                                             <a href="https://www.tandfonline.com/doi/full/10.1080/10447318.2024.2385184" class="bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors">DOI</a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex flex-wrap gap-2 items-center">
+                                        <span class="publication-tag tag-haptic">Haptic</span>
+                                        <button class="abstract-toggle-btn ml-auto bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 px-3 py-1 rounded-full text-sm font-semibold hover:bg-amber-200 dark:hover:bg-amber-900">See Abstract</button>
+                                    </div>
+                                    <div class="abstract-container">
+                                        <div class="p-4 mt-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg border-l-4 border-amber-400">
+                                            <p class="abstract-content text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                A hard surface feels soft or elastic when carefully controlled vibrations are provided to a pressing finger. This compliance illusion method may be employed to augment graphical objects on smartphone screens with compliant tactile properties. However, product engineers encounter practical questions when attempting to use the compliance illusion method for their products. Should the waveform be sinusoidal? How much time delay is acceptable? Should the vibration axis be perpendicular to the surface? A series of experiments was conducted to address these questions. The first experiment revealed that the waveform could not be distinguished in the context of the compliance illusion method when applied to typical smartphones. The second experiment demonstrated that time delays greater than 25 ms and the use of the three vibration axes could be distinguished in the same context. The third experiment explored how the perceptual qualities of the compliance illusion change with variations in time delay and the axis of vibration. Time delay had significant effects on softness, smoothness, elasticity, and unpleasantness, while the vibration axis had significant effects on softness, smoothness, and elasticity.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Publication Item 4 -->
+                                <div class="publication-item bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex-col" data-tags="haptic vrar">
+                                    <div class="flex flex-col md:flex-row items-start gap-6">
+                                        <div class="flex-grow">
+                                            <h4 class="publication-title text-xl font-bold text-gray-900 dark:text-white">QuadStretcher: A Forearm‑Worn Skin Stretch Display for Bare‑Hand Interaction in AR/VR</h4>
+                                            <p class="text-gray-700 dark:text-gray-300 mt-1">T. Kim, YA. Sim, <strong>Y. Kim</strong>, S. Kim, J. Lee, G. Lee</p>
+                                            <p class="text-gray-500 dark:text-gray-400 italic mt-1">ACM Conference on Human Factors in Computing Systems (CHI), 2024</p>
+                                        </div>
+                                        <div class="flex-shrink-0 mt-4 md:mt-0 space-x-2">
+                                             <a href="https://dl.acm.org/doi/10.1145/3613904.3642067" class="bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors">DOI</a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex flex-wrap gap-2 items-center">
+                                        <span class="publication-tag tag-haptic">Haptic</span>
+                                        <span class="publication-tag tag-VRAR">VR/AR</span>
+                                        <button class="abstract-toggle-btn ml-auto bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 px-3 py-1 rounded-full text-sm font-semibold hover:bg-amber-200 dark:hover:bg-amber-900">See Abstract</button>
+                                    </div>
+                                    <div class="abstract-container">
+                                        <div class="p-4 mt-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg border-l-4 border-amber-400">
+                                            <p class="abstract-content text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                The paradigm of bare-hand interaction has become increasingly prevalent in Augmented Reality (AR) and Virtual Reality (VR) environments, propelled by advancements in hand tracking technology. However, a significant challenge arises in delivering haptic feedback to users’ hands, due to the necessity for the hands to remain bare. In response to this challenge, recent research has proposed an indirect solution of providing haptic feedback to the forearm. In this work, we present QuadStretcher, a skin stretch display featuring four independently controlled stretching units surrounding the forearm. While achieving rich haptic expression, our device also eliminates the need for a grounding base on the forearm by using a pair of counteracting tactors, thereby reducing bulkiness. To assess the effectiveness of QuadStretcher in facilitating immersive bare-hand experiences, we conducted a comparative user evaluation (n = 20) with a baseline solution, Squeezer. The results confirmed that QuadStretcher outperformed Squeezer in terms of expressing force direction and heightening the sense of realism, particularly in 3-DoF VR interactions such as pulling a rubber band, hooking a fishing rod, and swinging a tennis racket. We further discuss the design insights gained from qualitative user interviews, presenting key takeaways for future forearm-haptic systems aimed at advancing AR/VR bare-hand experiences.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Publication Item 5 -->
+                                <div class="publication-item bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex-col" data-tags="inputdevice vrar">
+                                    <div class="flex flex-col md:flex-row items-start gap-6">
+                                        <div class="flex-grow">
+                                            <h4 class="publication-title text-xl font-bold text-gray-900 dark:text-white">Pressure‑Based Menu Selection on a Spherical Tangible Device</h4>
+                                            <p class="text-gray-700 dark:text-gray-300 mt-1">S. Kim, <strong>Y. Kim</strong>, G. Lee</p>
+                                            <p class="text-gray-500 dark:text-gray-400 italic mt-1">Extended Abstracts of the CHI Conference on Human Factors in Computing Systems (CHI EA), 2024</p>
+                                        </div>
+                                        <div class="flex-shrink-0 mt-4 md:mt-0 space-x-2">
+                                             <a href="https://dl.acm.org/doi/10.1145/3613905.3651090" class="bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors">DOI</a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex flex-wrap gap-2 items-center">
+                                        <span class="publication-tag tag-inputdevice">Input Device</span>
+                                        <span class="publication-tag tag-VRAR">VR/AR</span>
+
+                                        <button class="abstract-toggle-btn ml-auto bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 px-3 py-1 rounded-full text-sm font-semibold hover:bg-amber-200 dark:hover:bg-amber-900">See Abstract</button>
+                                    </div>
+                                    <div class="abstract-container">
+                                        <div class="p-4 mt-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg border-l-4 border-amber-400">
+                                            <p class="abstract-content text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                Spherical tangible devices are increasingly utilized in augmented and virtual reality applications due to their universal shape and ease of rotation. However, their form factor presents challenges in integrating input channels, such as buttons, leading to difficulties in menu selection and mode switching—functions essential for complex tasks. In this paper, we explored the utilization of air pressure to augment the input capabilities of spherical devices. We implemented linear menu selection using a pressure-sensitive spherical tangible device and evaluated its performance through three menu selection techniques: Dwell, Quick Release, and Stroke. Our results indicated that participants achieved an average success rate of 97.6% and an average selection time of 1,449 ms across all selection techniques for the 12 menu items. Dwell showed higher accuracy, while Quick Release and Stroke showed faster selection times. Lastly, we demonstrated the application of performing various tasks such as object manipulation, locomotion, and text input in a virtual reality environment using a spherical tangible device through pressure-based menu selection.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Publication Item 6 -->
+                                <div class="publication-item bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex-col" data-tags="locomotion vrar mldl">
+                                    <div class="flex flex-col md:flex-row items-start gap-6">
+                                        <div class="flex-grow">
+                                            <h4 class="publication-title text-xl font-bold text-gray-900 dark:text-white">GaitWay: Gait Data‑Based VR Locomotion Prediction System Robust to Visual Distraction</h4>
+                                            <p class="text-gray-700 dark:text-gray-300 mt-1"><strong>Y. Kim</strong>, S. Hwang, S. Kim</p>
+                                            <p class="text-gray-500 dark:text-gray-400 italic mt-1">Extended Abstracts of the CHI Conference on Human Factors in Computing Systems (CHI EA), 2024</p>
+                                        </div>
+                                        <div class="flex-shrink-0 mt-4 md:mt-0 space-x-2">
+                                             <a href="https://dl.acm.org/doi/10.1145/3613905.3651073" class="bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors">DOI</a>
+                                             <a href="assets/gaitway.pdf" class="bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-800 transition-colors">Paper</a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex flex-wrap gap-2 items-center">
+                                        <span class="publication-tag tag-VRAR">VR/AR</span>
+                                        <span class="publication-tag tag-locomotion">Locomotion</span>
+                                        <span class="publication-tag tag-MLDL">ML/DL</span>
+                                        <button class="abstract-toggle-btn ml-auto bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 px-3 py-1 rounded-full text-sm font-semibold hover:bg-amber-200 dark:hover:bg-amber-900">See Abstract</button>
+                                    </div>
+                                    <div class="abstract-container">
+                                        <div class="p-4 mt-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg border-l-4 border-amber-400">
+                                            <p class="abstract-content text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                In VR environments, user’s sense of presence is enhanced through natural locomotion. Redirected Walking (RDW) technology can provide a wider walking area by manipulating the trajectory of the user. Considering that the user’s future position enables a broader application of RDW, research has utilized gaze data combined with past positions to reduce prediction errors. However, in VR content that are replete with creatures and decorations, gaze dispersion may deteriorate the data quality. Thus, we propose an alternative system that utilizes gait data, GaitWay, which correlates directly to user locomotion. This study involved 11 participants navigating a visually distracting three-tiered VR environment while performing designated tasks. We employed a long short-term memory network for GaitWay to forecast positions two seconds ahead and evaluated the prediction accuracy. The findings demonstrated that incorporating gaze data significantly increased errors in highly-distracted settings, whereas GaitWay consistently reduced errors, regardless of the environmental complexity.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="year-section" data-year="2023">
+                            <h3 class="text-2xl font-bold mb-6 text-gray-700 dark:text-gray-300 border-b-2 border-gray-200 dark:border-gray-700 pb-2">2023</h3>
+                            <div class="space-y-8">
+                                <!-- Publication Item 3 -->
+                                <div class="publication-item bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex-col" data-tags="locomotion vrar">
+                                    <div class="flex flex-col md:flex-row items-start gap-6">
+                                        <div class="flex-grow">
+                                            <h4 class="publication-title text-xl font-bold text-gray-900 dark:text-white">Electrical, Vibrational, and Cooling Stimuli‑Based Redirected Walking: Comparison of Various Vestibular Stimulation‑Based Redirected Walking Systems</h4>
+                                            <p class="text-gray-700 dark:text-gray-300 mt-1">S. Hwang, J. Lee, <strong>Y. Kim</strong>, Y. Seo, S. Kim</p>
+                                            <p class="text-gray-500 dark:text-gray-400 italic mt-1">ACM Conference on Human Factors in Computing Systems (CHI), 2023</p>
+                                        </div>
+                                        <div class="flex-shrink-0 mt-4 md:mt-0 space-x-2">
+                                             <a href="https://dl.acm.org/doi/10.1145/3544548.3580862" class="bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors">DOI</a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex flex-wrap gap-2 items-center">
+                                        <span class="publication-tag tag-locomotion">Locomotion</span>
+                                        <span class="publication-tag tag-VRAR">VR/AR</span>
+                                        <button class="abstract-toggle-btn ml-auto bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 px-3 py-1 rounded-full text-sm font-semibold hover:bg-amber-200 dark:hover:bg-amber-900">See Abstract</button>
+                                    </div>
+                                    <div class="abstract-container">
+                                        <div class="p-4 mt-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg border-l-4 border-amber-400">
+                                            <p class="abstract-content text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                Redirected walking (RDW) is a technology that enables users to walk seamlessly in an enormous virtual space within a narrow real space while avoiding collisions with physical elements. Although RDW provides accurate proprioceptive sensations, redirection performance is limited by visual–vestibular inconsistencies. This study aims to support seamless walking in a VR environment by alleviating inconsistencies using four vestibular stimulations: noisy and directional galvanic vestibular stimulation, bone-conduction vibration, and caloric vestibular stimulation. The user study demonstrated that the stimulations successfully enable spatial expansion without impairing immersion and presence. Non-electrical stimulations (bone-conduction vibration and caloric vestibular stimulation) expanded the detection threshold, making them alternatives to electrical stimulations, and direction-based stimulation (directional galvanic vestibular stimulation) improved the user’s gait stability in RDW. Finally, the findings suggested improving the user experience for vestibular stimulation RDW either by lowering audio interference or increasing the synchronization between the RDW gain and the stimulation intensity.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Publication Item 4 -->
+                                <div class="publication-item bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex-col" data-tags="locomotion vrar">
+                                    <div class="flex flex-col md:flex-row items-start gap-6">
+                                        <div class="flex-grow">
+                                            <h4 class="publication-title text-xl font-bold text-gray-900 dark:text-white">Enhancing Seamless Walking in Virtual Reality: The Application of Bone Conduction Vibration in Redirected Walking</h4>
+                                            <p class="text-gray-700 dark:text-gray-300 mt-1">S. Hwang, <strong>Y. Kim</strong>, Y. Seo, S. Kim</p>
+                                            <p class="text-gray-500 dark:text-gray-400 italic mt-1">International Symposium on Mixed and Augmented Reality (ISMAR), 2023</p>
+                                        </div>
+                                        <div class="flex-shrink-0 mt-4 md:mt-0 space-x-2">
+                                             <a href="https://ieeexplore.ieee.org/document/10316524" class="bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors">DOI</a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex flex-wrap gap-2 items-center">
+                                        <span class="publication-tag tag-locomotion">Locomotion</span>
+                                        <span class="publication-tag tag-VRAR">VR/AR</span>
+                                        <button class="abstract-toggle-btn ml-auto bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 px-3 py-1 rounded-full text-sm font-semibold hover:bg-amber-200 dark:hover:bg-amber-900">See Abstract</button>
+                                    </div>
+                                    <div class="abstract-container">
+                                        <div class="p-4 mt-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg border-l-4 border-amber-400">
+                                            <p class="abstract-content text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                This study explored bone-conduction vibration (BCV) in redirected walking (RDW), a technology for seamless walking in large virtual spaces within confined physical areas, enhancing obstacle avoidance performance using nonelectrical vestibular stimulation without the side effects caused by electrical stimulation. We proposed four different BCV stimulation methods and evaluated their detection threshold (DT) extension performance and user experience in virtual reality (VR) conditions. The DT was successfully expanded from at least 23% to 45% under all BCV conditions while preserving the immersion and presence. Notably, user comfort increased when content sound was used for vestibular stimulation. Under the extended DT condition, a simulation study demonstrated that all BCV stimulation methods facilitated uninterrupted walking over extended distances when applying RDW to users with random movements. Thus, this research established the viability of using BCV in RDW applications and the potential for incorporating content sound into BCV stimulation techniques.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="year-section" data-year="2022">
+                            <h3 class="text-2xl font-bold mb-6 text-gray-700 dark:text-gray-300 border-b-2 border-gray-200 dark:border-gray-700 pb-2">2022</h3>
+                            <div class="space-y-8">
+                                <!-- Publication Item 3 -->
+                                <div class="publication-item bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex-col" data-tags="locomotion vrar">
+                                    <div class="flex flex-col md:flex-row items-start gap-6">
+                                        <div class="flex-grow">
+                                            <h4 class="publication-title text-xl font-bold text-gray-900 dark:text-white">REVES: Redirection Enhancement Using Four-Pole Vestibular Electrode Stimulation</h4>
+                                            <p class="text-gray-700 dark:text-gray-300 mt-1">S. Hwang, J. Lee, <strong>Y. Kim</strong>, S. Kim</p>
+                                            <p class="text-gray-500 dark:text-gray-400 italic mt-1">Extended Abstracts of the CHI Conference on Human Factors in Computing Systems (CHI EA), 2023</p>
+                                        </div>
+                                        <div class="flex-shrink-0 mt-4 md:mt-0 space-x-2">
+                                             <a href="https://dl.acm.org/doi/abs/10.1145/3491101.3519626" class="bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors">DOI</a>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 flex flex-wrap gap-2 items-center">
+                                        <span class="publication-tag tag-locomotion">Locomotion</span>
+                                        <span class="publication-tag tag-VRAR">VR/AR</span>
+                                        <button class="abstract-toggle-btn ml-auto bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300 px-3 py-1 rounded-full text-sm font-semibold hover:bg-amber-200 dark:hover:bg-amber-900">See Abstract</button>
+                                    </div>
+                                    <div class="abstract-container">
+                                        <div class="p-4 mt-4 bg-gray-100 dark:bg-gray-700/50 rounded-lg border-l-4 border-amber-400">
+                                            <p class="abstract-content text-gray-700 dark:text-gray-300 leading-relaxed">
+                                                Redirected walking (RDW) visually manipulates the movement of the virtual environment (VE) such that the movement of the real environment (RE) and VE are no longer matched 1:1. With RDW, users can overcome the spatial constraints of RE, such as furniture, walls, and columns, and freely move the wider VE using natural gait motion. However, when the intensity of visual manipulations increases, people notice the RDW manipulation owing to visual-vestibular inconsistency, and experience discomfort like motion sickness. To address visual-vestibular inconsistency, we modulated vestibular information in various directions to match the modulation of visual information using galvanic vestibular stimulation (GVS). We proposed a new RDW system—REVES: redirection enhancement using four-pole vestibular electrode stimulation. REVES stimulates the user’s vestibular system according to various visual modulation directions using four-pole GVS based on the proposed algorithm. REVES changed the detection threshold of RDW in three manipulation cases: rotation, translation, and walking direction.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- No Results Message -->
+                        <div id="no-results-message" class="hidden-filter text-center py-12">
+                            <i class="fas fa-search text-4xl text-gray-400 mb-4"></i>
+                            <p class="text-xl text-gray-500 dark:text-gray-400">No publications found matching your criteria.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Contact Section -->
+            <section id="contact" class="py-20 fade-in-section">
+                 <div class="container mx-auto px-6 text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">Get In Touch</h2>
+                    <div class="w-24 h-1 bg-amber-500 mx-auto mt-4"></div>
+                    <p class="mt-6 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                        If you have any questions about my research, feel free to reach out.
+                    </p>
+                    <div class="mt-8 flex justify-center items-center space-x-6 text-2xl">
+                        <a href="mailto:youngin@kaist.ac.kr" class="text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><i class="fas fa-envelope"></i></a>
+                        <a href="https://github.com/youngin3737" target="_blank" class="text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/youngin-kim-48624a2a2" target="_blank" class="text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://scholar.google.com/citations?user=sPl0gUgAAAAJ" target="_blank" class="text-gray-500 dark:text-gray-400 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"><i class="fas fa-graduation-cap"></i></a>
+
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 dark:bg-black text-white py-6">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; <span id="year"></span> YoungIn Kim. All Rights Reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set current year in footer
+            document.getElementById('year').textContent = new Date().getFullYear();
+
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const header = document.getElementById('header');
+            const homeContentWrapper = document.getElementById('home-content-wrapper');
+
+            // --- SCROLL-BASED ANIMATIONS ---
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                const viewportHeight = window.innerHeight;
+
+                // 1. Hero Section Fade-out Animation
+                const fadeEnd = viewportHeight * 0.8;
+                let opacity = 1 - (scrollY / fadeEnd);
+                opacity = Math.max(0, Math.min(1, opacity)); // Clamp between 0 and 1
+                
+                if (homeContentWrapper) {
+                    homeContentWrapper.style.opacity = opacity;
+                    homeContentWrapper.style.transform = `scale(${1 - (scrollY / (viewportHeight * 4))})`;
+                }
+
+
+                // 2. Header Style Change
+                if (scrollY > 50) {
+                    // 스크롤 시 필요한 클래스들을 한 번에 추가합니다.
+                    // 일반 모드 글자색: text-gray-800
+                    // 다크 모드 글자색: dark:text-gray-200
+                    header.classList.add(
+                        'bg-white/80', 'dark:bg-gray-900/80', 
+                        'backdrop-blur-md', 'shadow-sm', 
+                        'text-gray-800', 'dark:text-gray-200'
+                    );
+                    header.classList.remove('text-white');
+                } else {
+                    // 스크롤이 위로 올라가면 추가했던 클래스들을 모두 제거합니다.
+                    header.classList.remove(
+                        'bg-white/80', 'dark:bg-gray-900/80', 
+                        'backdrop-blur-md', 'shadow-sm', 
+                        'text-gray-800', 'dark:text-gray-200'
+                    );
+                    header.classList.add('text-white');
+                }
+            });
+
+
+            // Intersection Observer for fade-in animations for other sections
+            const sections = document.querySelectorAll('.fade-in-section');
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // Active navigation link highlighting on scroll
+            const navLinks = document.querySelectorAll('.nav-link');
+            const allSections = document.querySelectorAll('#main-content section');
+
+            const activateNavOnScroll = () => {
+                let current = '';
+                allSections.forEach(section => {
+                    const sectionTop = section.offsetTop + document.getElementById('main-content').offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            window.addEventListener('scroll', activateNavOnScroll);
+
+            // Dark Mode Toggle Script
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+            const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+            const htmlEl = document.documentElement;
+
+            function setTheme(theme) {
+                htmlEl.classList.remove('light', 'dark');
+                htmlEl.classList.add(theme);
+                localStorage.setItem('color-theme', theme);
+
+                if (theme === 'dark') {
+                    themeToggleLightIcon.classList.remove('hidden');
+                    themeToggleDarkIcon.classList.add('hidden');
+                } else {
+                    themeToggleDarkIcon.classList.remove('hidden');
+                    themeToggleLightIcon.classList.add('hidden');
+                }
+                window.dispatchEvent(new Event('scroll'));
+            }
+
+            if (localStorage.getItem('color-theme') === 'dark') {
+                setTheme('dark');
+            } else {
+                setTheme('light');
+            }
+
+            themeToggleBtn.addEventListener('click', () => {
+                const currentTheme = htmlEl.classList.contains('dark') ? 'light' : 'dark';
+                setTheme(currentTheme);
+            });
+            
+            // --- Publication Search and Filter ---
+            const searchIcon = document.getElementById('search-icon');
+            const searchContainer = document.getElementById('search-bar-container');
+            const searchInput = document.getElementById('search-input');
+            const filterContainer = document.getElementById('tag-filter-container');
+            const publicationItems = document.querySelectorAll('.publication-item');
+            const yearSections = document.querySelectorAll('.year-section');
+            const noResultsMessage = document.getElementById('no-results-message');
+
+            // Expand/Collapse search bar
+            searchIcon.addEventListener('click', () => {
+                searchContainer.classList.toggle('expanded');
+                if (searchContainer.classList.contains('expanded')) {
+                    searchInput.focus();
+                }
+            });
+
+            // Automatically collapse search bar when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchContainer.contains(e.target) && searchInput.value === '') {
+                    searchContainer.classList.remove('expanded');
+                }
+            });
+
+
+            // Combined filter function
+            const filterPublications = () => {
+                const searchQuery = searchInput.value.toLowerCase();
+                const activeTagBtn = filterContainer.querySelector('.tag-btn.active');
+                const selectedTag = activeTagBtn ? activeTagBtn.dataset.tag : 'all';
+                let visibleItemsCount = 0;
+
+                publicationItems.forEach(item => {
+                    const title = item.querySelector('.publication-title').textContent.toLowerCase();
+                    const tags = item.dataset.tags;
+
+                    const searchMatch = title.includes(searchQuery);
+                    const tagMatch = selectedTag === 'all' || tags.includes(selectedTag);
+
+                    if (searchMatch && tagMatch) {
+                        item.classList.remove('hidden-filter');
+                        visibleItemsCount++;
+                    } else {
+                        item.classList.add('hidden-filter');
+                    }
+                });
+
+                // Hide empty year sections
+                yearSections.forEach(section => {
+                    const visibleItems = section.querySelectorAll('.publication-item:not(.hidden-filter)');
+                    if (visibleItems.length > 0) {
+                        section.classList.remove('hidden-filter');
+                    } else {
+                        section.classList.add('hidden-filter');
+                    }
+                });
+
+                // Show/hide no results message
+                if (visibleItemsCount === 0) {
+                    noResultsMessage.classList.remove('hidden-filter');
+                } else {
+                    noResultsMessage.classList.add('hidden-filter');
+                }
+            };
+
+            // Event listeners
+            searchInput.addEventListener('input', filterPublications);
+            if (filterContainer) {
+                filterContainer.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON' && !e.target.classList.contains('active')) {
+                        filterContainer.querySelector('.active').classList.remove('active');
+                        e.target.classList.add('active');
+                        
+                        // Reset other filter buttons to default style
+                        filterContainer.querySelectorAll('.tag-btn').forEach(btn => {
+                            if (!btn.classList.contains('active')) {
+                                btn.style.backgroundColor = '';
+                                btn.style.color = '';
+                            }
+                        });
+
+                        filterPublications();
+                    }
+                });
+            }
+
+            // --- Publication Abstract Toggle ---
+            const toggleButtons = document.querySelectorAll('.abstract-toggle-btn');
+            
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const publicationItem = e.target.closest('.publication-item');
+                    const abstractContainer = publicationItem.querySelector('.abstract-container');
+                    
+                    const isVisible = abstractContainer.classList.contains('show');
+                    
+                    if (isVisible) {
+                        abstractContainer.classList.remove('show');
+                        e.target.textContent = 'See Abstract';
+                    } else {
+                        abstractContainer.classList.add('show');
+                        e.target.textContent = 'Hide Abstract';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
