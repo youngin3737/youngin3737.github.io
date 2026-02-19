@@ -1,10 +1,52 @@
 [
   {
+    "id": "master-thesis-prize",
+    "date": "2026-01-30",
+    "title": "I got an outstanding MS Thesis in School of Computing, KAIST for Year 2025!",
+    "thumbnail": "",
+    "tags": [
+      "Thesis",
+      "Award"
+    ],
+    "body": "I got a certificate of achievement for an outstanding MS Thesis! It is related to the paper that was accepted to the CHI'26! You can see the device named ConCon and its open-hardware with demo Unity scene in upcomming April!"
+  },
+  {
+    "id": "chi2026-paper",
+    "date": "2026-01-16",
+    "title": "ConCon accepted to CHI 2026",
+    "thumbnail": "",
+    "tags": [
+      "CHI",
+      "paper"
+    ],
+    "body": "Our paper, <span class=\\\"font-semibold\\\">\\\"ConCon: A Wrist-Worn Clutch-Coupled Force-Feedback Device for VR Controller\\\"</span>, was accepted to CHI 2026! Looking forward to presenting our work in Barcelona!"
+  },
+  {
+    "id": "uist2025-presentation",
+    "date": "2025-09-27",
+    "title": "I presented my paper StringTouch at Busan",
+    "thumbnail": "",
+    "tags": [
+      "UIST",
+      "paper presentation"
+    ],
+    "body": "I presented the paper \"StringTouch: A Non-occlusive 3DoF Haptic Interface Using String Structures for Modulating Finger Sensations\" in UIST 2025, Busan. You can find the paper in ACM DL or this hompage!"
+  },
+  {
+    "id": "ict2025-prize",
+    "date": "2025-09-15",
+    "title": "Our Team (Geppetto) won the Minister's Award for ICT Challenge 2025",
+    "thumbnail": "",
+    "tags": [
+      "Award"
+    ],
+    "body": "Our Team (Me, Kyunghwan, Taejun from KAIST HCI Lab) presented ConCon, which is a wrist-grounded 3DoF force feedback device compatible with existing VR controllers, enabling realistic haptic interactions without extra tracking, and won the Minister's Award for ICT Challenge 2025 in Republic of Korea!"
+  },
+  {
     "id": "uist2025-stringtouch",
     "date": "2025-08-14",
     "title": "StringTouch accepted to UIST 2025",
     "thumbnail": "images/news/uist2025_stringtouch.png",
-    "icon": "fa-newspaper",
     "tags": [
       "UIST",
       "Publication"
@@ -12,23 +54,21 @@
     "body": "Our paper, <span class=\"font-semibold\">\"StringTouch: A Non-occlusive 3DoF Haptic Interface Using String Structures for Modulating Finger Sensations\"</span>, was accepted to UIST 2025. Looking forward to presenting our work in Busan!"
   },
   {
-    "id": "uist2025-reviewer",
+    "id": "ismar2025-reviewer",
     "date": "2025-06-05",
-    "title": "Serving as a reviewer for UIST 2025",
+    "title": "Serving as a reviewer for ISMAR 2025",
     "thumbnail": "images/news/uist2025_reviewer.png",
-    "icon": "fa-pen-nib",
     "tags": [
       "Service",
-      "UIST"
+      "ISMAR"
     ],
-    "body": "I will be serving as a reviewer for the UIST 2025 conference. Honored to contribute to the HCI community."
+    "body": "I will be serving as a reviewer for the ISMAR 2025 conference. Honored to contribute to the HCI community."
   },
   {
     "id": "chi2025-otmouse",
     "date": "2025-03-20",
     "title": "OtMouse accepted to CHI 2025",
     "thumbnail": "images/news/chi2025_otmouse.png",
-    "icon": "fa-mouse",
     "tags": [
       "CHI",
       "Publication"
