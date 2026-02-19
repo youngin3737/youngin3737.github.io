@@ -35,7 +35,7 @@
       "vrar"
     ],
     "doi": "https://doi.org/10.1145/3746058.3759018",
-    "thumbnail": "images/pubs/tensionandgaze-thumbnail.png",
+    "thumbnail": "images/pubs/tensionandgaze-thumbnail.jpg",
     "abstract": "Gaze-interactive applications involve UI responses triggered by users’ gaze, which is often involuntary and reflexive. While it may not cause false input ‘registration’ in eye+hand contexts, it can still produce unintended chains of visual UI responses. Although designers strive to minimize potential distraction and visual irritation, gaze input inherently carries noise; our eyes are always-on, often unconsciously scanning the visual field as active sensors, making this a persistent and challenging issue.\nWe argue that always gaze-responsive applications may not be favored by consumers, particularly when they risk causing visual discomfort. As a simple yet potentially effective alternative, this work introduces Tension&Gaze interaction techniques, in which UI elements become gaze-responsive only during moments of finger-induced tension, e.g., pinching in XR or key pressing on PC. This allows users to engage with gaze-adaptive UI changes only when desired, maintaining a comfortable default viewing experience. We demonstrate four application scenarios: XR Museum and Cooking Room using Meta Quest Pro, and PC Youtube and Social Media using a Tobii eye tracker-equipped laptop."
   },
   {
