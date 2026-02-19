@@ -1,0 +1,38 @@
+[
+  {
+    "id": "uist2025-stringtouch",
+    "date": "2025-08-14",
+    "title": "StringTouch accepted to UIST 2025",
+    "thumbnail": "images/news/uist2025_stringtouch.png",
+    "icon": "fa-newspaper",
+    "tags": [
+      "UIST",
+      "Publication"
+    ],
+    "body": "Our paper, <span class=\"font-semibold\">\"StringTouch: A Non-occlusive 3DoF Haptic Interface Using String Structures for Modulating Finger Sensations\"</span>, was accepted to UIST 2025. Looking forward to presenting our work in Busan!"
+  },
+  {
+    "id": "uist2025-reviewer",
+    "date": "2025-06-05",
+    "title": "Serving as a reviewer for UIST 2025",
+    "thumbnail": "images/news/uist2025_reviewer.png",
+    "icon": "fa-pen-nib",
+    "tags": [
+      "Service",
+      "UIST"
+    ],
+    "body": "I will be serving as a reviewer for the UIST 2025 conference. Honored to contribute to the HCI community."
+  },
+  {
+    "id": "chi2025-otmouse",
+    "date": "2025-03-20",
+    "title": "OtMouse accepted to CHI 2025",
+    "thumbnail": "images/news/chi2025_otmouse.png",
+    "icon": "fa-mouse",
+    "tags": [
+      "CHI",
+      "Publication"
+    ],
+    "body": "Our paper, <span class=\"font-semibold\">\"Over the Mouse: Navigating across the GUI with Finger‑Lifting Operation Mouse\"</span>, was accepted to CHI 2025!"
+  }
+]

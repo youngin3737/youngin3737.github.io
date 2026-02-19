@@ -136,14 +136,19 @@
             box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.5);
         }
 
-        /* Publication Item Filter Animation */
+                /* Publication Item Filter Animation */
         .publication-item, .year-section, #no-results-message {
-            transition: opacity 0.4s ease, transform 0.4s ease, max-height 0.6s ease, padding 0.6s ease, margin 0.6s ease;
+            transition: opacity 0.38s ease,
+                        transform 0.38s ease,
+                        max-height 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        padding 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        margin 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        border-width 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
+            max-height: var(--mh, 1400px); /* JS will keep this synced to content height */
+            will-change: max-height, opacity, transform;
         }
-        .publication-item, .year-section {
-             max-height: 100000px; /* Large height to prevent clipping when abstracts expand */
-        }
+
         .hidden-filter {
             opacity: 0;
             transform: scale(0.95);
@@ -405,75 +410,18 @@
                         <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">News</h2>
                         <div class="w-24 h-1 bg-amber-500 mx-auto mt-4"></div>
                     </div>
-                    <div class="max-w-3xl mx-auto">
-                        
-                    <div class="max-w-3xl mx-auto">
-                        <div class="space-y-6">
-                            <!-- News Card 1 -->
-                            <a href="news.html#post-uist2025-stringtouch" class="news-card group block bg-white dark:bg-gray-800 p-4 md:p-6 rounded-lg shadow-sm">
-                                <div class="flex gap-4 items-start">
-                                    <div class="news-thumb relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                        <i class="fas fa-newspaper text-gray-400 dark:text-gray-500 text-2xl absolute"></i>
-                                        <img src="images/news/uist2025_stringtouch.png" alt="UIST 2025 thumbnail" class="w-full h-full object-cover relative z-10" loading="lazy" onerror="this.style.display='none';">
-                                    </div>
-                                    <div class="flex-grow">
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">August 14, 2025</p>
-                                        <h3 class="mt-1 text-lg font-semibold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors">
-                                            StringTouch accepted to UIST 2025
-                                        </h3>
-                                        <p class="mt-2 text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-3">
-                                            Our paper, "StringTouch: A Non-occlusive 3DoF Haptic Interface Using String Structures for Modulating Finger Sensations," was accepted to UIST 2025. Looking forward to presenting our work in Busan!
-                                        </p>
-                                        <span class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-amber-600 dark:text-amber-300">
-                                            Read more <i class="fas fa-arrow-right text-xs"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
 
-                            <!-- News Card 2 -->
-                            <a href="news.html#post-uist2025-reviewer" class="news-card group block bg-white dark:bg-gray-800 p-4 md:p-6 rounded-lg shadow-sm">
-                                <div class="flex gap-4 items-start">
-                                    <div class="news-thumb relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                        <i class="fas fa-pen-nib text-gray-400 dark:text-gray-500 text-2xl absolute"></i>
-                                        <img src="images/news/uist2025_reviewer.png" alt="UIST 2025 reviewer thumbnail" class="w-full h-full object-cover relative z-10" loading="lazy" onerror="this.style.display='none';">
-                                    </div>
-                                    <div class="flex-grow">
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">June 5, 2025</p>
-                                        <h3 class="mt-1 text-lg font-semibold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors">
-                                            Serving as a reviewer for UIST 2025
-                                        </h3>
-                                        <p class="mt-2 text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-3">
-                                            I will be serving as a reviewer for the UIST 2025 conference. Honored to contribute to the HCI community.
-                                        </p>
-                                        <span class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-amber-600 dark:text-amber-300">
-                                            Read more <i class="fas fa-arrow-right text-xs"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
+                    <div class="max-w-3xl mx-auto">
+                        <div id="news-loading" class="text-center py-10 text-gray-500 dark:text-gray-400">
+                            <i class="fas fa-spinner fa-spin text-3xl mb-3"></i>
+                            <p class="text-sm font-semibold">Loading news...</p>
+                        </div>
 
-                            <!-- News Card 3 -->
-                            <a href="news.html#post-chi2025-otmouse" class="news-card group block bg-white dark:bg-gray-800 p-4 md:p-6 rounded-lg shadow-sm">
-                                <div class="flex gap-4 items-start">
-                                    <div class="news-thumb relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                        <i class="fas fa-mouse text-gray-400 dark:text-gray-500 text-2xl absolute"></i>
-                                        <img src="images/news/chi2025_otmouse.png" alt="CHI 2025 thumbnail" class="w-full h-full object-cover relative z-10" loading="lazy" onerror="this.style.display='none';">
-                                    </div>
-                                    <div class="flex-grow">
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">March 20, 2025</p>
-                                        <h3 class="mt-1 text-lg font-semibold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors">
-                                            OtMouse accepted to CHI 2025
-                                        </h3>
-                                        <p class="mt-2 text-gray-700 dark:text-gray-300 leading-relaxed line-clamp-3">
-                                            Our paper, "Over the Mouse: Navigating across the GUI with Finger‑Lifting Operation Mouse," was accepted to CHI 2025!
-                                        </p>
-                                        <span class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-amber-600 dark:text-amber-300">
-                                            Read more <i class="fas fa-arrow-right text-xs"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </a>
+                        <div id="news-list" class="space-y-4"></div>
+
+                        <div id="news-empty" class="hidden text-center py-10">
+                            <i class="fas fa-newspaper text-3xl text-gray-400 mb-3"></i>
+                            <p class="text-gray-500 dark:text-gray-400">No news posts yet.</p>
                         </div>
 
                         <div class="mt-10 text-center">
@@ -481,8 +429,6 @@
                                 View all News <i class="fas fa-arrow-right text-sm"></i>
                             </a>
                         </div>
-                    </div>
-
                     </div>
                 </div>
             </section>
@@ -739,6 +685,74 @@
                     .replace(/'/g, '&#039;');
             };
 
+
+            // --- News: load preview (top 5) from JSON (data/news.json) ---
+            const newsLoading = document.getElementById('news-loading');
+            const newsList = document.getElementById('news-list');
+            const newsEmpty = document.getElementById('news-empty');
+
+            const formatNewsDate = (iso = '') => {
+                const d = new Date(iso);
+                if (Number.isNaN(d.getTime())) return iso;
+                return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            };
+
+            const buildNewsPreviewItem = (n) => {
+                const id = n?.id ? String(n.id) : '';
+                const title = n?.title ? String(n.title) : '';
+                const thumb = n?.thumbnail ? String(n.thumbnail) : '';
+                const icon = n?.icon ? String(n.icon) : 'fa-newspaper';
+                const dateIso = n?.date ? String(n.date) : '';
+
+                return `
+                    <a href="news.html#post-${escapeHtml(id)}" class="news-card group block bg-white dark:bg-gray-800 p-4 md:p-5 rounded-lg shadow-sm" aria-label="${escapeHtml(title)} (${escapeHtml(formatNewsDate(dateIso))})">
+                        <div class="flex gap-4 items-center">
+                            <div class="news-thumb relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                <i class="fas ${escapeHtml(icon)} text-gray-400 dark:text-gray-500 text-xl absolute"></i>
+                                ${thumb ? `<img src="${escapeHtml(thumb)}" alt="" class="w-full h-full object-cover relative z-10" loading="lazy" onerror="this.style.display='none';">` : ''}
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors">
+                                ${escapeHtml(title)}
+                            </h3>
+                            <i class="fas fa-arrow-right ml-auto text-sm text-amber-600 dark:text-amber-300 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </a>
+                `;
+            };
+
+            const loadNewsPreview = async () => {
+                if (!newsList) return;
+                try {
+                    const res = await fetch('data/news.json', { cache: 'no-store' });
+                    if (!res.ok) throw new Error(`Failed to load news.json (${res.status})`);
+                    const news = await res.json();
+
+                    const sorted = (news || []).slice().sort((a,b) => new Date(b.date) - new Date(a.date));
+                    const top = sorted.slice(0, 5);
+
+                    if (top.length === 0) {
+                        if (newsLoading) newsLoading.classList.add('hidden');
+                        if (newsEmpty) newsEmpty.classList.remove('hidden');
+                        return;
+                    }
+
+                    newsList.innerHTML = top.map(buildNewsPreviewItem).join('\n');
+                    if (newsLoading) newsLoading.classList.add('hidden');
+                } catch (err) {
+                    console.error(err);
+                    if (newsLoading) {
+                        newsLoading.innerHTML = `
+                            <i class="fas fa-triangle-exclamation text-3xl mb-3 text-amber-500"></i>
+                            <p class="text-sm font-semibold">Failed to load news.</p>
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-500">
+                                data/news.json 를 불러오지 못했어요. 웹서버에서 실행하거나 파일 경로/이름을 확인해 주세요.
+                            </p>
+                        `;
+                    }
+                }
+            };
+
+            loadNewsPreview();
             const buildTagSpans = (tags = []) => {
                 return (tags || [])
                     .map(t => {
@@ -853,6 +867,20 @@
                 const filterContainer = document.getElementById('tag-filter-container');
                 const noResultsMessage = document.getElementById('no-results-message');
 
+                // Keep max-height values synced to real content height.
+                // This restores smooth filter animations while preventing clipping when abstracts expand.
+                const setMH = (el, extra = 0) => {
+                    if (!el) return;
+                    el.style.setProperty('--mh', (el.scrollHeight + extra) + 'px');
+                };
+
+                const refreshPublicationHeights = () => {
+                    document.querySelectorAll('.publication-item').forEach(el => setMH(el, 120));
+                    document.querySelectorAll('.year-section').forEach(el => setMH(el, 220));
+                    setMH(noResultsMessage, 120);
+                };
+
+
                 // Expand/Collapse search bar
                 if (searchIcon && searchContainer && searchInput) {
                     searchIcon.addEventListener('click', () => {
@@ -881,6 +909,7 @@
                     let visibleItemsCount = 0;
 
                     publicationItems.forEach(item => {
+                        setMH(item, 120);
                         const title = item.querySelector('.publication-title')?.textContent?.toLowerCase() || '';
                         const tags = item.dataset.tags || '';
 
@@ -897,6 +926,7 @@
 
                     // Hide empty year sections
                     yearSections.forEach(section => {
+                        setMH(section, 220);
                         const visibleItems = section.querySelectorAll('.publication-item:not(.hidden-filter)');
                         if (visibleItems.length > 0) {
                             section.classList.remove('hidden-filter');
@@ -913,6 +943,10 @@
                             noResultsMessage.classList.add('hidden-filter');
                         }
                     }
+
+
+                    // Sync max-heights after filtering so transitions stay smooth
+                    requestAnimationFrame(refreshPublicationHeights);
                 };
 
                 // Event listeners
@@ -961,6 +995,8 @@
                             abstractContainer.style.maxHeight = (abstractContainer.scrollHeight + 40) + 'px';
                             button.textContent = 'Hide Abstract';
                         }
+
+                        requestAnimationFrame(refreshPublicationHeights);
                     });
 
                     // Keep opened abstracts sized correctly on resize
@@ -968,8 +1004,13 @@
                         document.querySelectorAll('.abstract-container.show').forEach(ac => {
                             ac.style.maxHeight = (ac.scrollHeight + 40) + 'px';
                         });
+                        requestAnimationFrame(refreshPublicationHeights);
                     });
                 }
+
+                // Initial max-height sync (prevents jumpy filter animations)
+                requestAnimationFrame(refreshPublicationHeights);
+
             };
 
             const loadPublications = async () => {

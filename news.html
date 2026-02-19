@@ -147,69 +147,20 @@
         <section class="py-16 fade-in-section">
             <div class="container mx-auto px-6">
                 <div class="max-w-4xl mx-auto space-y-8">
-                    <!-- Post 1 -->
-                    <article id="post-uist2025-stringtouch" class="news-post bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm scroll-mt-28">
-                        <div class="flex flex-col md:flex-row gap-6 items-start">
-                            <div class="relative w-full md:w-56 h-44 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                <i class="fas fa-newspaper text-gray-400 dark:text-gray-500 text-3xl absolute"></i>
-                                <img src="images/news/uist2025_stringtouch.png" alt="UIST 2025 thumbnail" class="w-full h-full object-cover relative z-10" loading="lazy" onerror="this.style.display='none';">
-                            </div>
-                            <div class="flex-grow">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">August 14, 2025</p>
-                                <h2 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">StringTouch accepted to UIST 2025</h2>
-                                <p class="mt-4 text-gray-700 dark:text-gray-300 leading-relaxed">
-                                    Our paper, <span class="font-semibold">"StringTouch: A Non-occlusive 3DoF Haptic Interface Using String Structures for Modulating Finger Sensations"</span>,
-                                    was accepted to UIST 2025. Looking forward to presenting our work in Busan!
-                                </p>
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">UIST</span>
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 dark:bg-gray-700/60 dark:text-gray-300">Publication</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
+                    <div id="news-loading" class="text-center py-10 text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+                        <p class="text-lg">Loading news...</p>
+                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-500">
+                            Tip: 로컬에서 file://로 열면 JSON 로딩이 막힐 수 있어요. 웹서버로 띄우면 정상 동작합니다.
+                        </p>
+                    </div>
 
-                    <!-- Post 2 -->
-                    <article id="post-uist2025-reviewer" class="news-post bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm scroll-mt-28">
-                        <div class="flex flex-col md:flex-row gap-6 items-start">
-                            <div class="relative w-full md:w-56 h-44 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                <i class="fas fa-pen-nib text-gray-400 dark:text-gray-500 text-3xl absolute"></i>
-                                <img src="images/news/uist2025_reviewer.png" alt="Reviewer thumbnail" class="w-full h-full object-cover relative z-10" loading="lazy" onerror="this.style.display='none';">
-                            </div>
-                            <div class="flex-grow">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">June 5, 2025</p>
-                                <h2 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">Serving as a reviewer for UIST 2025</h2>
-                                <p class="mt-4 text-gray-700 dark:text-gray-300 leading-relaxed">
-                                    I will be serving as a reviewer for the UIST 2025 conference. Honored to contribute to the HCI community.
-                                </p>
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">Service</span>
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 dark:bg-gray-700/60 dark:text-gray-300">UIST</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
+                    <div id="news-posts" class="space-y-8 hidden"></div>
 
-                    <!-- Post 3 -->
-                    <article id="post-chi2025-otmouse" class="news-post bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm scroll-mt-28">
-                        <div class="flex flex-col md:flex-row gap-6 items-start">
-                            <div class="relative w-full md:w-56 h-44 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                <i class="fas fa-mouse text-gray-400 dark:text-gray-500 text-3xl absolute"></i>
-                                <img src="images/news/chi2025_otmouse.png" alt="CHI 2025 thumbnail" class="w-full h-full object-cover relative z-10" loading="lazy" onerror="this.style.display='none';">
-                            </div>
-                            <div class="flex-grow">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">March 20, 2025</p>
-                                <h2 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">OtMouse accepted to CHI 2025</h2>
-                                <p class="mt-4 text-gray-700 dark:text-gray-300 leading-relaxed">
-                                    Our paper, <span class="font-semibold">"Over the Mouse: Navigating across the GUI with Finger‑Lifting Operation Mouse"</span>, was accepted to CHI 2025!
-                                </p>
-                                <div class="mt-4 flex flex-wrap gap-2">
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">CHI</span>
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 dark:bg-gray-700/60 dark:text-gray-300">Publication</span>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
+                    <div id="news-empty" class="hidden text-center py-12">
+                        <i class="fas fa-newspaper text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-xl text-gray-500 dark:text-gray-400">No news posts yet.</p>
+                    </div>
 
                     <div class="pt-6 text-center">
                         <a href="#news-hero" class="inline-flex items-center gap-2 text-sm font-semibold text-amber-600 dark:text-amber-300 hover:underline">
@@ -305,6 +256,103 @@
                 const currentTheme = htmlEl.classList.contains('dark') ? 'light' : 'dark';
                 setTheme(currentTheme);
             });
+
+            // --- News: load + render from JSON (data/news.json) ---
+            const newsLoading = document.getElementById('news-loading');
+            const newsPosts = document.getElementById('news-posts');
+            const newsEmpty = document.getElementById('news-empty');
+
+            const escapeHtml = (unsafe = '') => {
+                return String(unsafe)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            };
+
+            const formatDate = (iso = '') => {
+                const d = new Date(iso);
+                if (Number.isNaN(d.getTime())) return iso;
+                return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            };
+
+            const buildBadges = (tags = []) => {
+                if (!Array.isArray(tags) || tags.length === 0) return '';
+                return tags.map((t, i) => {
+                    const cls = (i === 0)
+                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+                        : 'bg-gray-100 text-gray-700 dark:bg-gray-700/60 dark:text-gray-300';
+                    return `<span class="px-3 py-1 rounded-full text-xs font-semibold ${cls}">${escapeHtml(t)}</span>`;
+                }).join('\n');
+            };
+
+            const buildPost = (p) => {
+                const id = p?.id ? String(p.id) : '';
+                const title = p?.title ? String(p.title) : '';
+                const dateIso = p?.date ? String(p.date) : '';
+                const thumb = p?.thumbnail ? String(p.thumbnail) : '';
+                const icon = p?.icon ? String(p.icon) : 'fa-newspaper';
+                const tags = Array.isArray(p?.tags) ? p.tags : [];
+                const bodyRaw = p?.body ? String(p.body) : '';
+                const bodyHtml = bodyRaw.includes('<') ? bodyRaw : escapeHtml(bodyRaw).replace(/\n/g, '<br>');
+
+                return `
+                    <article id="post-${escapeHtml(id)}" class="news-post bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm scroll-mt-28">
+                        <div class="flex flex-col md:flex-row gap-6 items-start">
+                            <div class="relative w-full md:w-56 h-44 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                <i class="fas ${escapeHtml(icon)} text-gray-400 dark:text-gray-500 text-3xl absolute"></i>
+                                ${thumb ? `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(title)} thumbnail" class="w-full h-full object-cover relative z-10" loading="lazy" onerror="this.style.display='none';">` : ''}
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">${escapeHtml(formatDate(dateIso))}</p>
+                                <h2 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">${escapeHtml(title)}</h2>
+                                <div class="mt-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+                                    ${bodyHtml}
+                                </div>
+                                <div class="mt-4 flex flex-wrap gap-2">
+                                    ${buildBadges(tags)}
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            };
+
+            const loadNews = async () => {
+                if (!newsPosts) return;
+                try {
+                    const res = await fetch('data/news.json', { cache: 'no-store' });
+                    if (!res.ok) throw new Error(`Failed to load news.json (${res.status})`);
+                    const news = await res.json();
+
+                    const sorted = (news || []).slice().sort((a,b) => new Date(b.date) - new Date(a.date));
+
+                    if (sorted.length === 0) {
+                        if (newsLoading) newsLoading.classList.add('hidden');
+                        if (newsEmpty) newsEmpty.classList.remove('hidden');
+                        return;
+                    }
+
+                    newsPosts.innerHTML = sorted.map(buildPost).join('\n');
+                    if (newsLoading) newsLoading.classList.add('hidden');
+                    newsPosts.classList.remove('hidden');
+                } catch (err) {
+                    console.error(err);
+                    if (newsLoading) {
+                        newsLoading.innerHTML = `
+                            <i class="fas fa-triangle-exclamation text-4xl mb-4 text-amber-500"></i>
+                            <p class="text-lg font-semibold">Failed to load news.</p>
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-500">
+                                data/news.json 를 불러오지 못했어요. 웹서버 환경에서 실행하거나, 파일 경로/이름이 맞는지 확인해 주세요.
+                            </p>
+                        `;
+                    }
+                }
+            };
+
+            loadNews();
+
         });
     </script>
 </body>
