@@ -277,7 +277,54 @@
             border-color: rgba(55, 65, 81, 0.9); /* gray-700 */
         }
 
-    </style>
+    
+        /* Publication thumbnail hover preview (0.5s delay) */
+        .pub-thumb {
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        .pub-thumb.preview-active {
+            transform: scale(1.03);
+            box-shadow: 0 18px 55px rgba(0, 0, 0, 0.18);
+            border-color: rgba(245, 158, 11, 0.55);
+        }
+        .dark .pub-thumb.preview-active {
+            box-shadow: 0 18px 55px rgba(0, 0, 0, 0.42);
+            border-color: rgba(252, 211, 77, 0.32);
+        }
+        #pub-image-preview {
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(10px) scale(0.98);
+            transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+        #pub-image-preview.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+        #pub-image-preview .preview-box {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+        }
+        .dark #pub-image-preview .preview-box {
+            background: rgba(17, 24, 39, 0.82);
+            border-color: rgba(252, 211, 77, 0.24);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+        }
+        #pub-image-preview img {
+            display: block;
+            max-width: min(560px, 82vw);
+            max-height: min(440px, 72vh);
+            object-fit: contain;
+        }
+</style>
     <script>
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
         if (localStorage.getItem('color-theme') === 'dark') {
@@ -338,8 +385,11 @@
                 </a>
             </div>
             <!-- Latest News Floating Box -->
-            <a href="#news" class="latest-news-float bg-gray-900/50 hover:bg-gray-900/80 transition-colors w-11/12 md:w-auto max-w-2xl p-4 rounded-xl mb-8">
-                <p class="text-sm font-semibold text-gray-200"><span class="font-bold text-amber-300">Latest News:</span> Our paper "StringTouch" has been accepted to UIST 2025!</p>
+            <a id="hero-latest-news-float" href="#news" class="latest-news-float bg-gray-900/50 hover:bg-gray-900/80 transition-colors w-11/12 md:w-auto max-w-2xl p-4 rounded-xl mb-8">
+                <p class="text-sm font-semibold text-gray-200">
+                    <span class="font-bold text-amber-300">Latest News:</span>
+                    <span id="hero-latest-news-title">Loading...</span>
+                </p>
             </a>
         </div>
     </section>
@@ -691,7 +741,10 @@
             const newsList = document.getElementById('news-list');
             const newsEmpty = document.getElementById('news-empty');
 
-            const formatNewsDate = (iso = '') => {
+            
+            const heroLatestNewsFloat = document.getElementById('hero-latest-news-float');
+            const heroLatestNewsTitle = document.getElementById('hero-latest-news-title');
+const formatNewsDate = (iso = '') => {
                 const d = new Date(iso);
                 if (Number.isNaN(d.getTime())) return iso;
                 return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -730,9 +783,23 @@
                     const sorted = (news || []).slice().sort((a,b) => new Date(b.date) - new Date(a.date));
                     const top = sorted.slice(0, 5);
 
-                    if (top.length === 0) {
+                    
+
+                    // Update hero Latest News (title only)
+                    const latest = sorted[0];
+                    if (heroLatestNewsFloat) {
+                        if (!latest || !latest.title) {
+                            heroLatestNewsFloat.classList.add('hidden');
+                        } else {
+                            heroLatestNewsFloat.classList.remove('hidden');
+                            if (heroLatestNewsTitle) heroLatestNewsTitle.textContent = String(latest.title);
+                            heroLatestNewsFloat.setAttribute('aria-label', `Latest News: ${String(latest.title)}`);
+                        }
+                    }
+if (top.length === 0) {
                         if (newsLoading) newsLoading.classList.add('hidden');
                         if (newsEmpty) newsEmpty.classList.remove('hidden');
+                        if (heroLatestNewsFloat) heroLatestNewsFloat.classList.add('hidden');
                         return;
                     }
 
@@ -740,6 +807,7 @@
                     if (newsLoading) newsLoading.classList.add('hidden');
                 } catch (err) {
                     console.error(err);
+                    if (heroLatestNewsFloat) heroLatestNewsFloat.classList.add('hidden');
                     if (newsLoading) {
                         newsLoading.innerHTML = `
                             <i class="fas fa-triangle-exclamation text-3xl mb-3 text-amber-500"></i>
@@ -975,6 +1043,55 @@
 
                 // --- Publication Abstract Toggle (event delegation) ---
                 if (publicationsList) {
+
+                    // Helper: animate abstract open/close without clipping the parent (publication item/year-section)
+                    const animateAbstract = (publicationItem, abstractContainer, open) => {
+                        const yearSection = publicationItem?.closest('.year-section');
+
+                        // Full content height (works even when collapsed)
+                        const target = (abstractContainer.scrollHeight + 40);
+
+                        // Make sure containers have enough max-height during the animation (prevents "snap back")
+                        if (open) {
+                            if (publicationItem) {
+                                publicationItem.style.setProperty('--mh', (publicationItem.scrollHeight + target + 180) + 'px');
+                            }
+                            if (yearSection) {
+                                yearSection.style.setProperty('--mh', (yearSection.scrollHeight + target + 260) + 'px');
+                            }
+                        }
+
+                        // Clean up previous transition handler (if user clicks quickly)
+                        if (abstractContainer._yk_onEnd) {
+                            abstractContainer.removeEventListener('transitionend', abstractContainer._yk_onEnd);
+                            abstractContainer._yk_onEnd = null;
+                        }
+
+                        const onEnd = (ev) => {
+                            if (ev.propertyName !== 'max-height') return;
+                            abstractContainer.removeEventListener('transitionend', onEnd);
+                            abstractContainer._yk_onEnd = null;
+                            // After animation settles, re-sync heights for smooth filtering + no clipping
+                            requestAnimationFrame(refreshPublicationHeights);
+                        };
+                        abstractContainer._yk_onEnd = onEnd;
+                        abstractContainer.addEventListener('transitionend', onEnd);
+
+                        if (open) {
+                            abstractContainer.classList.add('show');
+                            abstractContainer.style.maxHeight = '0px';
+                            // Force reflow so the browser sees 0px -> target transition
+                            abstractContainer.offsetHeight;
+                            abstractContainer.style.maxHeight = target + 'px';
+                        } else {
+                            // Set start height explicitly to avoid jumping
+                            abstractContainer.style.maxHeight = (abstractContainer.scrollHeight + 40) + 'px';
+                            abstractContainer.offsetHeight;
+                            abstractContainer.style.maxHeight = '0px';
+                            abstractContainer.classList.remove('show');
+                        }
+                    };
+
                     publicationsList.addEventListener('click', (e) => {
                         const button = e.target.closest('.abstract-toggle-btn');
                         if (!button) return;
@@ -986,17 +1103,12 @@
                         const isVisible = abstractContainer.classList.contains('show');
 
                         if (isVisible) {
-                            abstractContainer.style.maxHeight = '0px';
-                            abstractContainer.classList.remove('show');
+                            animateAbstract(publicationItem, abstractContainer, false);
                             button.textContent = 'See Abstract';
                         } else {
-                            abstractContainer.classList.add('show');
-                            // Add a small buffer to avoid clipping due to margin-collapsing edge cases
-                            abstractContainer.style.maxHeight = (abstractContainer.scrollHeight + 40) + 'px';
+                            animateAbstract(publicationItem, abstractContainer, true);
                             button.textContent = 'Hide Abstract';
                         }
-
-                        requestAnimationFrame(refreshPublicationHeights);
                     });
 
                     // Keep opened abstracts sized correctly on resize
@@ -1006,10 +1118,112 @@
                         });
                         requestAnimationFrame(refreshPublicationHeights);
                     });
+
+                    // --- Publication thumbnail hover preview (0.5s delay) ---
+                    // Shows full (uncropped) image in a floating popover.
+                    const preview = document.createElement('div');
+                    preview.id = 'pub-image-preview';
+                    preview.innerHTML = `<div class="preview-box"><img alt="Publication preview"></div>`;
+                    document.body.appendChild(preview);
+
+                    const previewImg = preview.querySelector('img');
+                    const previewBox = preview.querySelector('.preview-box');
+
+                    let hoverTimer = null;
+                    let activeThumb = null;
+
+                    const hidePreview = () => {
+                        if (hoverTimer) {
+                            clearTimeout(hoverTimer);
+                            hoverTimer = null;
+                        }
+                        if (activeThumb) {
+                            activeThumb.classList.remove('preview-active');
+                            activeThumb = null;
+                        }
+                        preview.classList.remove('show');
+                    };
+
+                    const positionPreview = (thumbEl) => {
+                        if (!thumbEl) return;
+
+                        const rect = thumbEl.getBoundingClientRect();
+                        const pad = 12;
+
+                        // Ensure we have a measurable box size
+                        const w = previewBox.offsetWidth || 360;
+                        const h = previewBox.offsetHeight || 260;
+
+                        let x = rect.right + pad;
+                        let y = rect.top;
+
+                        // flip horizontally if overflowing
+                        if (x + w + pad > window.innerWidth) {
+                            x = rect.left - w - pad;
+                        }
+                        x = Math.max(pad, Math.min(x, window.innerWidth - w - pad));
+
+                        // clamp vertically
+                        if (y + h + pad > window.innerHeight) {
+                            y = window.innerHeight - h - pad;
+                        }
+                        y = Math.max(pad, y);
+
+                        preview.style.left = x + 'px';
+                        preview.style.top = y + 'px';
+                    };
+
+                    const showPreviewFor = (thumbEl) => {
+                        if (!thumbEl) return;
+
+                        const img = thumbEl.querySelector('img');
+                        // Only show if the thumbnail image exists and is visible (not removed by onerror)
+                        if (!img || !img.getAttribute('src') || img.style.display === 'none') return;
+
+                        activeThumb = thumbEl;
+                        activeThumb.classList.add('preview-active');
+
+                        previewImg.src = img.getAttribute('src');
+                        previewImg.onload = () => {
+                            if (activeThumb === thumbEl) positionPreview(thumbEl);
+                        };
+
+                        positionPreview(thumbEl);
+                        preview.classList.add('show');
+                    };
+
+                    publicationsList.addEventListener('pointerover', (e) => {
+                        // Desktop hover only
+                        if (e.pointerType && e.pointerType !== 'mouse') return;
+
+                        const thumbEl = e.target.closest('.pub-thumb');
+                        if (!thumbEl) return;
+
+                        // If hovering same thumb again, do nothing
+                        if (activeThumb === thumbEl) return;
+
+                        hidePreview();
+                        hoverTimer = setTimeout(() => showPreviewFor(thumbEl), 500);
+                    });
+
+                    publicationsList.addEventListener('pointerout', (e) => {
+                        if (e.pointerType && e.pointerType !== 'mouse') return;
+
+                        const thumbEl = e.target.closest('.pub-thumb');
+                        if (!thumbEl) return;
+
+                        // Only hide when leaving the thumb element
+                        if (thumbEl && !thumbEl.contains(e.relatedTarget)) {
+                            hidePreview();
+                        }
+                    });
+
+                    window.addEventListener('scroll', hidePreview, { passive: true });
                 }
 
                 // Initial max-height sync (prevents jumpy filter animations)
                 requestAnimationFrame(refreshPublicationHeights);
+
 
             };
 
