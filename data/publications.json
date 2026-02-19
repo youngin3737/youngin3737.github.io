@@ -8,7 +8,7 @@
       "haptic",
       "vrar"
     ],
-    "thumbnail": "",
+    "thumbnail": "images/pubs/concon-thumbnail.png",
     "abstract": "Effective force feedback is critical for user immersion in VR. However, current solutions have limitations; ungrounded devices using propellers or air-jets often suffer from slow response times and bulky hardware, body-worn devices tend to hinder hand movement, and wrist-worn force-feedback devices usually restrict free wrist movement. To address these challenges, we present ConCon, a wrist-worn 3-DoF force-feedback device utilizing motors with electromagnetic clutches. ConCon's three actuation units apply force to wrist along the radial/ulnar-deviation, flexion/extension, and proximal/distal directions. Clutches can control force transmission continuously, discretely, or impulsively by suddenly releasing a loaded-state. They also enable unimpeded free movement by minimizing mechanical resistance. We first evaluated ConCon's technical performance, including force output, wrist manipulation range, wrist impedance while free movement, and clutch response time. Subsequently, a user study (N=12) across six VR scenarios (Slingshot, Door, Fishing, Handfan, Pistol, Spray) showed ConCon provided significantly higher fun, immersion, and realism than vibrotactile feedback."
   },
   {
@@ -22,7 +22,7 @@
     ],
     "doi": "https://dl.acm.org/doi/10.1145/3746059.3747658",
     "paper": "assets/stringTouch.pdf",
-    "thumbnail": "images/pubs/2025_stringtouch.png",
+    "thumbnail": "images/pubs/stringtouch-thumbnail.png",
     "abstract": "Providing realistic and diverse tactile feedback during interactions with objects in virtual and augmented reality, various studies have explored the use of tangible proxies. However, tangible proxies face limitations due to their fixed physical properties, restricting the expression of various stiffness, weights, and shapes. To address these issues, we propose StringTouch, a device modulating sensations from proxies without obstructing the fingers to preserve finger sensitivity. StringTouch modulates sensations utilizing 0.2mm thin nylon threads tactor to deform fingers with 3DoF. In a user study (n = 12), our string structure showed better performance in distinguishing orientation, roughness, and weight than conditions using a 0.1 mm latex finger cot and was comparable to bare fingers in some of the discriminating tasks. Another experiment (n = 12) verified the device's capability to modulate orientation, stiffness, and weight perceptions. Finally, in a user study (n = 10) in proxy-based VR scenarios (pouring water, touching a teddy bear, touching a bottle), participants preferred StringTouch over bare finger interactions, with most of them reporting enhanced presence."
   },
   {
@@ -35,7 +35,7 @@
       "vrar"
     ],
     "doi": "https://doi.org/10.1145/3746058.3759018",
-    "thumbnail": "",
+    "thumbnail": "images/pubs/tensionandgaze-thumbnail.png",
     "abstract": "Gaze-interactive applications involve UI responses triggered by users’ gaze, which is often involuntary and reflexive. While it may not cause false input ‘registration’ in eye+hand contexts, it can still produce unintended chains of visual UI responses. Although designers strive to minimize potential distraction and visual irritation, gaze input inherently carries noise; our eyes are always-on, often unconsciously scanning the visual field as active sensors, making this a persistent and challenging issue.\nWe argue that always gaze-responsive applications may not be favored by consumers, particularly when they risk causing visual discomfort. As a simple yet potentially effective alternative, this work introduces Tension&Gaze interaction techniques, in which UI elements become gaze-responsive only during moments of finger-induced tension, e.g., pinching in XR or key pressing on PC. This allows users to engage with gaze-adaptive UI changes only when desired, maintaining a comfortable default viewing experience. We demonstrate four application scenarios: XR Museum and Cooking Room using Meta Quest Pro, and PC Youtube and Social Media using a Tobii eye tracker-equipped laptop."
   },
   {
@@ -48,7 +48,7 @@
     ],
     "doi": "https://dl.acm.org/doi/full/10.1145/3706598.3713340",
     "paper": "assets/overthemouse.pdf",
-    "thumbnail": "images/pubs/2025_overthemouse.png",
+    "thumbnail": "images/pubs/otm-thumbnail.png",
     "abstract": "Modern GUIs often have a hierarchical structure, i.e., the z-axis of the GUI interaction space. However, conventional mice do not support effective navigation along the z-axis, leading to increased physical movements and cognitive load. To address this inefficiency, we present the OtMouse, a novel mouse that supports finger-lifting operations by detecting finger height through proximity sensors embedded beneath the mouse buttons, and ‘Over the Mouse’ (OtM) interface, a set of interaction techniques along the z-axis of the GUI interaction space with the OtMouse. Initially, We evaluated the performance of finger-lifting operations (n = 8) with the OtMouse for two- and three-level lifting discrimination tasks. Subsequently, we conducted a user study (n = 16) to compare the usability of the OtM interface and traditional mouse interface for three representative tasks: ‘Context Switch,’ ‘Video Preview,’ and ‘Map Zooming.’ The results showed that OtM interface was both qualitatively and quantitatively superior to using traditional mouse in the Context Switch and Video Preview tasks. This research contributes to the ongoing efforts to enhance mouse-based GUI navigation experiences."
   },
   {
@@ -60,7 +60,7 @@
       "haptic"
     ],
     "doi": "https://www.tandfonline.com/doi/full/10.1080/10447318.2024.2385184",
-    "thumbnail": "images/pubs/2024_ijhci_compliance.png",
+    "thumbnail": "images/pubs/dfeedback-thumbnail.png",
     "abstract": "A hard surface feels soft or elastic when carefully controlled vibrations are provided to a pressing finger. This compliance illusion method may be employed to augment graphical objects on smartphone screens with compliant tactile properties. However, product engineers encounter practical questions when attempting to use the compliance illusion method for their products. Should the waveform be sinusoidal? How much time delay is acceptable? Should the vibration axis be perpendicular to the surface? A series of experiments was conducted to address these questions. The first experiment revealed that the waveform could not be distinguished in the context of the compliance illusion method when applied to typical smartphones. The second experiment demonstrated that time delays greater than 25 ms and the use of the three vibration axes could be distinguished in the same context. The third experiment explored how the perceptual qualities of the compliance illusion change with variations in time delay and the axis of vibration. Time delay had significant effects on softness, smoothness, elasticity, and unpleasantness, while the vibration axis had significant effects on softness, smoothness, and elasticity."
   },
   {
@@ -73,7 +73,7 @@
       "vrar"
     ],
     "doi": "https://dl.acm.org/doi/10.1145/3613904.3642067",
-    "thumbnail": "images/pubs/2024_quadstretcher.png",
+    "thumbnail": "images/pubs/quadstretcher-thumbnail.png",
     "abstract": "The paradigm of bare-hand interaction has become increasingly prevalent in Augmented Reality (AR) and Virtual Reality (VR) environments, propelled by advancements in hand tracking technology. However, a significant challenge arises in delivering haptic feedback to users’ hands, due to the necessity for the hands to remain bare. In response to this challenge, recent research has proposed an indirect solution of providing haptic feedback to the forearm. In this work, we present QuadStretcher, a skin stretch display featuring four independently controlled stretching units surrounding the forearm. While achieving rich haptic expression, our device also eliminates the need for a grounding base on the forearm by using a pair of counteracting tactors, thereby reducing bulkiness. To assess the effectiveness of QuadStretcher in facilitating immersive bare-hand experiences, we conducted a comparative user evaluation (n = 20) with a baseline solution, Squeezer. The results confirmed that QuadStretcher outperformed Squeezer in terms of expressing force direction and heightening the sense of realism, particularly in 3-DoF VR interactions such as pulling a rubber band, hooking a fishing rod, and swinging a tennis racket. We further discuss the design insights gained from qualitative user interviews, presenting key takeaways for future forearm-haptic systems aimed at advancing AR/VR bare-hand experiences."
   },
   {
@@ -86,7 +86,7 @@
       "vrar"
     ],
     "doi": "https://dl.acm.org/doi/10.1145/3613905.3651090",
-    "thumbnail": "images/pubs/2024_pressure_menu.png",
+    "thumbnail": "images/pubs/ballcont-thumbnail.png",
     "abstract": "Spherical tangible devices are increasingly utilized in augmented and virtual reality applications due to their universal shape and ease of rotation. However, their form factor presents challenges in integrating input channels, such as buttons, leading to difficulties in menu selection and mode switching—functions essential for complex tasks. In this paper, we explored the utilization of air pressure to augment the input capabilities of spherical devices. We implemented linear menu selection using a pressure-sensitive spherical tangible device and evaluated its performance through three menu selection techniques: Dwell, Quick Release, and Stroke. Our results indicated that participants achieved an average success rate of 97.6% and an average selection time of 1,449 ms across all selection techniques for the 12 menu items. Dwell showed higher accuracy, while Quick Release and Stroke showed faster selection times. Lastly, we demonstrated the application of performing various tasks such as object manipulation, locomotion, and text input in a virtual reality environment using a spherical tangible device through pressure-based menu selection."
   },
   {
@@ -101,7 +101,7 @@
     ],
     "doi": "https://dl.acm.org/doi/10.1145/3613905.3651073",
     "paper": "assets/gaitway.pdf",
-    "thumbnail": "images/pubs/2024_gaitway.png",
+    "thumbnail": "images/pubs/gaitway-thumbnail.png",
     "abstract": "In VR environments, user’s sense of presence is enhanced through natural locomotion. Redirected Walking (RDW) technology can provide a wider walking area by manipulating the trajectory of the user. Considering that the user’s future position enables a broader application of RDW, research has utilized gaze data combined with past positions to reduce prediction errors. However, in VR content that are replete with creatures and decorations, gaze dispersion may deteriorate the data quality. Thus, we propose an alternative system that utilizes gait data, GaitWay, which correlates directly to user locomotion. This study involved 11 participants navigating a visually distracting three-tiered VR environment while performing designated tasks. We employed a long short-term memory network for GaitWay to forecast positions two seconds ahead and evaluated the prediction accuracy. The findings demonstrated that incorporating gaze data significantly increased errors in highly-distracted settings, whereas GaitWay consistently reduced errors, regardless of the environmental complexity."
   },
   {
@@ -114,7 +114,7 @@
       "vrar"
     ],
     "doi": "https://dl.acm.org/doi/10.1145/3544548.3580862",
-    "thumbnail": "images/pubs/2023_rdw_stimuli.png",
+    "thumbnail": "images/pubs/rdw-comparison-thumbnail.png",
     "abstract": "Redirected walking (RDW) is a technology that enables users to walk seamlessly in an enormous virtual space within a narrow real space while avoiding collisions with physical elements. Although RDW provides accurate proprioceptive sensations, redirection performance is limited by visual–vestibular inconsistencies. This study aims to support seamless walking in a VR environment by alleviating inconsistencies using four vestibular stimulations: noisy and directional galvanic vestibular stimulation, bone-conduction vibration, and caloric vestibular stimulation. The user study demonstrated that the stimulations successfully enable spatial expansion without impairing immersion and presence. Non-electrical stimulations (bone-conduction vibration and caloric vestibular stimulation) expanded the detection threshold, making them alternatives to electrical stimulations, and direction-based stimulation (directional galvanic vestibular stimulation) improved the user’s gait stability in RDW. Finally, the findings suggested improving the user experience for vestibular stimulation RDW either by lowering audio interference or increasing the synchronization between the RDW gain and the stimulation intensity."
   },
   {
@@ -127,7 +127,7 @@
       "vrar"
     ],
     "doi": "https://ieeexplore.ieee.org/document/10316524",
-    "thumbnail": "images/pubs/2023_bcv_rdw.png",
+    "thumbnail": "images/pubs/4pole-thumbnail.png",
     "abstract": "This study explored bone-conduction vibration (BCV) in redirected walking (RDW), a technology for seamless walking in large virtual spaces within confined physical areas, enhancing obstacle avoidance performance using nonelectrical vestibular stimulation without the side effects caused by electrical stimulation. We proposed four different BCV stimulation methods and evaluated their detection threshold (DT) extension performance and user experience in virtual reality (VR) conditions. The DT was successfully expanded from at least 23% to 45% under all BCV conditions while preserving the immersion and presence. Notably, user comfort increased when content sound was used for vestibular stimulation. Under the extended DT condition, a simulation study demonstrated that all BCV stimulation methods facilitated uninterrupted walking over extended distances when applying RDW to users with random movements. Thus, this research established the viability of using BCV in RDW applications and the potential for incorporating content sound into BCV stimulation techniques."
   },
   {
@@ -140,7 +140,7 @@
       "vrar"
     ],
     "doi": "https://dl.acm.org/doi/abs/10.1145/3491101.3519626",
-    "thumbnail": "images/pubs/2022_reves.png",
+    "thumbnail": "images/pubs/reves-thumbnail.png",
     "abstract": "Redirected walking (RDW) visually manipulates the movement of the virtual environment (VE) such that the movement of the real environment (RE) and VE are no longer matched 1:1. With RDW, users can overcome the spatial constraints of RE, such as furniture, walls, and columns, and freely move the wider VE using natural gait motion. However, when the intensity of visual manipulations increases, people notice the RDW manipulation owing to visual-vestibular inconsistency, and experience discomfort like motion sickness. To address visual-vestibular inconsistency, we modulated vestibular information in various directions to match the modulation of visual information using galvanic vestibular stimulation (GVS). We proposed a new RDW system—REVES: redirection enhancement using four-pole vestibular electrode stimulation. REVES stimulates the user’s vestibular system according to various visual modulation directions using four-pole GVS based on the proposed algorithm. REVES changed the detection threshold of RDW in three manipulation cases: rotation, translation, and walking direction."
   }
 ]
