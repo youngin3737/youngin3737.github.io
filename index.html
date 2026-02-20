@@ -64,6 +64,11 @@
         
         #home-content-wrapper {
              transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+             pointer-events: none; /* let hero background/word field receive interactions */
+        }
+        #home-content-wrapper a,
+        #home-content-wrapper button {
+            pointer-events: auto; /* keep buttons/links clickable */
         }
 
         /* This div pushes the main content down by 100vh */
@@ -238,6 +243,74 @@
             0%   { transform: translate(-50%, -50%) scale(0); opacity: 0.85; }
             100% { transform: translate(-50%, -50%) scale(var(--ripple-scale, 18)); opacity: 0; }
         }
+
+        /* HERO interactive word field (Human/Computer drag) */
+        #hero-wordfield {
+            position: absolute;
+            inset: 0;
+            z-index: 3; /* Above background, below hero content */
+            overflow: hidden;
+            pointer-events: none; /* allow clicks through except on tokens */
+        }
+        .hero-token {
+            position: absolute;
+            left: 0;
+            top: 0;
+            will-change: transform;
+            user-select: none;
+            pointer-events: auto;
+            cursor: grab;
+        }
+        .hero-token:active { cursor: grabbing; }
+
+        .hero-token-inner {
+            display: inline-block;
+            transform: scale(1);
+            transition: transform 0.18s ease, opacity 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .hero-token.word .hero-token-inner {
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 0.4px;
+            opacity: 1;
+            text-shadow: 0 10px 26px rgba(0,0,0,0.18);
+        }
+        .hero-token.word.human .hero-token-inner { color: rgba(253, 224, 71, 0.22); }
+        .hero-token.word.computer .hero-token-inner { color: rgba(255, 255, 255, 0.20); }
+
+        .hero-token.logo .hero-token-inner {
+            width: 44px;
+            height: 44px;
+            opacity: 0.72;
+            filter: drop-shadow(0 18px 40px rgba(0,0,0,0.25));
+        }
+        .hero-token.logo img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .hero-token.dragging .hero-token-inner {
+            transform: scale(1.08);
+            opacity: 0.34;
+        }
+        .hero-token.near .hero-token-inner {
+            transform: scale(1.10);
+            opacity: 0.38;
+            text-shadow: 0 0 30px rgba(245,158,11,0.22);
+        }
+        .hero-token.logo.pop .hero-token-inner {
+            animation: heroTokenPop 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        @keyframes heroTokenPop {
+            0%   { transform: scale(0.55); opacity: 0.0; }
+            60%  { transform: scale(1.18); opacity: 1.0; }
+            100% { transform: scale(1.0); opacity: 0.72; }
+        }
+
 
         /* Research cards hover highlight */
         .research-card {
@@ -474,7 +547,7 @@
         }
 
         /* link groups inside publication cards */
-        .pub-links-compact { display: none; }
+        .pub-links-compact { display: none !important; }
         .pub-link-text {
             font-size: 0.90rem;
             font-weight: 700;
@@ -591,6 +664,7 @@
     <!-- Hero Section -->
     <section id="home">
         <div id="hero-ripple-container" aria-hidden="true"></div>
+        <div id="hero-wordfield" aria-hidden="true"></div>
         <div id="home-content-wrapper" class="h-full flex flex-col items-center justify-center text-white relative z-10">
             <div class="container mx-auto px-6 text-center flex-grow flex flex-col items-center justify-center">
                 <h1 class="text-4xl md:text-6xl font-bold leading-tight mb-4">
@@ -911,39 +985,360 @@
                 setTheme(currentTheme);
             });
 
-            // --- HERO click ripple effect ---
+            
+            // --- HERO interactive word field (Human/Computer drag) ---
             const homeSection = document.getElementById('home');
-            const rippleContainer = document.getElementById('hero-ripple-container');
+            const wordField = document.getElementById('hero-wordfield');
 
-            if (homeSection && rippleContainer) {
-                homeSection.addEventListener('pointerdown', (e) => {
-                    // Only left click for mouse
+            if (homeSection && wordField) {
+                const tokens = [];
+                let lastT = performance.now();
+
+                const rand = (a, b) => a + Math.random() * (b - a);
+                const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+                const bounds = { w: 0, h: 0 };
+                const updateBounds = () => {
+                    bounds.w = homeSection.clientWidth || window.innerWidth;
+                    bounds.h = homeSection.clientHeight || window.innerHeight;
+                };
+
+                const calcCount = () => {
+                    const w = bounds.w || window.innerWidth;
+                    const h = bounds.h || window.innerHeight;
+                    const base = Math.round((w * h) / 60000);
+                    return clamp(base, 10, 40);
+                };
+
+                const updateTransform = (tok) => {
+                    tok.el.style.transform = `translate3d(${tok.x}px, ${tok.y}px, 0) rotate(${tok.rot}deg)`;
+                };
+
+                const safeSpawn = (w, h) => {
+                    // Avoid the central text/button area so interaction doesn't interfere
+                    const ex = {
+                        x1: bounds.w * 0.28,
+                        x2: bounds.w * 0.72,
+                        y1: bounds.h * 0.22,
+                        y2: bounds.h * 0.78
+                    };
+
+                    for (let tries = 0; tries < 40; tries++) {
+                        const x = rand(0, Math.max(1, bounds.w - w));
+                        const y = rand(0, Math.max(1, bounds.h - h));
+                        const cx = x + w / 2;
+                        const cy = y + h / 2;
+
+                        if (!(cx > ex.x1 && cx < ex.x2 && cy > ex.y1 && cy < ex.y2)) {
+                            return { x, y };
+                        }
+                    }
+                    return {
+                        x: rand(0, Math.max(1, bounds.w - w)),
+                        y: rand(0, Math.max(1, bounds.h - h))
+                    };
+                };
+
+                const createToken = (kind, x, y) => {
+                    const el = document.createElement('div');
+                    el.className = `hero-token ${kind === 'logo' ? 'logo' : 'word ' + kind}`;
+                    el.dataset.kind = kind;
+
+                    const inner = document.createElement('div');
+                    inner.className = 'hero-token-inner';
+
+                    if (kind === 'logo') {
+                        const img = document.createElement('img');
+                        img.src = 'images/logo.png';
+                        img.alt = 'logo';
+                        img.loading = 'lazy';
+                        inner.appendChild(img);
+                    } else {
+                        inner.textContent = (kind === 'human') ? 'Human' : 'Computer';
+                    }
+
+                    el.appendChild(inner);
+                    wordField.appendChild(el);
+
+                    const rect = el.getBoundingClientRect();
+                    const w = rect.width || (kind === 'logo' ? 44 : 72);
+                    const h = rect.height || (kind === 'logo' ? 44 : 20);
+
+                    const rot = (kind === 'logo') ? 0 : rand(-10, 10);
+
+                    const tok = {
+                        kind,
+                        el,
+                        inner,
+                        x: clamp(x, 0, Math.max(0, bounds.w - w)),
+                        y: clamp(y, 0, Math.max(0, bounds.h - h)),
+                        w,
+                        h,
+                        rot,
+                        vx: rand(-18, 18),
+                        vy: rand(-12, 12),
+                        dragging: false,
+                        ox: 0,
+                        oy: 0,
+                        lockedUntil: 0
+                    };
+
+                    // Ensure it moves
+                    if (Math.abs(tok.vx) < 4) tok.vx = (tok.vx < 0 ? -1 : 1) * rand(6, 12);
+                    if (Math.abs(tok.vy) < 3) tok.vy = (tok.vy < 0 ? -1 : 1) * rand(4, 9);
+
+                    el._ykToken = tok;
+                    updateTransform(tok);
+
+                    // Drag handlers
+                    el.addEventListener('pointerdown', onPointerDown);
+
+                    return tok;
+                };
+
+                const removeToken = (tok) => {
+                    const idx = tokens.indexOf(tok);
+                    if (idx !== -1) tokens.splice(idx, 1);
+                    tok?.el?.remove();
+                };
+
+                let active = null;
+                let nearTarget = null;
+
+                const clearNear = () => {
+                    if (nearTarget?.el) nearTarget.el.classList.remove('near');
+                    if (active?.el) active.el.classList.remove('near');
+                    nearTarget = null;
+                };
+
+                const findNearestToken = (tok, radius = 78) => {
+                    const cx = tok.x + tok.w / 2;
+                    const cy = tok.y + tok.h / 2;
+
+                    let best = null;
+                    let bestD = radius;
+
+                    for (const other of tokens) {
+                        if (other === tok) continue;
+
+                        // Only word-word interactions for now
+                        if (tok.kind === 'logo' || other.kind === 'logo') continue;
+
+                        const ocx = other.x + other.w / 2;
+                        const ocy = other.y + other.h / 2;
+                        const d = Math.hypot(ocx - cx, ocy - cy);
+
+                        if (d < bestD) {
+                            bestD = d;
+                            best = other;
+                        }
+                    }
+                    return best;
+                };
+
+                function onPointerDown(e) {
                     if (e.pointerType === 'mouse' && e.button !== 0) return;
 
+                    const tok = this._ykToken;
+                    if (!tok) return;
+
+                    active = tok;
+                    clearNear();
+
+                    tok.dragging = true;
+                    tok.el.classList.add('dragging');
+                    tok.el.style.zIndex = '20';
+
                     const rect = homeSection.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
+                    const px = e.clientX - rect.left;
+                    const py = e.clientY - rect.top;
 
-                    // Max distance to a corner -> ripple scale
-                    const maxX = Math.max(x, rect.width - x);
-                    const maxY = Math.max(y, rect.height - y);
-                    const maxDist = Math.sqrt(maxX * maxX + maxY * maxY);
+                    tok.ox = px - tok.x;
+                    tok.oy = py - tok.y;
 
-                    const baseSize = 16; // matches .hero-ripple size
-                    const scale = Math.max(10, maxDist / baseSize);
+                    tok.el.setPointerCapture(e.pointerId);
 
-                    const ripple = document.createElement('span');
-                    ripple.className = 'hero-ripple';
-                    ripple.style.left = `${x}px`;
-                    ripple.style.top = `${y}px`;
-                    ripple.style.setProperty('--ripple-scale', scale.toFixed(2));
+                    tok.el.addEventListener('pointermove', onPointerMove);
+                    tok.el.addEventListener('pointerup', onPointerUp);
+                    tok.el.addEventListener('pointercancel', onPointerUp);
+                }
 
-                    rippleContainer.appendChild(ripple);
-                    ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
-                }, { passive: true });
+                function onPointerMove(e) {
+                    const tok = this._ykToken;
+                    if (!tok || !tok.dragging) return;
+
+                    const rect = homeSection.getBoundingClientRect();
+                    const px = e.clientX - rect.left;
+                    const py = e.clientY - rect.top;
+
+                    tok.x = clamp(px - tok.ox, 0, Math.max(0, bounds.w - tok.w));
+                    tok.y = clamp(py - tok.oy, 0, Math.max(0, bounds.h - tok.h));
+                    updateTransform(tok);
+
+                    const candidate = findNearestToken(tok, 78);
+                    if (candidate !== nearTarget) {
+                        clearNear();
+                        nearTarget = candidate;
+                        if (nearTarget) {
+                            nearTarget.el.classList.add('near');
+                            tok.el.classList.add('near');
+                        }
+                    }
+                }
+
+                const mergeToLogo = (a, b) => {
+                    const ax = a.x + a.w / 2, ay = a.y + a.h / 2;
+                    const bx = b.x + b.w / 2, by = b.y + b.h / 2;
+                    const mx = (ax + bx) / 2;
+                    const my = (ay + by) / 2;
+
+                    removeToken(a);
+                    removeToken(b);
+
+                    const logoX = clamp(mx - 22, 0, Math.max(0, bounds.w - 44));
+                    const logoY = clamp(my - 22, 0, Math.max(0, bounds.h - 44));
+
+                    const logoTok = createToken('logo', logoX, logoY);
+                    tokens.push(logoTok);
+
+                    logoTok.el.classList.add('pop');
+                    setTimeout(() => logoTok.el.classList.remove('pop'), 480);
+
+                    // Slow, gentle drift
+                    logoTok.vx *= 0.55;
+                    logoTok.vy *= 0.55;
+                };
+
+                const repelPair = (a, b) => {
+                    const acx = a.x + a.w / 2, acy = a.y + a.h / 2;
+                    const bcx = b.x + b.w / 2, bcy = b.y + b.h / 2;
+
+                    let dx = acx - bcx;
+                    let dy = acy - bcy;
+
+                    const dist = Math.hypot(dx, dy) || 1;
+                    dx /= dist;
+                    dy /= dist;
+
+                    const push = 90;
+                    const newAX = clamp(a.x + dx * push, 0, Math.max(0, bounds.w - a.w));
+                    const newAY = clamp(a.y + dy * push, 0, Math.max(0, bounds.h - a.h));
+                    const newBX = clamp(b.x - dx * push, 0, Math.max(0, bounds.w - b.w));
+                    const newBY = clamp(b.y - dy * push, 0, Math.max(0, bounds.h - b.h));
+
+                    const now = performance.now();
+                    a.lockedUntil = now + 260;
+                    b.lockedUntil = now + 260;
+
+                    const oldA = a.el.style.transform;
+                    const oldB = b.el.style.transform;
+
+                    a.x = newAX; a.y = newAY;
+                    b.x = newBX; b.y = newBY;
+
+                    const newAT = `translate3d(${a.x}px, ${a.y}px, 0) rotate(${a.rot}deg)`;
+                    const newBT = `translate3d(${b.x}px, ${b.y}px, 0) rotate(${b.rot}deg)`;
+
+                    a.el.animate([{ transform: oldA }, { transform: newAT }], {
+                        duration: 260,
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    });
+                    b.el.animate([{ transform: oldB }, { transform: newBT }], {
+                        duration: 260,
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    });
+
+                    a.el.style.transform = newAT;
+                    b.el.style.transform = newBT;
+
+                    // kick their drift away
+                    a.vx = dx * rand(10, 18);
+                    a.vy = dy * rand(6, 12);
+                    b.vx = -dx * rand(10, 18);
+                    b.vy = -dy * rand(6, 12);
+                };
+
+                function onPointerUp(e) {
+                    const tok = this._ykToken;
+                    if (!tok) return;
+
+                    tok.dragging = false;
+                    tok.el.classList.remove('dragging');
+                    tok.el.style.zIndex = '';
+
+                    tok.el.removeEventListener('pointermove', onPointerMove);
+                    tok.el.removeEventListener('pointerup', onPointerUp);
+                    tok.el.removeEventListener('pointercancel', onPointerUp);
+
+                    const candidate = findNearestToken(tok, 78);
+                    clearNear();
+
+                    if (candidate) {
+                        if (tok.kind !== candidate.kind) {
+                            // Human + Computer => logo!
+                            mergeToLogo(tok, candidate);
+                        } else {
+                            // Same type => repel
+                            repelPair(tok, candidate);
+                        }
+                    } else {
+                        // gentle new drift after a drag
+                        tok.vx = rand(-18, 18);
+                        tok.vy = rand(-12, 12);
+                        if (Math.abs(tok.vx) < 4) tok.vx = (tok.vx < 0 ? -1 : 1) * rand(6, 12);
+                        if (Math.abs(tok.vy) < 3) tok.vy = (tok.vy < 0 ? -1 : 1) * rand(4, 9);
+                    }
+
+                    active = null;
+                }
+
+                const step = (t) => {
+                    const dt = Math.min(0.033, (t - lastT) / 1000);
+                    lastT = t;
+
+                    for (const tok of tokens) {
+                        if (tok.dragging) continue;
+                        if (t < tok.lockedUntil) continue;
+
+                        tok.x += tok.vx * dt;
+                        tok.y += tok.vy * dt;
+
+                        // bounce
+                        if (tok.x < 0) { tok.x = 0; tok.vx *= -1; }
+                        if (tok.y < 0) { tok.y = 0; tok.vy *= -1; }
+                        if (tok.x > bounds.w - tok.w) { tok.x = bounds.w - tok.w; tok.vx *= -1; }
+                        if (tok.y > bounds.h - tok.h) { tok.y = bounds.h - tok.h; tok.vy *= -1; }
+
+                        updateTransform(tok);
+                    }
+                    requestAnimationFrame(step);
+                };
+
+                // Init
+                updateBounds();
+
+                const N = calcCount();
+                for (let i = 0; i < N; i++) {
+                    const kind = (i % 2 === 0) ? 'human' : 'computer';
+                    const approxW = (kind === 'human') ? 70 : 92;
+                    const approxH = 22;
+                    const pos = safeSpawn(approxW, approxH);
+                    const tok = createToken(kind, pos.x, pos.y);
+                    tokens.push(tok);
+                }
+
+                window.addEventListener('resize', () => {
+                    updateBounds();
+                    for (const tok of tokens) {
+                        tok.x = clamp(tok.x, 0, Math.max(0, bounds.w - tok.w));
+                        tok.y = clamp(tok.y, 0, Math.max(0, bounds.h - tok.h));
+                        updateTransform(tok);
+                    }
+                });
+
+                requestAnimationFrame(step);
             }
-
-            // --- Publications: load + render from JSON (data/publications.json) ---
+// --- Publications: load + render from JSON (data/publications.json) ---
             const publicationsLoading = document.getElementById('publications-loading');
             const publicationsContent = document.getElementById('publications-content');
             const publicationsList = document.getElementById('publications-list');
