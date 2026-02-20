@@ -324,6 +324,193 @@
             max-height: min(440px, 72vh);
             object-fit: contain;
         }
+
+
+        /* ------------------------------------------------------------
+           News Timeline (Index Page)
+        ------------------------------------------------------------ */
+        .news-timeline {
+            position: relative;
+            padding-left: 2.75rem; /* space for line + markers */
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+        .news-timeline::before {
+            content: "";
+            position: absolute;
+            left: 1.05rem;
+            top: 0.15rem;
+            bottom: 0.15rem;
+            width: 1px;
+            background: rgba(203, 213, 225, 0.9); /* slate-300-ish */
+        }
+        .dark .news-timeline::before {
+            background: rgba(71, 85, 105, 0.85); /* slate-600-ish */
+        }
+
+        .news-timeline-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.48rem 0.9rem;
+            border-radius: 0.95rem;
+            border: 1px solid rgba(226, 232, 240, 0.95);
+            background: rgba(255, 255, 255, 0.86);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.045);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        .dark .news-timeline-item {
+            border-color: rgba(55, 65, 81, 0.95);
+            background: rgba(31, 41, 55, 0.78);
+            box-shadow: 0 2px 14px rgba(0, 0, 0, 0.28);
+        }
+
+        .news-timeline-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+            border-color: rgba(245, 158, 11, 0.45);
+        }
+        .dark .news-timeline-item:hover {
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.38);
+        }
+
+        .news-timeline-marker {
+            position: absolute;
+            left: 1.05rem;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 9999px;
+            background: #f59e0b; /* amber-500 */
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.92);
+        }
+        .dark .news-timeline-marker {
+            box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.95);
+        }
+
+        .news-timeline-date {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: #6b7280; /* gray-500 */
+            min-width: 84px;
+            letter-spacing: 0.2px;
+        }
+        .dark .news-timeline-date {
+            color: #94a3b8; /* slate-400 */
+        }
+
+        .news-timeline-title {
+            font-size: 0.90rem; /* smaller than before */
+            font-weight: 600;
+            color: #111827;
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .dark .news-timeline-title { color: #f3f4f6; }
+
+        .news-timeline-item:hover .news-timeline-title { color: #d97706; } /* amber-600 */
+        .dark .news-timeline-item:hover .news-timeline-title { color: #fcd34d; } /* amber-300 */
+
+
+        /* ------------------------------------------------------------
+           Publications View Toggle + Compact Mode
+        ------------------------------------------------------------ */
+        .pub-view-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 9999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(229, 231, 235, 1);
+            background: rgba(255, 255, 255, 0.86);
+            color: rgba(75, 85, 99, 1);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+            user-select: none;
+        }
+        .dark .pub-view-btn {
+            border-color: rgba(75, 85, 99, 1);
+            background: rgba(55, 65, 81, 0.65);
+            color: rgba(229, 231, 235, 1);
+        }
+        .pub-view-btn:hover {
+            border-color: rgba(245, 158, 11, 0.55);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.16);
+            transform: translateY(-1px);
+        }
+        .pub-view-btn.active {
+            background: rgba(245, 158, 11, 1);
+            border-color: rgba(245, 158, 11, 1);
+            color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.16);
+            transform: none;
+        }
+        .dark .pub-view-btn.active {
+            background: rgba(245, 158, 11, 0.96);
+            border-color: rgba(245, 158, 11, 0.96);
+            color: #111827;
+        }
+
+        /* link groups inside publication cards */
+        .pub-links-compact { display: none; }
+        .pub-link-text {
+            font-size: 0.90rem;
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            color: #d97706; /* amber-600 */
+            opacity: 0.95;
+        }
+        .pub-link-text:hover { opacity: 1; }
+        .dark .pub-link-text { color: #fcd34d; }
+
+        /* Compact view overrides */
+        #publications.pub-compact .pub-thumb { display: none !important; }
+        #publications.pub-compact .pub-tags-row { display: none !important; }
+        #publications.pub-compact .abstract-container { 
+            display: none !important;
+            max-height: 0 !important;
+            opacity: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        #publications.pub-compact .publication-item {
+            padding: 0.9rem 1rem !important;
+        }
+        #publications.pub-compact .pub-top {
+            gap: 0.75rem !important;
+            flex-direction: row !important;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+        #publications.pub-compact .pub-links {
+            margin-top: 0 !important;
+        }
+        #publications.pub-compact .publication-title {
+            font-size: 1.05rem !important;
+        }
+        #publications.pub-compact .pub-authors {
+            font-size: 0.90rem !important;
+            margin-top: 0.25rem !important;
+        }
+        #publications.pub-compact .pub-venue {
+            font-size: 0.82rem !important;
+            margin-top: 0.12rem !important;
+        }
+
+        #publications.pub-compact .pub-links-detailed { display: none !important; }
+        #publications.pub-compact .pub-links-compact { 
+            display: flex !important;
+            gap: 0.9rem;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
 </style>
     <script>
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
@@ -358,7 +545,7 @@
             </div>
         </nav>
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 bg-gray-800/90 backdrop-blur-sm">
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-900 dark:text-white border-t border-gray-200/70 dark:border-gray-700/70">
              <a href="#about" class="block py-2">About</a>
              <a href="#research" class="block py-2">Interests</a>
              <a href="#news" class="block py-2">News</a>
@@ -467,7 +654,7 @@
                             <p class="text-sm font-semibold">Loading news...</p>
                         </div>
 
-                        <div id="news-list" class="space-y-4"></div>
+                        <div id="news-list" class="news-timeline"></div>
 
                         <div id="news-empty" class="hidden text-center py-10">
                             <i class="fas fa-newspaper text-3xl text-gray-400 mb-3"></i>
@@ -508,6 +695,15 @@
                             <button class="tag-btn tag-VRAR" data-tag="vrar">VR/AR</button>
                             <button class="tag-btn tag-locomotion" data-tag="locomotion">Locomotion</button>
                             <button class="tag-btn tag-MLDL" data-tag="mldl">MLDL</button>
+                        </div>
+                        <!-- View Mode Toggle -->
+                        <div id="pub-view-toggle" class="flex items-center gap-2">
+                            <button id="pub-view-detailed" type="button" class="pub-view-btn active" aria-label="Detailed view" title="Detailed view">
+                                <i class="fas fa-table-cells-large"></i>
+                            </button>
+                            <button id="pub-view-compact" type="button" class="pub-view-btn" aria-label="Compact view" title="Compact view">
+                                <i class="fas fa-list"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -750,25 +946,23 @@ const formatNewsDate = (iso = '') => {
                 return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
             };
 
+            const formatNewsMonthYear = (iso = '') => {
+                const d = new Date(iso);
+                if (Number.isNaN(d.getTime())) return iso;
+                return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            };
+
             const buildNewsPreviewItem = (n) => {
                 const id = n?.id ? String(n.id) : '';
                 const title = n?.title ? String(n.title) : '';
-                const thumb = n?.thumbnail ? String(n.thumbnail) : '';
-                const icon = n?.icon ? String(n.icon) : 'fa-newspaper';
                 const dateIso = n?.date ? String(n.date) : '';
+                const monthYear = formatNewsMonthYear(dateIso);
 
                 return `
-                    <a href="news.html#post-${escapeHtml(id)}" class="news-card group block bg-white dark:bg-gray-800 p-4 md:p-5 rounded-lg shadow-sm" aria-label="${escapeHtml(title)} (${escapeHtml(formatNewsDate(dateIso))})">
-                        <div class="flex gap-4 items-center">
-                            <div class="news-thumb relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                <i class="fas ${escapeHtml(icon)} text-gray-400 dark:text-gray-500 text-xl absolute"></i>
-                                ${thumb ? `<img src="${escapeHtml(thumb)}" alt="" class="w-full h-full object-cover relative z-10" loading="lazy" onerror="this.style.display='none';">` : ''}
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors">
-                                ${escapeHtml(title)}
-                            </h3>
-                            <i class="fas fa-arrow-right ml-auto text-sm text-amber-600 dark:text-amber-300 opacity-70 group-hover:opacity-100 transition-opacity"></i>
-                        </div>
+                    <a href="news.html#post-${escapeHtml(id)}" class="news-timeline-item group" aria-label="${escapeHtml(title)} (${escapeHtml(formatNewsDate(dateIso))})">
+                        <span class="news-timeline-marker" aria-hidden="true"></span>
+                        <span class="news-timeline-date">${escapeHtml(monthYear)}</span>
+                        <span class="news-timeline-title">${escapeHtml(title)}</span>
                     </a>
                 `;
             };
@@ -832,17 +1026,31 @@ if (top.length === 0) {
             };
 
             const buildLinkButtons = (pub) => {
-                const btns = [];
-                if (pub.doi) {
-                    btns.push(`<a href="${escapeHtml(pub.doi)}" class="bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors">DOI</a>`);
-                }
-                if (pub.paper) {
-                    btns.push(`<a href="${escapeHtml(pub.paper)}" class="bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-800 transition-colors">Paper</a>`);
-                }
-                if (pub.project) {
-                    btns.push(`<a href="${escapeHtml(pub.project)}" class="bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">Project</a>`);
-                }
-                return btns.join('\n');
+                const detailed = [];
+                const compact = [];
+
+                const pushLink = (label, href, detailedClass) => {
+                    if (!href) return;
+                    detailed.push(`<a href="${escapeHtml(href)}" class="${detailedClass}">${label}</a>`);
+                    compact.push(`<a href="${escapeHtml(href)}" class="pub-link-text">${label}</a>`);
+                };
+
+                pushLink('DOI', pub.doi, 'bg-amber-500 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-amber-600 transition-colors');
+                pushLink('Paper', pub.paper, 'bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-800 transition-colors');
+                pushLink('Project', pub.project, 'bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors');
+
+                if (detailed.length === 0) return '';
+
+                return `
+                    <div class="pub-links-detailed flex flex-wrap gap-2 justify-start md:justify-end">
+                        ${detailed.join('
+')}
+                    </div>
+                    <div class="pub-links-compact flex flex-wrap gap-3 justify-start md:justify-end">
+                        ${compact.join('
+')}
+                    </div>
+                `;
             };
 
             const buildPublicationItem = (pub) => {
@@ -870,21 +1078,21 @@ if (top.length === 0) {
 
                 return `
                     <div class="publication-item bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm flex-col" data-tags="${escapeHtml(dataTags)}">
-                        <div class="flex flex-col md:flex-row items-start gap-6">
+                        <div class="pub-top flex flex-col md:flex-row items-start gap-6">
                             <div class="pub-thumb relative w-full md:w-40 h-40 md:h-28 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                                 <i class="fas fa-book-open text-gray-400 dark:text-gray-500 text-3xl absolute"></i>
                                 ${thumb}
                             </div>
-                            <div class="flex-grow">
+                            <div class="pub-meta flex-grow min-w-0">
                                 <h4 class="publication-title text-xl font-bold text-gray-900 dark:text-white">${escapeHtml(pub.title)}</h4>
-                                <p class="text-gray-700 dark:text-gray-300 mt-1">${pub.authors || ''}</p>
-                                <p class="text-gray-500 dark:text-gray-400 italic mt-1">${escapeHtml(pub.venue || '')}</p>
+                                <p class="pub-authors text-gray-700 dark:text-gray-300 mt-1">${pub.authors || ''}</p>
+                                <p class="pub-venue text-gray-500 dark:text-gray-400 italic mt-1">${escapeHtml(pub.venue || '')}</p>
                             </div>
-                            <div class="flex-shrink-0 mt-4 md:mt-0 space-x-2">
+                            <div class="pub-links flex-shrink-0 mt-4 md:mt-0">
                                 ${buildLinkButtons(pub)}
                             </div>
                         </div>
-                        <div class="mt-4 flex flex-wrap gap-2 items-center">
+                        <div class="pub-tags-row mt-4 flex flex-wrap gap-2 items-center">
                             ${buildTagSpans(tags)}
                             ${abstractBtn}
                         </div>
@@ -935,6 +1143,12 @@ if (top.length === 0) {
                 const filterContainer = document.getElementById('tag-filter-container');
                 const noResultsMessage = document.getElementById('no-results-message');
 
+                const publicationsSection = document.getElementById('publications');
+                const viewDetailedBtn = document.getElementById('pub-view-detailed');
+                const viewCompactBtn = document.getElementById('pub-view-compact');
+
+                const isCompactView = () => publicationsSection && publicationsSection.classList.contains('pub-compact');
+
                 // Keep max-height values synced to real content height.
                 // This restores smooth filter animations while preventing clipping when abstracts expand.
                 const setMH = (el, extra = 0) => {
@@ -942,10 +1156,19 @@ if (top.length === 0) {
                     el.style.setProperty('--mh', (el.scrollHeight + extra) + 'px');
                 };
 
+                const getMHExtras = () => {
+                    const compact = isCompactView();
+                    return {
+                        item: compact ? 70 : 120,
+                        year: compact ? 150 : 220
+                    };
+                };
+
                 const refreshPublicationHeights = () => {
-                    document.querySelectorAll('.publication-item').forEach(el => setMH(el, 120));
-                    document.querySelectorAll('.year-section').forEach(el => setMH(el, 220));
-                    setMH(noResultsMessage, 120);
+                    const ex = getMHExtras();
+                    document.querySelectorAll('.publication-item').forEach(el => setMH(el, ex.item));
+                    document.querySelectorAll('.year-section').forEach(el => setMH(el, ex.year));
+                    setMH(noResultsMessage, ex.item);
                 };
 
 
@@ -966,7 +1189,50 @@ if (top.length === 0) {
                     });
                 }
 
-                const filterPublications = () => {
+                
+                // --- Publications view mode toggle (Detailed / Compact) ---
+                const applyPublicationViewMode = (mode) => {
+                    if (!publicationsSection) return;
+                    const compact = mode === 'compact';
+
+                    publicationsSection.classList.toggle('pub-compact', compact);
+
+                    if (viewDetailedBtn) viewDetailedBtn.classList.toggle('active', !compact);
+                    if (viewCompactBtn) viewCompactBtn.classList.toggle('active', compact);
+
+                    // In compact view: close any opened abstracts so hidden content doesn't affect height calculations
+                    if (compact && publicationsList) {
+                        publicationsList.querySelectorAll('.abstract-container.show').forEach(ac => {
+                            ac.classList.remove('show');
+                            ac.style.maxHeight = '0px';
+                        });
+                        publicationsList.querySelectorAll('.abstract-toggle-btn').forEach(btn => {
+                            btn.textContent = 'See Abstract';
+                        });
+                    }
+
+                    requestAnimationFrame(refreshPublicationHeights);
+                };
+
+                const savedView = (() => {
+                    try { return localStorage.getItem('pubViewMode'); } catch (_) { return null; }
+                })();
+
+                applyPublicationViewMode(savedView === 'compact' ? 'compact' : 'detailed');
+
+                if (viewDetailedBtn) {
+                    viewDetailedBtn.addEventListener('click', () => {
+                        try { localStorage.setItem('pubViewMode', 'detailed'); } catch (_) {}
+                        applyPublicationViewMode('detailed');
+                    });
+                }
+                if (viewCompactBtn) {
+                    viewCompactBtn.addEventListener('click', () => {
+                        try { localStorage.setItem('pubViewMode', 'compact'); } catch (_) {}
+                        applyPublicationViewMode('compact');
+                    });
+                }
+const filterPublications = () => {
                     const publicationItems = document.querySelectorAll('.publication-item');
                     const yearSections = document.querySelectorAll('.year-section');
 
@@ -974,10 +1240,12 @@ if (top.length === 0) {
                     const activeTagBtn = filterContainer?.querySelector('.tag-btn.active');
                     const selectedTag = activeTagBtn ? activeTagBtn.dataset.tag : 'all';
 
+                    const ex = getMHExtras();
+
                     let visibleItemsCount = 0;
 
                     publicationItems.forEach(item => {
-                        setMH(item, 120);
+                        setMH(item, ex.item);
                         const title = item.querySelector('.publication-title')?.textContent?.toLowerCase() || '';
                         const tags = item.dataset.tags || '';
 
@@ -994,7 +1262,7 @@ if (top.length === 0) {
 
                     // Hide empty year sections
                     yearSections.forEach(section => {
-                        setMH(section, 220);
+                        setMH(section, ex.year);
                         const visibleItems = section.querySelectorAll('.publication-item:not(.hidden-filter)');
                         if (visibleItems.length > 0) {
                             section.classList.remove('hidden-filter');
