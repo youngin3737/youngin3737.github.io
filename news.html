@@ -74,6 +74,59 @@
             box-shadow: 0 18px 55px rgba(0, 0, 0, 0.35);
             border-color: rgba(252, 211, 77, 0.24);
         }
+    
+
+        /* Floating Back-to-Main button (follows while scrolling) */
+        :root { --yk-header-h: 72px; }
+
+        #back-to-main-float {
+            position: fixed;
+            right: 1.25rem;
+            top: calc(var(--yk-header-h) + 14px);
+            z-index: 40; /* below header (z-50), above content */
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.62rem 0.92rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.90rem;
+            letter-spacing: 0.1px;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            background: rgba(255, 255, 255, 0.82);
+            color: rgba(17, 24, 39, 0.92);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 16px 46px rgba(0, 0, 0, 0.10);
+            transition: opacity 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        .dark #back-to-main-float {
+            border-color: rgba(55, 65, 81, 0.85);
+            background: rgba(17, 24, 39, 0.68);
+            color: rgba(243, 244, 246, 0.96);
+            box-shadow: 0 18px 55px rgba(0, 0, 0, 0.35);
+        }
+        #back-to-main-float:hover {
+            transform: translateY(-1px);
+            border-color: rgba(245, 158, 11, 0.45);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.14);
+        }
+        .dark #back-to-main-float:hover {
+            box-shadow: 0 22px 70px rgba(0, 0, 0, 0.45);
+        }
+        #back-to-main-float.hidden-float {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.98);
+            pointer-events: none;
+        }
+
+        @media (max-width: 480px) {
+            #back-to-main-float {
+                right: 0.9rem;
+                padding: 0.58rem 0.84rem;
+                font-size: 0.86rem;
+            }
+        }
+
     </style>
 
     <script>
@@ -119,6 +172,11 @@
         </div>
     </header>
 
+    <!-- Floating Back to Main (follows while scrolling) -->
+    <a id="back-to-main-float" href="index.html#news" class="hidden-float" aria-label="Back to Main">
+        <i class="fas fa-arrow-left"></i> Back to Main
+    </a>
+
     <!-- News Hero -->
     <section id="news-hero" class="pt-28 pb-14 text-white">
         <div class="container mx-auto px-6">
@@ -131,7 +189,7 @@
                     Updates on publications, talks, reviews, and research milestones.
                 </p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="index.html#news" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg px-5 py-2.5 transition-colors">
+                    <a id="back-to-main-hero" href="index.html#news" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg px-5 py-2.5 transition-colors">
                         <i class="fas fa-arrow-left"></i> Back to Main
                     </a>
                     <a href="#posts" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg px-5 py-2.5 transition-colors">
@@ -189,9 +247,40 @@
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenuButton.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
+                updateHeaderH();
+                updateFloatingBack();
             });
 
             const header = document.getElementById('header');
+
+
+            // Floating Back-to-Main button (appears when the hero button scrolls away)
+            const backHero = document.getElementById('back-to-main-hero');
+            const backFloat = document.getElementById('back-to-main-float');
+
+            const isInViewport = (el) => {
+                if (!el) return false;
+                const r = el.getBoundingClientRect();
+                return (r.bottom > 0) && (r.top < window.innerHeight);
+            };
+
+            const updateHeaderH = () => {
+                if (!header) return;
+                const h = header.getBoundingClientRect().height || 0;
+                document.documentElement.style.setProperty('--yk-header-h', `${Math.round(h)}px`);
+            };
+
+            const updateFloatingBack = () => {
+                if (!backFloat) return;
+                const show = (window.scrollY > 20) && backHero && !isInViewport(backHero);
+                backFloat.classList.toggle('hidden-float', !show);
+            };
+
+            updateHeaderH();
+            updateFloatingBack();
+            window.addEventListener('resize', () => { updateHeaderH(); updateFloatingBack(); });
+            // If landing via deep hash (news.html#post-...), make sure it's correct after browser scrolls.
+            setTimeout(updateFloatingBack, 60);
 
             // Header Style Change
             window.addEventListener('scroll', () => {
@@ -210,6 +299,9 @@
                     );
                     header.classList.add('text-white');
                 }
+
+                // Keep floating Back-to-Main button in sync
+                updateFloatingBack();
             });
 
             // Fade-in observer
