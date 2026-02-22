@@ -130,96 +130,78 @@
         }
 
     
-        /* ------------------------------------------------------------
-           Floating bar (Back to Main + Search) — News page
-        ------------------------------------------------------------ */
-        #news-floatbar {
+        /* Floating Search (title-only) */
+        #news-search-float {
             position: fixed;
-            left: 0;
-            right: 0;
-            top: 76px; /* JS will update (header height + gap) */
-            z-index: 45; /* below header (z-50) */
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: opacity 0.22s ease, transform 0.22s ease;
-            pointer-events: none;
-            color: #111827;
-        }
-        .dark #news-floatbar { color: #e5e7eb; }
-
-        #news-floatbar.show {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: auto;
-        }
-
-        #news-floatbar .news-floatbar-inner {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.55rem 0.75rem;
-            border-radius: 0.9rem;
-            background: rgba(255, 255, 255, 0.86);
-            border: 1px solid rgba(229, 231, 235, 0.85);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
-        }
-        .dark #news-floatbar .news-floatbar-inner {
-            background: rgba(17, 24, 39, 0.72);
-            border-color: rgba(55, 65, 81, 0.85);
-            box-shadow: 0 16px 55px rgba(0,0,0,0.35);
-        }
-
-        #news-floatbar .news-float-btn {
+            left: 1.5rem;
+            right: auto;
+            top: calc(var(--yk-header-h) + 14px);
+            z-index: 40; /* below header (z-50), above content */
             display: inline-flex;
             align-items: center;
-            gap: 0.45rem;
-            padding: 0.55rem 0.9rem;
-            border-radius: 0.75rem;
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: inherit;
-            background: rgba(245, 158, 11, 0.16);
-            border: 1px solid rgba(245, 158, 11, 0.24);
-            transition: background-color 0.18s ease, transform 0.18s ease;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        #news-floatbar .news-float-btn:hover {
-            background: rgba(245, 158, 11, 0.24);
-            transform: translateY(-1px);
-        }
-
-        #news-floatbar .news-float-search {
-            flex: 1 1 auto;
-            display: flex;
-            align-items: center;
             gap: 0.55rem;
-            padding: 0.55rem 0.8rem;
-            border-radius: 0.75rem;
-            background: rgba(255, 255, 255, 0.72);
-            border: 1px solid rgba(229, 231, 235, 0.9);
-            min-width: 160px;
+            padding: 0.58rem 0.86rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.90rem;
+            letter-spacing: 0.1px;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            background: rgba(255, 255, 255, 0.82);
+            color: rgba(17, 24, 39, 0.92);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 16px 46px rgba(0, 0, 0, 0.10);
+            transition: opacity 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
         }
-        .dark #news-floatbar .news-float-search {
-            background: rgba(31, 41, 55, 0.62);
-            border-color: rgba(55, 65, 81, 0.9);
+        .dark #news-search-float {
+            border-color: rgba(55, 65, 81, 0.85);
+            background: rgba(17, 24, 39, 0.68);
+            color: rgba(243, 244, 246, 0.96);
+            box-shadow: 0 18px 55px rgba(0, 0, 0, 0.35);
         }
-        #news-floatbar .news-float-search i { color: rgba(107, 114, 128, 0.9); }
-        .dark #news-floatbar .news-float-search i { color: rgba(148, 163, 184, 0.9); }
-
-        #news-floatbar .news-float-search input {
-            width: 100%;
+        #news-search-float:hover {
+            transform: translateY(-1px);
+            border-color: rgba(245, 158, 11, 0.45);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.14);
+        }
+        .dark #news-search-float:hover {
+            box-shadow: 0 22px 70px rgba(0, 0, 0, 0.45);
+        }
+        #news-search-float.hidden-float {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.98);
+            pointer-events: none;
+        }
+        #news-search-float i {
+            opacity: 0.75;
+        }
+        #news-search-input {
+            width: min(320px, 62vw);
             background: transparent;
             border: none;
             outline: none;
+            padding: 0;
+            margin: 0;
             color: inherit;
-            font-size: 0.95rem;
+            font-weight: 600;
         }
-        #news-floatbar .news-float-search input::placeholder { color: rgba(107, 114, 128, 0.75); }
-        .dark #news-floatbar .news-float-search input::placeholder { color: rgba(148, 163, 184, 0.72); }
+        #news-search-input::placeholder {
+            color: rgba(107, 114, 128, 0.9);
+        }
+        .dark #news-search-input::placeholder {
+            color: rgba(156, 163, 175, 0.9);
+        }
 
-</style>
+        @media (max-width: 480px) {
+            #news-search-float {
+                left: 0.9rem;
+                right: auto;
+                padding: 0.56rem 0.78rem;
+                font-size: 0.86rem;
+            }
+            #news-search-input { width: min(240px, 64vw); }
+        }
+
+    </style>
 
     <script>
         // Theme preload to avoid FOUC
@@ -264,32 +246,19 @@
         </div>
     </header>
 
-
-    <!-- Floating tools (Back to Main + Search) -->
-    <div id="news-floatbar" class="news-floatbar" aria-hidden="true">
-        <div class="container mx-auto px-6">
-            <div class="max-w-4xl mx-auto">
-                <div class="news-floatbar-inner">
-                    <a href="index.html#news" class="news-float-btn">
-                        <i class="fas fa-arrow-left"></i> Back to Main
-                    </a>
-                    <div class="news-float-search" role="search" aria-label="Search news titles">
-                        <i class="fas fa-search" aria-hidden="true"></i>
-                        <input id="news-search-input-float" type="text" placeholder="Search titles..." autocomplete="off">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
     <!-- Floating Back to Main (follows while scrolling) -->
     <a id="back-to-main-float" href="index.html#news" class="hidden-float" aria-label="Back to Main">
         <i class="fas fa-arrow-left"></i> Back to Main
     </a>
 
-    <!-- News Hero -->
+    
+    <!-- Floating Search (title only) -->
+    <div id="news-search-float" class="hidden-float" role="search" aria-label="Search news titles">
+        <i class="fas fa-magnifying-glass"></i>
+        <input id="news-search-input" type="text" placeholder="Search titles..." autocomplete="off" />
+    </div>
+
+<!-- News Hero -->
     <section id="news-hero" class="pt-28 pb-14 text-white">
         <div class="container mx-auto px-6">
             <div class="max-w-4xl">
@@ -300,19 +269,18 @@
                 <p class="mt-4 text-lg md:text-xl text-gray-200/90">
                     Updates on publications, talks, reviews, and research milestones.
                 </p>
-                
-                <div class="mt-8 flex flex-wrap items-center gap-3">
-                    <a href="index.html#news" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg px-5 py-2.5 transition-colors">
+                <div class="mt-8 flex flex-wrap gap-3">
+                    <a id="back-to-main-hero" href="index.html#news" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg px-5 py-2.5 transition-colors">
                         <i class="fas fa-arrow-left"></i> Back to Main
                     </a>
 
-                    <!-- Search (title only) -->
-                    <div class="relative flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white rounded-lg px-4 py-2.5 backdrop-blur-sm border border-white/10">
-                        <i class="fas fa-search text-white/80"></i>
+                    <div id="news-search-hero" class="relative inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/10 focus-within:border-amber-300/60 rounded-lg px-4 py-2.5 backdrop-blur-sm transition-colors">
+                        <i class="fas fa-magnifying-glass text-white/85"></i>
                         <input id="news-search-input-hero" type="text" placeholder="Search titles..." autocomplete="off"
-                               class="bg-transparent border-none focus:ring-0 focus:outline-none text-white placeholder-white/60 w-56 md:w-72">
+                               class="bg-transparent border-0 outline-none text-white placeholder:text-white/60 w-64 md:w-72 font-semibold text-sm" />
                     </div>
-                </div>
+
+</div>
             </div>
         </div>
     </section>
@@ -330,13 +298,7 @@
                         </p>
                     </div>
 
-                    
                     <div id="news-posts" class="space-y-8 hidden"></div>
-
-                    <div id="news-no-results" class="hidden text-center py-12">
-                        <i class="fas fa-magnifying-glass text-4xl text-gray-400 mb-4"></i>
-                        <p class="text-xl text-gray-500 dark:text-gray-400">No posts match your search.</p>
-                    </div>
 
                     <div id="news-empty" class="hidden text-center py-12">
                         <i class="fas fa-newspaper text-4xl text-gray-400 mb-4"></i>
@@ -380,6 +342,9 @@ const header = document.getElementById('header');
             // Floating Back-to-Main button (appears when the hero button scrolls away)
             const backHero = document.getElementById('back-to-main-hero');
             const backFloat = document.getElementById('back-to-main-float');
+            const searchFloat = document.getElementById('news-search-float');
+            const searchInput = document.getElementById('news-search-input');
+            const searchHeroInput = document.getElementById('news-search-input-hero');
 
             const isInViewport = (el) => {
                 if (!el) return false;
@@ -405,12 +370,41 @@ const header = document.getElementById('header');
                 const x = clamp(r.left, pad, maxX);
                 backFloat.style.left = `${Math.round(x)}px`;
                 backFloat.style.right = 'auto';
+                updateFloatingSearchPos();
             };
+
+            const updateFloatingSearchPos = () => {
+                if (!searchFloat || !backFloat) return;
+
+                const backR = backFloat.getBoundingClientRect();
+                const pad = 12;
+                const gap = 12;
+                const sw = searchFloat.getBoundingClientRect().width || 0;
+
+                let x = backR.left + backR.width + gap;
+                let topPx = null;
+
+                // If there's not enough horizontal room, stack below the Back button
+                if (x + sw > window.innerWidth - pad) {
+                    x = backR.left;
+                    topPx = backR.top + backR.height + 10;
+                }
+
+                const maxX = Math.max(pad, window.innerWidth - sw - pad);
+                x = clamp(x, pad, maxX);
+
+                searchFloat.style.left = `${Math.round(x)}px`;
+                searchFloat.style.right = 'auto';
+                searchFloat.style.top = (topPx !== null) ? `${Math.round(topPx)}px` : '';
+            };
+
 
             const updateFloatingBack = () => {
                 if (!backFloat) return;
                 const show = (window.scrollY > 20) && backHero && !isInViewport(backHero);
                 backFloat.classList.toggle('hidden-float', !show);
+                if (searchFloat) searchFloat.classList.toggle('hidden-float', !show);
+                updateFloatingSearchPos();
             };
 
             updateHeaderH();
@@ -492,6 +486,48 @@ const header = document.getElementById('header');
             const newsPosts = document.getElementById('news-posts');
             const newsEmpty = document.getElementById('news-empty');
 
+            const getSearchQuery = () => {
+                const raw = (searchHeroInput ? searchHeroInput.value : (searchInput ? searchInput.value : ''));
+                return String(raw || '').trim().toLowerCase();
+            };
+
+            const applyNewsSearch = () => {
+                if (!newsPosts) return;
+                const q = getSearchQuery();
+                const cards = newsPosts.querySelectorAll('.news-post');
+                cards.forEach(card => {
+                    const t = (card.querySelector('h2')?.textContent || '').toLowerCase();
+                    const match = (!q) || t.includes(q);
+                    card.style.display = match ? '' : 'none';
+                });
+            };
+
+            const clearSearch = () => {
+                if (searchInput) searchInput.value = '';
+                if (searchHeroInput) searchHeroInput.value = '';
+                applyNewsSearch();
+            };
+
+            const wireSearch = (inputEl) => {
+                if (!inputEl) return;
+                inputEl.addEventListener('input', () => {
+                    const v = inputEl.value || '';
+                    if (inputEl === searchHeroInput && searchInput) searchInput.value = v;
+                    if (inputEl === searchInput && searchHeroInput) searchHeroInput.value = v;
+                    applyNewsSearch();
+                });
+                inputEl.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Escape') {
+                        clearSearch();
+                        inputEl.blur();
+                    }
+                });
+            };
+
+            wireSearch(searchHeroInput);
+            wireSearch(searchInput);
+
+
             const escapeHtml = (unsafe = '') => {
                 return String(unsafe)
                     .replace(/&/g, '&amp;')
@@ -528,7 +564,7 @@ const header = document.getElementById('header');
                 const bodyHtml = bodyRaw.includes('<') ? bodyRaw : escapeHtml(bodyRaw).replace(/\n/g, '<br>');
 
                 return `
-                    <article id="post-${escapeHtml(id)}" data-title="${escapeHtml(title.toLowerCase())}" class="news-post bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm scroll-mt-28">
+                    <article id="post-${escapeHtml(id)}" class="news-post bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm scroll-mt-28">
                         <div class="flex flex-col md:flex-row gap-6 items-start">
                             <div class="relative w-full md:w-56 h-44 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                                 <i class="fas ${escapeHtml(icon)} text-gray-400 dark:text-gray-500 text-3xl absolute"></i>
@@ -567,6 +603,7 @@ const header = document.getElementById('header');
                     newsPosts.innerHTML = sorted.map(buildPost).join('\n');
                     if (newsLoading) newsLoading.classList.add('hidden');
                     newsPosts.classList.remove('hidden');
+                    applyNewsSearch();
                 } catch (err) {
                     console.error(err);
                     if (newsLoading) {
@@ -581,75 +618,7 @@ const header = document.getElementById('header');
                 }
             };
 
-
-            // --- News search (title only) ---
-            const newsSearchHero = document.getElementById('news-search-input-hero');
-            const newsSearchFloat = document.getElementById('news-search-input-float');
-            const newsNoResults = document.getElementById('news-no-results');
-
-            let newsQuery = '';
-
-            const applyNewsFilter = () => {
-                if (!newsPosts) return;
-
-                const q = newsQuery.trim().toLowerCase();
-                const articles = Array.from(newsPosts.querySelectorAll('article.news-post'));
-                let visible = 0;
-
-                for (const a of articles) {
-                    const key = String(a.dataset.title || '').toLowerCase();
-                    const match = !q || key.includes(q);
-                    a.classList.toggle('hidden', !match);
-                    if (match) visible++;
-                }
-
-                if (newsNoResults) {
-                    const showNoResults = (articles.length > 0 && visible === 0);
-                    newsNoResults.classList.toggle('hidden', !showNoResults);
-                }
-            };
-
-            const setNewsQuery = (val, source) => {
-                newsQuery = String(val || '');
-                if (newsSearchHero && source !== 'hero') newsSearchHero.value = newsQuery;
-                if (newsSearchFloat && source !== 'float') newsSearchFloat.value = newsQuery;
-                applyNewsFilter();
-            };
-
-            if (newsSearchHero) {
-                newsSearchHero.addEventListener('input', () => setNewsQuery(newsSearchHero.value, 'hero'));
-            }
-            if (newsSearchFloat) {
-                newsSearchFloat.addEventListener('input', () => setNewsQuery(newsSearchFloat.value, 'float'));
-            }
-
-            // --- Floating bar (Back to Main + Search) ---
-            const floatBar = document.getElementById('news-floatbar');
-            const heroSection = document.getElementById('news-hero');
-
-            const updateFloatBarTop = () => {
-                if (!floatBar || !header) return;
-                const h = header.getBoundingClientRect().height || 64;
-                floatBar.style.top = `${Math.round(h + 12)}px`;
-            };
-
-            const updateFloatBarVisibility = () => {
-                if (!floatBar || !heroSection) return;
-                const headerH = header ? (header.getBoundingClientRect().height || 64) : 64;
-                const threshold = Math.max(80, heroSection.offsetHeight - headerH - 12);
-                const show = window.scrollY > threshold;
-                floatBar.classList.toggle('show', show);
-                floatBar.setAttribute('aria-hidden', show ? 'false' : 'true');
-            };
-
-            updateFloatBarTop();
-            updateFloatBarVisibility();
-            window.addEventListener('resize', () => { updateFloatBarTop(); updateFloatBarVisibility(); });
-            window.addEventListener('scroll', updateFloatBarVisibility, { passive: true });
-
-            // Load posts, then apply current filter (if any)
-            loadNews().then(() => applyNewsFilter());
-
+            loadNews();
 
         });
     </script>
