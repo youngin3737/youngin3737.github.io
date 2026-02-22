@@ -3,7 +3,7 @@
     "id": "master-thesis-prize",
     "date": "2026-01-30",
     "title": "I got an outstanding MS Thesis in School of Computing, KAIST for Year 2025!",
-    "thumbnail": "",
+    "thumbnail": "images/news/soc-logo.png",
     "tags": [
       "Thesis",
       "Award"
@@ -14,7 +14,7 @@
     "id": "chi2026-paper",
     "date": "2026-01-16",
     "title": "ConCon accepted to CHI 2026",
-    "thumbnail": "",
+    "thumbnail": "images/news/chi2026-logo.jpg",
     "tags": [
       "CHI",
       "paper"
@@ -25,7 +25,7 @@
     "id": "uist2025-presentation",
     "date": "2025-09-27",
     "title": "I presented my paper StringTouch at Busan",
-    "thumbnail": "",
+    "thumbnail": "images/news/uist-presentation.jpg",
     "tags": [
       "UIST",
       "paper presentation"
@@ -36,7 +36,7 @@
     "id": "ict2025-prize",
     "date": "2025-09-15",
     "title": "Our Team (Geppetto) won the Minister's Award for ICT Challenge 2025",
-    "thumbnail": "",
+    "thumbnail": "imges/news/geppetto-image.jpg",
     "tags": [
       "Award"
     ],
@@ -46,7 +46,7 @@
     "id": "uist2025-stringtouch",
     "date": "2025-08-14",
     "title": "StringTouch accepted to UIST 2025",
-    "thumbnail": "images/news/uist2025_stringtouch.png",
+    "thumbnail": "images/news/uist2025-logo.png",
     "tags": [
       "UIST",
       "Publication"
@@ -57,7 +57,7 @@
     "id": "ismar2025-reviewer",
     "date": "2025-06-05",
     "title": "Serving as a reviewer for ISMAR 2025",
-    "thumbnail": "images/news/uist2025_reviewer.png",
+    "thumbnail": "images/news/ismar-reviewer.png",
     "tags": [
       "Service",
       "ISMAR"
@@ -68,7 +68,7 @@
     "id": "chi2025-otmouse",
     "date": "2025-03-20",
     "title": "OtMouse accepted to CHI 2025",
-    "thumbnail": "images/news/chi2025_otmouse.png",
+    "thumbnail": "images/news/chi2025-logo.png",
     "tags": [
       "CHI",
       "Publication"
