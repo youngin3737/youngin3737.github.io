@@ -81,7 +81,8 @@
 
         #back-to-main-float {
             position: fixed;
-            right: 1.25rem;
+            left: 1.5rem;
+            right: auto;
             top: calc(var(--yk-header-h) + 14px);
             z-index: 40; /* below header (z-50), above content */
             display: inline-flex;
@@ -121,7 +122,8 @@
 
         @media (max-width: 480px) {
             #back-to-main-float {
-                right: 0.9rem;
+                left: 0.9rem;
+                right: auto;
                 padding: 0.58rem 0.84rem;
                 font-size: 0.86rem;
             }
@@ -248,10 +250,10 @@
             mobileMenuButton.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
                 updateHeaderH();
+                updateFloatingBackX();
                 updateFloatingBack();
             });
-
-            const header = document.getElementById('header');
+const header = document.getElementById('header');
 
 
             // Floating Back-to-Main button (appears when the hero button scrolls away)
@@ -270,6 +272,20 @@
                 document.documentElement.style.setProperty('--yk-header-h', `${Math.round(h)}px`);
             };
 
+            const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+            // Keep floating Back-to-Main horizontally aligned with the hero button
+            const updateFloatingBackX = () => {
+                if (!backFloat || !backHero) return;
+                const r = backHero.getBoundingClientRect();
+                const pad = 12;
+                const w = backFloat.getBoundingClientRect().width || 0;
+                const maxX = Math.max(pad, window.innerWidth - w - pad);
+                const x = clamp(r.left, pad, maxX);
+                backFloat.style.left = `${Math.round(x)}px`;
+                backFloat.style.right = 'auto';
+            };
+
             const updateFloatingBack = () => {
                 if (!backFloat) return;
                 const show = (window.scrollY > 20) && backHero && !isInViewport(backHero);
@@ -277,10 +293,11 @@
             };
 
             updateHeaderH();
+            updateFloatingBackX();
             updateFloatingBack();
-            window.addEventListener('resize', () => { updateHeaderH(); updateFloatingBack(); });
+            window.addEventListener('resize', () => { updateHeaderH(); updateFloatingBackX(); updateFloatingBack(); });
             // If landing via deep hash (news.html#post-...), make sure it's correct after browser scrolls.
-            setTimeout(updateFloatingBack, 60);
+            setTimeout(() => { updateFloatingBackX(); updateFloatingBack(); }, 60);
 
             // Header Style Change
             window.addEventListener('scroll', () => {

@@ -1791,13 +1791,16 @@ if (top.length === 0) {
                                             <button id="yk-news-overlay-back" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg px-5 py-2.5 transition-colors">
                                                 <i class="fas fa-arrow-left"></i> Back to Main
                                             </button>
+                                            <button id="yk-news-overlay-browse" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg px-5 py-2.5 transition-colors">
+                                                Browse Posts <i class="fas fa-arrow-down text-sm"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </section>
 
                             <main class="yk-main text-gray-800 dark:text-gray-200 transition-colors duration-500">
-                                <section class="py-16">
+                                <section id="yk-news-overlay-posts-anchor" class="py-16">
                                     <div class="container mx-auto px-6 yk-fade">
                                         <div class="max-w-4xl mx-auto space-y-8">
                                             <div id="yk-news-overlay-loading" class="text-center py-10 text-gray-500 dark:text-gray-400">
@@ -1813,6 +1816,12 @@ if (top.length === 0) {
                                             <div id="yk-news-overlay-empty" class="hidden text-center py-12">
                                                 <i class="fas fa-newspaper text-4xl text-gray-400 mb-4"></i>
                                                 <p class="text-xl text-gray-500 dark:text-gray-400">No news posts yet.</p>
+                                            </div>
+
+                                            <div class="pt-6 text-center">
+                                                <button id="yk-news-overlay-top" class="inline-flex items-center gap-2 text-sm font-semibold text-amber-600 dark:text-amber-300 hover:underline">
+                                                    Back to top <i class="fas fa-arrow-up"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -1836,6 +1845,31 @@ if (top.length === 0) {
                     backBtn.addEventListener('click', () => {
                         // Let popstate drive the close animation
                         history.back();
+                    });
+                }
+
+                const browseBtn = overlay.querySelector('#yk-news-overlay-browse');
+                if (browseBtn) {
+                    browseBtn.addEventListener('click', () => {
+                        const anchor = overlay.querySelector('#yk-news-overlay-posts-anchor');
+                        if (!anchor || !ykNewsScrollEl) return;
+
+                        const tr = anchor.getBoundingClientRect();
+                        const cr = ykNewsScrollEl.getBoundingClientRect();
+                        const top = tr.top - cr.top;
+
+                        ykNewsScrollEl.scrollTo({
+                            top: Math.max(0, ykNewsScrollEl.scrollTop + top - 110),
+                            behavior: 'smooth'
+                        });
+                    });
+                }
+
+                const topBtn = overlay.querySelector('#yk-news-overlay-top');
+                if (topBtn) {
+                    topBtn.addEventListener('click', () => {
+                        if (!ykNewsScrollEl) return;
+                        ykNewsScrollEl.scrollTo({ top: 0, behavior: 'smooth' });
                     });
                 }
 
@@ -1961,12 +1995,11 @@ if (top.length === 0) {
                 // Load data while animation runs
                 const dataPromise = loadAllNewsData();
 
-                // Wait for slide-in to settle before revealing inner blocks
-                await waitForTransformTransition(ykNewsShellEl, 680);
-
-                // Fade in hero + main blocks
-                ykNewsOverlayEl.querySelectorAll('.yk-fade').forEach((el, idx) => {
-                    setTimeout(() => el.classList.add('show'), 40 + idx * 70);
+                // Fade in hero + main blocks while the slide transition runs (reduces perceived delay)
+                requestAnimationFrame(() => {
+                    ykNewsOverlayEl.querySelectorAll('.yk-fade').forEach((el, idx) => {
+                        setTimeout(() => el.classList.add('show'), 50 + idx * 70);
+                    });
                 });
 
                 // Render posts
