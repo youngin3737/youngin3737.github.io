@@ -38,6 +38,8 @@
             background-color: #111827; /* Default dark background */
         }
 
+        :root { --hero-logo-box: 144px; }
+
         /* Keyframes for the moving gradient background */
         @keyframes moveGradient {
             0% { background-position: 0% 50%; }
@@ -281,16 +283,20 @@
         .hero-token.word.computer .hero-token-inner { color: rgba(255, 255, 255, 0.20); }
 
         .hero-token.logo .hero-token-inner {
-            width: 144px;
-            height: 144px;
+            width: var(--hero-logo-box, 144px);
+            height: var(--hero-logo-box, 144px);
             opacity: 0.99;
             filter: drop-shadow(0 18px 40px rgba(0,0,0,0.25));
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .hero-token.logo img {
-            width: 70px;
-            height: 70px;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
             display: block;
+            pointer-events: none; /* ensure drag works on the visible logo */
         }
 
         .hero-token.dragging .hero-token-inner {
@@ -312,7 +318,22 @@
         }
 
 
-        /* Research cards hover highlight */
+        
+        /* Hero screen shake (used when logo + logo merges) */
+        @keyframes ykHeroShake {
+            0%   { transform: translate3d(0, 0, 0); }
+            15%  { transform: translate3d(-6px, 3px, 0); }
+            30%  { transform: translate3d(5px, -4px, 0); }
+            45%  { transform: translate3d(-4px, -2px, 0); }
+            60%  { transform: translate3d(4px, 4px, 0); }
+            75%  { transform: translate3d(-3px, 2px, 0); }
+            100% { transform: translate3d(0, 0, 0); }
+        }
+        .hero-shake {
+            animation: ykHeroShake 420ms ease-in-out;
+        }
+
+/* Research cards hover highlight */
         .research-card {
             border: 1px solid transparent;
             transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
@@ -507,7 +528,77 @@
         }
 
 
+        
         /* ------------------------------------------------------------
+           News Overlay (SPA-like transition for "View all News")
+        ------------------------------------------------------------ */
+        #yk-news-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 40; /* below header (z-50) */
+            display: none;
+        }
+        #yk-news-overlay.active { display: block; }
+
+        #yk-news-overlay .yk-shell {
+            position: absolute;
+            inset: 0;
+            transform-origin: top left;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 40px 140px rgba(0,0,0,0.35);
+            background: #111827;
+        }
+
+        #yk-news-overlay .yk-scroll {
+            position: absolute;
+            inset: 0;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #yk-news-overlay .yk-hero {
+            background-color: #111827;
+            background-image: radial-gradient(at 8% 13%, hsla(45, 90%, 60%, 0.38) 0px, transparent 50%),
+                              radial-gradient(at 86% 27%, hsla(35, 90%, 65%, 0.35) 0px, transparent 50%),
+                              radial-gradient(at 22% 83%, hsla(283,70%,63%,0.35) 0px, transparent 50%);
+            background-size: 200% 200%;
+            animation: moveGradient 20s ease infinite;
+        }
+
+        #yk-news-overlay .yk-main {
+            background: #f8f9fa;
+        }
+        .dark #yk-news-overlay .yk-main {
+            background: #111827;
+        }
+
+        #yk-news-overlay .yk-fade {
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+        #yk-news-overlay .yk-fade.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* News post card hover (scoped) */
+        #yk-news-overlay .yk-post {
+            border: 1px solid transparent;
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+        }
+        #yk-news-overlay .yk-post:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 55px rgba(0, 0, 0, 0.08);
+            border-color: rgba(245, 158, 11, 0.45);
+        }
+        .dark #yk-news-overlay .yk-post:hover {
+            box-shadow: 0 18px 55px rgba(0, 0, 0, 0.35);
+            border-color: rgba(252, 211, 77, 0.24);
+        }
+
+/* ------------------------------------------------------------
            Publications View Toggle + Compact Mode
         ------------------------------------------------------------ */
         .pub-view-btn {
@@ -989,6 +1080,7 @@
             // --- HERO interactive word field (Human/Computer drag) ---
             const homeSection = document.getElementById('home');
             const wordField = document.getElementById('hero-wordfield');
+            const rippleContainer = document.getElementById('hero-ripple-container');
 
             if (homeSection && wordField) {
                 const tokens = [];
@@ -997,7 +1089,35 @@
                 const rand = (a, b) => a + Math.random() * (b - a);
                 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
+                const readCssPx = (varName, fallback) => {
+                    try {
+                        const v = getComputedStyle(document.documentElement).getPropertyValue(varName);
+                        const n = parseFloat(v);
+                        return Number.isFinite(n) ? n : fallback;
+                    } catch (_) {
+                        return fallback;
+                    }
+                };
+
+                // Keep JS in sync with CSS via :root { --hero-logo-box: ...px; }
+                const LOGO_BOX = readCssPx('--hero-logo-box', 144);
+
+                // Physics tuning
+                const PHYS = {
+                    wordSnapRadius: 78,
+                    logoSnapRadius: Math.max(88, LOGO_BOX * 0.65),
+                    // How fast released velocity returns to its gentle drift target (bigger = stops faster)
+                    returnRate: 3.0, // per-second
+                    // Limit fling speed
+                    maxFlingWord: 900,
+                    maxFlingLogo: 650,
+                    // How strongly we keep the release velocity (smaller = gentler)
+                    flingScaleWord: 0.75,
+                    flingScaleLogo: 0.70
+                };
+
                 const bounds = { w: 0, h: 0 };
+
                 const updateBounds = () => {
                     bounds.w = homeSection.clientWidth || window.innerWidth;
                     bounds.h = homeSection.clientHeight || window.innerHeight;
@@ -1012,6 +1132,19 @@
 
                 const updateTransform = (tok) => {
                     tok.el.style.transform = `translate3d(${tok.x}px, ${tok.y}px, 0) rotate(${tok.rot}deg)`;
+                };
+
+                // Pointer position in hero-local coordinates (handles accidental parent scaling)
+                const toLocalPointer = (e) => {
+                    const rect = homeSection.getBoundingClientRect();
+                    const baseW = homeSection.clientWidth || rect.width || 1;
+                    const baseH = homeSection.clientHeight || rect.height || 1;
+                    const sx = rect.width / baseW;
+                    const sy = rect.height / baseH;
+
+                    const px = (e.clientX - rect.left) / (sx || 1);
+                    const py = (e.clientY - rect.top) / (sy || 1);
+                    return { x: px, y: py };
                 };
 
                 const safeSpawn = (w, h) => {
@@ -1039,6 +1172,37 @@
                     };
                 };
 
+                const spawnRipple = (x, y, scale = 60) => {
+                    if (!rippleContainer) return;
+                    const r = document.createElement('div');
+                    r.className = 'hero-ripple';
+                    r.style.left = `${x}px`;
+                    r.style.top = `${y}px`;
+                    r.style.setProperty('--ripple-scale', String(scale));
+                    rippleContainer.appendChild(r);
+                    r.addEventListener('animationend', () => r.remove(), { once: true });
+                };
+
+                const shakeScreen = () => {
+                    // Shake hero + header so it feels like the whole screen vibrates
+                    const homeEl = homeSection;
+                    const headerEl = document.getElementById('header');
+
+                    if (homeEl) {
+                        homeEl.classList.remove('hero-shake');
+                        // Force reflow so repeated shakes retrigger
+                        void homeEl.offsetWidth;
+                        homeEl.classList.add('hero-shake');
+                        setTimeout(() => homeEl.classList.remove('hero-shake'), 460);
+                    }
+                    if (headerEl) {
+                        headerEl.classList.remove('hero-shake');
+                        void headerEl.offsetWidth;
+                        headerEl.classList.add('hero-shake');
+                        setTimeout(() => headerEl.classList.remove('hero-shake'), 460);
+                    }
+                };
+
                 const createToken = (kind, x, y) => {
                     const el = document.createElement('div');
                     el.className = `hero-token ${kind === 'logo' ? 'logo' : 'word ' + kind}`;
@@ -1060,11 +1224,13 @@
                     el.appendChild(inner);
                     wordField.appendChild(el);
 
-                    const rect = el.getBoundingClientRect();
-                    const w = rect.width || (kind === 'logo' ? 44 : 72);
-                    const h = rect.height || (kind === 'logo' ? 44 : 20);
+                    const w = el.offsetWidth || (kind === 'logo' ? LOGO_BOX : 72);
+                    const h = el.offsetHeight || (kind === 'logo' ? LOGO_BOX : 20);
 
                     const rot = (kind === 'logo') ? 0 : rand(-10, 10);
+
+                    const driftVx = (kind === 'logo') ? rand(-10, 10) : rand(-18, 18);
+                    const driftVy = (kind === 'logo') ? rand(-8, 8) : rand(-12, 12);
 
                     const tok = {
                         kind,
@@ -1075,17 +1241,24 @@
                         w,
                         h,
                         rot,
-                        vx: rand(-18, 18),
-                        vy: rand(-12, 12),
+                        // current velocity
+                        vx: driftVx,
+                        vy: driftVy,
+                        // drift target velocity (we converge back to this after a fling)
+                        tvx: driftVx,
+                        tvy: driftVy,
                         dragging: false,
                         ox: 0,
                         oy: 0,
-                        lockedUntil: 0
+                        lockedUntil: 0,
+                        dragHist: []
                     };
 
-                    // Ensure it moves
+                    // Ensure it moves (drift) by default
                     if (Math.abs(tok.vx) < 4) tok.vx = (tok.vx < 0 ? -1 : 1) * rand(6, 12);
                     if (Math.abs(tok.vy) < 3) tok.vy = (tok.vy < 0 ? -1 : 1) * rand(4, 9);
+                    tok.tvx = tok.vx;
+                    tok.tvy = tok.vy;
 
                     el._ykToken = tok;
                     updateTransform(tok);
@@ -1111,7 +1284,7 @@
                     nearTarget = null;
                 };
 
-                const findNearestToken = (tok, radius = 78) => {
+                const findNearestToken = (tok, radius) => {
                     const cx = tok.x + tok.w / 2;
                     const cy = tok.y + tok.h / 2;
 
@@ -1121,8 +1294,14 @@
                     for (const other of tokens) {
                         if (other === tok) continue;
 
-                        // Only word-word interactions for now
-                        if (tok.kind === 'logo' || other.kind === 'logo') continue;
+                        // Interaction rules:
+                        // - word interacts with word (human/computer)
+                        // - logo interacts with logo
+                        if (tok.kind === 'logo') {
+                            if (other.kind !== 'logo') continue;
+                        } else {
+                            if (other.kind === 'logo') continue;
+                        }
 
                         const ocx = other.x + other.w / 2;
                         const ocy = other.y + other.h / 2;
@@ -1134,6 +1313,27 @@
                         }
                     }
                     return best;
+                };
+
+                const recordDragPoint = (tok, px, py, t) => {
+                    if (!tok.dragHist) tok.dragHist = [];
+                    tok.dragHist.push({ t, px, py });
+                    const cutoff = t - 140; // keep ~140ms window
+                    while (tok.dragHist.length && tok.dragHist[0].t < cutoff) tok.dragHist.shift();
+                    if (tok.dragHist.length > 12) tok.dragHist.shift();
+                };
+
+                const getReleaseVelocity = (tok) => {
+                    const hist = tok.dragHist || [];
+                    if (hist.length < 2) return null;
+                    const a = hist[0];
+                    const b = hist[hist.length - 1];
+                    const dt = (b.t - a.t) / 1000;
+                    if (!dt || dt <= 0) return null;
+                    return {
+                        vx: (b.px - a.px) / dt,
+                        vy: (b.py - a.py) / dt
+                    };
                 };
 
                 function onPointerDown(e) {
@@ -1149,12 +1349,12 @@
                     tok.el.classList.add('dragging');
                     tok.el.style.zIndex = '20';
 
-                    const rect = homeSection.getBoundingClientRect();
-                    const px = e.clientX - rect.left;
-                    const py = e.clientY - rect.top;
+                    const p = toLocalPointer(e);
+                    tok.ox = p.x - tok.x;
+                    tok.oy = p.y - tok.y;
 
-                    tok.ox = px - tok.x;
-                    tok.oy = py - tok.y;
+                    tok.dragHist = [];
+                    recordDragPoint(tok, p.x, p.y, performance.now());
 
                     tok.el.setPointerCapture(e.pointerId);
 
@@ -1167,15 +1367,16 @@
                     const tok = this._ykToken;
                     if (!tok || !tok.dragging) return;
 
-                    const rect = homeSection.getBoundingClientRect();
-                    const px = e.clientX - rect.left;
-                    const py = e.clientY - rect.top;
+                    const p = toLocalPointer(e);
 
-                    tok.x = clamp(px - tok.ox, 0, Math.max(0, bounds.w - tok.w));
-                    tok.y = clamp(py - tok.oy, 0, Math.max(0, bounds.h - tok.h));
+                    tok.x = clamp(p.x - tok.ox, 0, Math.max(0, bounds.w - tok.w));
+                    tok.y = clamp(p.y - tok.oy, 0, Math.max(0, bounds.h - tok.h));
                     updateTransform(tok);
 
-                    const candidate = findNearestToken(tok, 78);
+                    recordDragPoint(tok, p.x, p.y, performance.now());
+
+                    const snapR = (tok.kind === 'logo') ? PHYS.logoSnapRadius : PHYS.wordSnapRadius;
+                    const candidate = findNearestToken(tok, snapR);
                     if (candidate !== nearTarget) {
                         clearNear();
                         nearTarget = candidate;
@@ -1195,8 +1396,9 @@
                     removeToken(a);
                     removeToken(b);
 
-                    const logoX = clamp(mx - 22, 0, Math.max(0, bounds.w - 44));
-                    const logoY = clamp(my - 22, 0, Math.max(0, bounds.h - 44));
+                    const half = LOGO_BOX / 2;
+                    const logoX = clamp(mx - half, 0, Math.max(0, bounds.w - LOGO_BOX));
+                    const logoY = clamp(my - half, 0, Math.max(0, bounds.h - LOGO_BOX));
 
                     const logoTok = createToken('logo', logoX, logoY);
                     tokens.push(logoTok);
@@ -1204,9 +1406,55 @@
                     logoTok.el.classList.add('pop');
                     setTimeout(() => logoTok.el.classList.remove('pop'), 480);
 
-                    // Slow, gentle drift
+                    // A bit calmer drift for logos
                     logoTok.vx *= 0.55;
                     logoTok.vy *= 0.55;
+                    logoTok.tvx = logoTok.vx;
+                    logoTok.tvy = logoTok.vy;
+                };
+
+                const spawnWordPair = () => {
+                    const approxH = 26;
+                    const posH = safeSpawn(78, approxH);
+                    const tokH = createToken('human', posH.x, posH.y);
+                    tokens.push(tokH);
+
+                    const posC = safeSpawn(98, approxH);
+                    const tokC = createToken('computer', posC.x, posC.y);
+                    tokens.push(tokC);
+                };
+
+                const fuseLogos = (a, b) => {
+                    const ax = a.x + a.w / 2, ay = a.y + a.h / 2;
+                    const bx = b.x + b.w / 2, by = b.y + b.h / 2;
+                    const mx = (ax + bx) / 2;
+                    const my = (ay + by) / 2;
+
+                    removeToken(a);
+                    removeToken(b);
+
+                    // Big ripple + shake
+                    const diag = Math.hypot(bounds.w, bounds.h) || 1200;
+                    const big = Math.max(38, Math.min(120, diag / 16));
+                    const mid = Math.max(22, Math.min(80, diag / 28));
+                    spawnRipple(mx, my, big);
+                    spawnRipple(mx, my, mid);
+                    shakeScreen();
+
+                    // Make a new logo at the midpoint
+                    const half = LOGO_BOX / 2;
+                    const logoX = clamp(mx - half, 0, Math.max(0, bounds.w - LOGO_BOX));
+                    const logoY = clamp(my - half, 0, Math.max(0, bounds.h - LOGO_BOX));
+
+                    const logoTok = createToken('logo', logoX, logoY);
+                    tokens.push(logoTok);
+
+                    logoTok.el.classList.add('pop');
+                    setTimeout(() => logoTok.el.classList.remove('pop'), 520);
+
+                    // Spawn 2 Human + 2 Computer at random positions
+                    spawnWordPair();
+                    spawnWordPair();
                 };
 
                 const repelPair = (a, b) => {
@@ -1256,6 +1504,12 @@
                     a.vy = dy * rand(6, 12);
                     b.vx = -dx * rand(10, 18);
                     b.vy = -dy * rand(6, 12);
+
+                    // update their drift targets too, so they don't immediately drift back into each other
+                    a.tvx = a.vx * 0.6;
+                    a.tvy = a.vy * 0.6;
+                    b.tvx = b.vx * 0.6;
+                    b.tvy = b.vy * 0.6;
                 };
 
                 function onPointerUp(e) {
@@ -1270,24 +1524,44 @@
                     tok.el.removeEventListener('pointerup', onPointerUp);
                     tok.el.removeEventListener('pointercancel', onPointerUp);
 
-                    const candidate = findNearestToken(tok, 78);
+                    const snapR = (tok.kind === 'logo') ? PHYS.logoSnapRadius : PHYS.wordSnapRadius;
+                    const candidate = findNearestToken(tok, snapR);
                     clearNear();
 
                     if (candidate) {
+                        if (tok.kind === 'logo' && candidate.kind === 'logo') {
+                            // Logo + Logo => ripple + shake + spawn words
+                            fuseLogos(tok, candidate);
+                            active = null;
+                            return;
+                        }
+
+                        // Word + Word behavior
                         if (tok.kind !== candidate.kind) {
                             // Human + Computer => logo!
                             mergeToLogo(tok, candidate);
+                            active = null;
+                            return;
                         } else {
                             // Same type => repel
                             repelPair(tok, candidate);
+                            active = null;
+                            return;
                         }
-                    } else {
-                        // gentle new drift after a drag
-                        tok.vx = rand(-18, 18);
-                        tok.vy = rand(-12, 12);
-                        if (Math.abs(tok.vx) < 4) tok.vx = (tok.vx < 0 ? -1 : 1) * rand(6, 12);
-                        if (Math.abs(tok.vy) < 3) tok.vy = (tok.vy < 0 ? -1 : 1) * rand(4, 9);
                     }
+
+                    // No merge/repel: apply fling inertia
+                    const v = getReleaseVelocity(tok);
+                    if (v) {
+                        const max = (tok.kind === 'logo') ? PHYS.maxFlingLogo : PHYS.maxFlingWord;
+                        const scale = (tok.kind === 'logo') ? PHYS.flingScaleLogo : PHYS.flingScaleWord;
+                        tok.vx = clamp(v.vx * scale, -max, max);
+                        tok.vy = clamp(v.vy * scale, -max, max);
+                    }
+
+                    // If release velocity is tiny, keep gentle drift
+                    if (Math.abs(tok.vx) < 6) tok.vx = tok.tvx;
+                    if (Math.abs(tok.vy) < 5) tok.vy = tok.tvy;
 
                     active = null;
                 }
@@ -1296,6 +1570,8 @@
                     const dt = Math.min(0.033, (t - lastT) / 1000);
                     lastT = t;
 
+                    const blend = 1 - Math.exp(-dt * PHYS.returnRate);
+
                     for (const tok of tokens) {
                         if (tok.dragging) continue;
                         if (t < tok.lockedUntil) continue;
@@ -1303,11 +1579,15 @@
                         tok.x += tok.vx * dt;
                         tok.y += tok.vy * dt;
 
-                        // bounce
-                        if (tok.x < 0) { tok.x = 0; tok.vx *= -1; }
-                        if (tok.y < 0) { tok.y = 0; tok.vy *= -1; }
-                        if (tok.x > bounds.w - tok.w) { tok.x = bounds.w - tok.w; tok.vx *= -1; }
-                        if (tok.y > bounds.h - tok.h) { tok.y = bounds.h - tok.h; tok.vy *= -1; }
+                        // bounce (also flip drift targets so they keep floating inside bounds)
+                        if (tok.x < 0) { tok.x = 0; tok.vx = Math.abs(tok.vx); tok.tvx = Math.abs(tok.tvx); }
+                        if (tok.y < 0) { tok.y = 0; tok.vy = Math.abs(tok.vy); tok.tvy = Math.abs(tok.tvy); }
+                        if (tok.x > bounds.w - tok.w) { tok.x = bounds.w - tok.w; tok.vx = -Math.abs(tok.vx); tok.tvx = -Math.abs(tok.tvx); }
+                        if (tok.y > bounds.h - tok.h) { tok.y = bounds.h - tok.h; tok.vy = -Math.abs(tok.vy); tok.tvy = -Math.abs(tok.tvy); }
+
+                        // Smoothly return to drift target (makes fast drags glide then calm down)
+                        tok.vx += (tok.tvx - tok.vx) * blend;
+                        tok.vy += (tok.tvy - tok.vy) * blend;
 
                         updateTransform(tok);
                     }
@@ -1320,8 +1600,8 @@
                 const N = calcCount();
                 for (let i = 0; i < N; i++) {
                     const kind = (i % 2 === 0) ? 'human' : 'computer';
-                    const approxW = (kind === 'human') ? 70 : 92;
-                    const approxH = 22;
+                    const approxW = (kind === 'human') ? 78 : 98;
+                    const approxH = 26;
                     const pos = safeSpawn(approxW, approxH);
                     const tok = createToken(kind, pos.x, pos.y);
                     tokens.push(tok);
@@ -1338,7 +1618,9 @@
 
                 requestAnimationFrame(step);
             }
-// --- Publications: load + render from JSON (data/publications.json) ---
+
+
+            // --- Publications: load + render from JSON (data/publications.json) ---
             const publicationsLoading = document.getElementById('publications-loading');
             const publicationsContent = document.getElementById('publications-content');
             const publicationsList = document.getElementById('publications-list');
@@ -1406,6 +1688,7 @@ const formatNewsDate = (iso = '') => {
                     const news = await res.json();
 
                     const sorted = (news || []).slice().sort((a,b) => new Date(b.date) - new Date(a.date));
+                    window.__yk_news_cache = sorted;
                     const top = sorted.slice(0, 5);
 
                     
@@ -1446,6 +1729,337 @@ if (top.length === 0) {
             };
 
             loadNewsPreview();
+            // --- News Overlay: "news.html" feel without full reload (keeps header) ---
+            let ykNewsOverlayOpen = false;
+            let ykNewsOverlayEl = null;
+            let ykNewsShellEl = null;
+            let ykNewsScrollEl = null;
+            let ykNewsPostsEl = null;
+            let ykNewsLoadingEl = null;
+            let ykNewsEmptyEl = null;
+            let ykNewsStartTransform = null;
+            let ykNewsStartRadius = '18px';
+            let ykNewsLastFocus = null;
+
+            const isPlainLeftClick = (e) => (
+                e.button === 0 &&
+                !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey
+            );
+
+            const lockPageScroll = (lock) => {
+                // Prevent background scroll while overlay is open
+                if (lock) {
+                    document.documentElement.dataset.ykScrollLock = '1';
+                    document.documentElement.style.overflow = 'hidden';
+                } else {
+                    delete document.documentElement.dataset.ykScrollLock;
+                    document.documentElement.style.overflow = '';
+                }
+            };
+
+            const ensureNewsOverlay = () => {
+                if (ykNewsOverlayEl) return;
+
+                const overlay = document.createElement('div');
+                overlay.id = 'yk-news-overlay';
+                overlay.setAttribute('aria-hidden', 'true');
+
+                overlay.innerHTML = `
+                    <div class="yk-shell">
+                        <div class="yk-scroll">
+                            <section class="yk-hero pt-28 pb-14 text-white">
+                                <div class="container mx-auto px-6 yk-fade">
+                                    <div class="max-w-4xl">
+                                        <p class="text-sm text-gray-200/80">YoungIn Kim</p>
+                                        <h1 class="mt-2 text-4xl md:text-6xl font-bold leading-tight">
+                                            <span class="gradient-text">News</span>
+                                        </h1>
+                                        <p class="mt-4 text-lg md:text-xl text-gray-200/90">
+                                            Updates on publications, talks, reviews, and research milestones.
+                                        </p>
+                                        <div class="mt-8 flex flex-wrap gap-3">
+                                            <button id="yk-news-overlay-back" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg px-5 py-2.5 transition-colors">
+                                                <i class="fas fa-arrow-left"></i> Back to Main
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <main class="yk-main text-gray-800 dark:text-gray-200 transition-colors duration-500">
+                                <section class="py-16">
+                                    <div class="container mx-auto px-6 yk-fade">
+                                        <div class="max-w-4xl mx-auto space-y-8">
+                                            <div id="yk-news-overlay-loading" class="text-center py-10 text-gray-500 dark:text-gray-400">
+                                                <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+                                                <p class="text-lg">Loading news...</p>
+                                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-500">
+                                                    Tip: 로컬에서 file://로 열면 JSON 로딩이 막힐 수 있어요. 웹서버로 띄우면 정상 동작합니다.
+                                                </p>
+                                            </div>
+
+                                            <div id="yk-news-overlay-posts" class="space-y-8 hidden"></div>
+
+                                            <div id="yk-news-overlay-empty" class="hidden text-center py-12">
+                                                <i class="fas fa-newspaper text-4xl text-gray-400 mb-4"></i>
+                                                <p class="text-xl text-gray-500 dark:text-gray-400">No news posts yet.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </main>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(overlay);
+
+                ykNewsOverlayEl = overlay;
+                ykNewsShellEl = overlay.querySelector('.yk-shell');
+                ykNewsScrollEl = overlay.querySelector('.yk-scroll');
+                ykNewsPostsEl = overlay.querySelector('#yk-news-overlay-posts');
+                ykNewsLoadingEl = overlay.querySelector('#yk-news-overlay-loading');
+                ykNewsEmptyEl = overlay.querySelector('#yk-news-overlay-empty');
+
+                const backBtn = overlay.querySelector('#yk-news-overlay-back');
+                if (backBtn) {
+                    backBtn.addEventListener('click', () => {
+                        // Let popstate drive the close animation
+                        history.back();
+                    });
+                }
+
+                // ESC closes (via history)
+                window.addEventListener('keydown', (ev) => {
+                    if (!ykNewsOverlayOpen) return;
+                    if (ev.key === 'Escape') history.back();
+                });
+            };
+
+            const formatOverlayDate = (iso = '') => {
+                const d = new Date(iso);
+                if (Number.isNaN(d.getTime())) return iso;
+                return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            };
+
+            const buildOverlayBadges = (tags = []) => {
+                if (!Array.isArray(tags) || tags.length === 0) return '';
+                return tags.map((t, i) => {
+                    const cls = (i === 0)
+                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+                        : 'bg-gray-100 text-gray-700 dark:bg-gray-700/60 dark:text-gray-300';
+                    return `<span class="px-3 py-1 rounded-full text-xs font-semibold ${cls}">${escapeHtml(t)}</span>`;
+                }).join('\n');
+            };
+
+            const buildOverlayPost = (p) => {
+                const id = p?.id ? String(p.id) : '';
+                const title = p?.title ? String(p.title) : '';
+                const dateIso = p?.date ? String(p.date) : '';
+                const thumb = p?.thumbnail ? String(p.thumbnail) : '';
+                const icon = p?.icon ? String(p.icon) : 'fa-newspaper';
+                const tags = Array.isArray(p?.tags) ? p.tags : [];
+                const bodyRaw = p?.body ? String(p.body) : '';
+                const bodyHtml = bodyRaw.includes('<') ? bodyRaw : escapeHtml(bodyRaw).replace(/\n/g, '<br>');
+
+                return `
+                    <article id="post-${escapeHtml(id)}" class="yk-post bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm scroll-mt-28">
+                        <div class="flex flex-col md:flex-row gap-6 items-start">
+                            <div class="relative w-full md:w-56 h-44 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                <i class="fas ${escapeHtml(icon)} text-gray-400 dark:text-gray-500 text-3xl absolute"></i>
+                                ${thumb ? `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(title)} thumbnail" class="w-full h-full object-cover relative z-10" loading="lazy" onerror="this.style.display='none';">` : ''}
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">${escapeHtml(formatOverlayDate(dateIso))}</p>
+                                <h2 class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">${escapeHtml(title)}</h2>
+                                <div class="mt-4 text-gray-700 dark:text-gray-300 leading-relaxed">
+                                    ${bodyHtml}
+                                </div>
+                                <div class="mt-4 flex flex-wrap gap-2">
+                                    ${buildOverlayBadges(tags)}
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            };
+
+            const loadAllNewsData = async () => {
+                // Prefer cache from the preview loader
+                if (Array.isArray(window.__yk_news_cache)) return window.__yk_news_cache;
+
+                const res = await fetch('data/news.json', { cache: 'no-store' });
+                if (!res.ok) throw new Error(`Failed to load news.json (${res.status})`);
+                const news = await res.json();
+                return (news || []).slice().sort((a,b) => new Date(b.date) - new Date(a.date));
+            };
+
+            const openNewsOverlay = async (url = 'news.html', anchorId = null, pushState = true) => {
+                if (ykNewsOverlayOpen) return;
+                ensureNewsOverlay();
+
+                ykNewsLastFocus = document.activeElement;
+
+                // Start rect: use the News section header block (so it feels like it "expands")
+                const headerBlock = document.querySelector('#news .text-center') || document.querySelector('#news h2') || document.body;
+                const r = headerBlock.getBoundingClientRect();
+
+                const sx = (r.width / window.innerWidth) || 0.001;
+                const sy = (r.height / window.innerHeight) || 0.001;
+                const tx = r.left;
+                const ty = r.top;
+
+                ykNewsStartTransform = `translate3d(${tx}px, ${ty}px, 0) scale(${sx}, ${sy})`;
+
+                ykNewsOverlayEl.classList.add('active');
+                ykNewsOverlayEl.setAttribute('aria-hidden', 'false');
+
+                lockPageScroll(true);
+
+                // Reset view + loader
+                if (ykNewsScrollEl) ykNewsScrollEl.scrollTop = 0;
+                if (ykNewsPostsEl) { ykNewsPostsEl.classList.add('hidden'); ykNewsPostsEl.innerHTML = ''; }
+                if (ykNewsLoadingEl) ykNewsLoadingEl.classList.remove('hidden');
+                if (ykNewsEmptyEl) ykNewsEmptyEl.classList.add('hidden');
+
+                // Set initial (collapsed) transform
+                if (ykNewsShellEl) {
+                    ykNewsShellEl.style.transform = ykNewsStartTransform;
+                    ykNewsShellEl.style.borderRadius = ykNewsStartRadius;
+                }
+
+                // Expand animation
+                const expandAnim = ykNewsShellEl?.animate?.([
+                    { transform: ykNewsStartTransform, borderRadius: ykNewsStartRadius, opacity: 0.98 },
+                    { transform: 'translate3d(0,0,0) scale(1,1)', borderRadius: '0px', opacity: 1 }
+                ], {
+                    duration: 540,
+                    easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+                    fill: 'forwards'
+                });
+
+                ykNewsOverlayOpen = true;
+
+                // Push state (URL looks like news.html)
+                if (pushState) {
+                    const nextUrl = anchorId ? `${url}#${anchorId}` : url;
+                    history.pushState({ ykOverlay: 'news', anchor: anchorId || '' }, '', nextUrl);
+                }
+
+                // Wait for expand before revealing content (feels cleaner)
+                try { await expandAnim?.finished; } catch (_) {}
+
+                // Fade in hero + main blocks
+                ykNewsOverlayEl.querySelectorAll('.yk-fade').forEach(el => {
+                    // Stagger just a bit
+                    setTimeout(() => el.classList.add('show'), 40);
+                });
+
+                // Load + render posts
+                try {
+                    const sorted = await loadAllNewsData();
+
+                    if (!sorted || sorted.length === 0) {
+                        if (ykNewsLoadingEl) ykNewsLoadingEl.classList.add('hidden');
+                        if (ykNewsEmptyEl) ykNewsEmptyEl.classList.remove('hidden');
+                        return;
+                    }
+
+                    if (ykNewsPostsEl) {
+                        ykNewsPostsEl.innerHTML = sorted.map(buildOverlayPost).join('\n');
+                        if (ykNewsLoadingEl) ykNewsLoadingEl.classList.add('hidden');
+                        ykNewsPostsEl.classList.remove('hidden');
+                    }
+
+                    // Scroll to anchor (if provided)
+                    if (anchorId) {
+                        requestAnimationFrame(() => {
+                            const target = document.getElementById(anchorId);
+                            if (target && ykNewsScrollEl) {
+                                // Smooth scroll inside overlay
+                                const top = target.getBoundingClientRect().top - ykNewsShellEl.getBoundingClientRect().top;
+                                ykNewsScrollEl.scrollTo({ top: Math.max(0, ykNewsScrollEl.scrollTop + top - 110), behavior: 'smooth' });
+                            }
+                        });
+                    }
+                } catch (err) {
+                    console.error(err);
+                    if (ykNewsLoadingEl) {
+                        ykNewsLoadingEl.innerHTML = `
+                            <i class="fas fa-triangle-exclamation text-4xl mb-4 text-amber-500"></i>
+                            <p class="text-lg font-semibold">Failed to load news.</p>
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-500">
+                                data/news.json 를 불러오지 못했어요. 웹서버 환경에서 실행하거나, 파일 경로/이름이 맞는지 확인해 주세요.
+                            </p>
+                        `;
+                    }
+                }
+            };
+
+            const closeNewsOverlay = async () => {
+                if (!ykNewsOverlayOpen || !ykNewsOverlayEl) return;
+
+                // Hide content fade class quickly (so it "compresses" cleanly)
+                ykNewsOverlayEl.querySelectorAll('.yk-fade').forEach(el => el.classList.remove('show'));
+
+                const collapseAnim = ykNewsShellEl?.animate?.([
+                    { transform: 'translate3d(0,0,0) scale(1,1)', borderRadius: '0px', opacity: 1 },
+                    { transform: ykNewsStartTransform || 'translate3d(0,0,0) scale(0.7,0.2)', borderRadius: ykNewsStartRadius, opacity: 0.98 }
+                ], {
+                    duration: 460,
+                    easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+                    fill: 'forwards'
+                });
+
+                try { await collapseAnim?.finished; } catch (_) {}
+
+                ykNewsOverlayEl.classList.remove('active');
+                ykNewsOverlayEl.setAttribute('aria-hidden', 'true');
+                ykNewsOverlayOpen = false;
+
+                lockPageScroll(false);
+
+                // Restore focus
+                if (ykNewsLastFocus && typeof ykNewsLastFocus.focus === 'function') {
+                    ykNewsLastFocus.focus();
+                }
+            };
+
+            // Intercept in-page navigation to news.html for SPA-like feel
+            document.addEventListener('click', (e) => {
+                if (!isPlainLeftClick(e)) return;
+
+                const a = e.target?.closest?.('a');
+                if (!a) return;
+                const href = a.getAttribute('href') || '';
+                if (!href.startsWith('news.html')) return;
+                if (a.target === '_blank') return;
+
+                // Respect downloads / external modifiers
+                if (a.hasAttribute('download')) return;
+
+                e.preventDefault();
+
+                const hash = href.includes('#') ? href.split('#')[1] : '';
+                openNewsOverlay('news.html', hash || null, true);
+            });
+
+            // Popstate: close/open overlay with browser back/forward
+            window.addEventListener('popstate', () => {
+                const st = history.state;
+                const wantNews = st && st.ykOverlay === 'news';
+
+                if (wantNews && !ykNewsOverlayOpen) {
+                    const anchor = (st && st.anchor) ? String(st.anchor) : (location.hash ? location.hash.slice(1) : null);
+                    openNewsOverlay('news.html', anchor || null, false);
+                    return;
+                }
+
+                if (!wantNews && ykNewsOverlayOpen) {
+                    closeNewsOverlay();
+                }
+            });
+
             const buildTagSpans = (tags = []) => {
                 return (tags || [])
                     .map(t => {
