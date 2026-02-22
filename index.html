@@ -540,14 +540,30 @@
         }
         #yk-news-overlay.active { display: block; }
 
+        /* Slide-in page transition (index ↔ News overlay) */
+        #home, #hero-spacer, #main-content {
+            transition: transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        html.yk-news-open #home,
+        html.yk-news-open #hero-spacer,
+        html.yk-news-open #main-content {
+            transform: translate3d(-100%, 0, 0);
+        }
+
         #yk-news-overlay .yk-shell {
             position: absolute;
             inset: 0;
-            transform-origin: top left;
-            border-radius: 18px;
             overflow: hidden;
-            box-shadow: 0 40px 140px rgba(0,0,0,0.35);
             background: #111827;
+            border-radius: 0;
+            box-shadow: none;
+            transform: translate3d(100%, 0, 0);
+            transition: transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: transform;
+        }
+        html.yk-news-open #yk-news-overlay .yk-shell {
+            transform: translate3d(0, 0, 0);
         }
 
         #yk-news-overlay .yk-scroll {
@@ -1441,18 +1457,12 @@
                     spawnRipple(mx, my, mid);
                     shakeScreen();
 
-                    // Make a new logo at the midpoint
-                    const half = LOGO_BOX / 2;
-                    const logoX = clamp(mx - half, 0, Math.max(0, bounds.w - LOGO_BOX));
-                    const logoY = clamp(my - half, 0, Math.max(0, bounds.h - LOGO_BOX));
+                    
 
-                    const logoTok = createToken('logo', logoX, logoY);
-                    tokens.push(logoTok);
+                    // When two logos meet: both disappear (no logo remains)
 
-                    logoTok.el.classList.add('pop');
-                    setTimeout(() => logoTok.el.classList.remove('pop'), 520);
-
-                    // Spawn 2 Human + 2 Computer at random positions
+                    // (keeps the field from getting saturated with logos)
+// Spawn 2 Human + 2 Computer at random positions
                     spawnWordPair();
                     spawnWordPair();
                 };
@@ -1894,25 +1904,38 @@ if (top.length === 0) {
                 return (news || []).slice().sort((a,b) => new Date(b.date) - new Date(a.date));
             };
 
+                        const waitForTransformTransition = (el, timeout = 650) => {
+                return new Promise((resolve) => {
+                    if (!el) return resolve();
+                    let done = false;
+                    const finish = () => {
+                        if (done) return;
+                        done = true;
+                        el.removeEventListener('transitionend', onEnd);
+                        resolve();
+                    };
+                    const onEnd = (ev) => {
+                        if (!ev || ev.target !== el) return;
+                        if (ev.propertyName !== 'transform') return;
+                        finish();
+                    };
+                    el.addEventListener('transitionend', onEnd);
+                    setTimeout(finish, timeout);
+                });
+            };
+
             const openNewsOverlay = async (url = 'news.html', anchorId = null, pushState = true) => {
                 if (ykNewsOverlayOpen) return;
                 ensureNewsOverlay();
 
                 ykNewsLastFocus = document.activeElement;
 
-                // Start rect: use the News section header block (so it feels like it "expands")
-                const headerBlock = document.querySelector('#news .text-center') || document.querySelector('#news h2') || document.body;
-                const r = headerBlock.getBoundingClientRect();
-
-                const sx = (r.width / window.innerWidth) || 0.001;
-                const sy = (r.height / window.innerHeight) || 0.001;
-                const tx = r.left;
-                const ty = r.top;
-
-                ykNewsStartTransform = `translate3d(${tx}px, ${ty}px, 0) scale(${sx}, ${sy})`;
-
+                // Prepare overlay (shell starts off-screen to the right via CSS)
                 ykNewsOverlayEl.classList.add('active');
                 ykNewsOverlayEl.setAttribute('aria-hidden', 'false');
+
+                // Ensure starting state is "closed" before we flip the class on next frame
+                document.documentElement.classList.remove('yk-news-open');
 
                 lockPageScroll(true);
 
@@ -1922,22 +1945,6 @@ if (top.length === 0) {
                 if (ykNewsLoadingEl) ykNewsLoadingEl.classList.remove('hidden');
                 if (ykNewsEmptyEl) ykNewsEmptyEl.classList.add('hidden');
 
-                // Set initial (collapsed) transform
-                if (ykNewsShellEl) {
-                    ykNewsShellEl.style.transform = ykNewsStartTransform;
-                    ykNewsShellEl.style.borderRadius = ykNewsStartRadius;
-                }
-
-                // Expand animation
-                const expandAnim = ykNewsShellEl?.animate?.([
-                    { transform: ykNewsStartTransform, borderRadius: ykNewsStartRadius, opacity: 0.98 },
-                    { transform: 'translate3d(0,0,0) scale(1,1)', borderRadius: '0px', opacity: 1 }
-                ], {
-                    duration: 540,
-                    easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-                    fill: 'forwards'
-                });
-
                 ykNewsOverlayOpen = true;
 
                 // Push state (URL looks like news.html)
@@ -1946,18 +1953,25 @@ if (top.length === 0) {
                     history.pushState({ ykOverlay: 'news', anchor: anchorId || '' }, '', nextUrl);
                 }
 
-                // Wait for expand before revealing content (feels cleaner)
-                try { await expandAnim?.finished; } catch (_) {}
-
-                // Fade in hero + main blocks
-                ykNewsOverlayEl.querySelectorAll('.yk-fade').forEach(el => {
-                    // Stagger just a bit
-                    setTimeout(() => el.classList.add('show'), 40);
+                // Kick slide animation next frame (page slides left, news slides in from right)
+                requestAnimationFrame(() => {
+                    document.documentElement.classList.add('yk-news-open');
                 });
 
-                // Load + render posts
+                // Load data while animation runs
+                const dataPromise = loadAllNewsData();
+
+                // Wait for slide-in to settle before revealing inner blocks
+                await waitForTransformTransition(ykNewsShellEl, 680);
+
+                // Fade in hero + main blocks
+                ykNewsOverlayEl.querySelectorAll('.yk-fade').forEach((el, idx) => {
+                    setTimeout(() => el.classList.add('show'), 40 + idx * 70);
+                });
+
+                // Render posts
                 try {
-                    const sorted = await loadAllNewsData();
+                    const sorted = await dataPromise;
 
                     if (!sorted || sorted.length === 0) {
                         if (ykNewsLoadingEl) ykNewsLoadingEl.classList.add('hidden');
@@ -1966,7 +1980,8 @@ if (top.length === 0) {
                     }
 
                     if (ykNewsPostsEl) {
-                        ykNewsPostsEl.innerHTML = sorted.map(buildOverlayPost).join('\n');
+                        ykNewsPostsEl.innerHTML = sorted.map(buildOverlayPost).join('
+');
                         if (ykNewsLoadingEl) ykNewsLoadingEl.classList.add('hidden');
                         ykNewsPostsEl.classList.remove('hidden');
                     }
@@ -1974,10 +1989,11 @@ if (top.length === 0) {
                     // Scroll to anchor (if provided)
                     if (anchorId) {
                         requestAnimationFrame(() => {
-                            const target = document.getElementById(anchorId);
+                            const target = ykNewsOverlayEl?.querySelector(`#${CSS.escape(anchorId)}`);
                             if (target && ykNewsScrollEl) {
-                                // Smooth scroll inside overlay
-                                const top = target.getBoundingClientRect().top - ykNewsShellEl.getBoundingClientRect().top;
+                                const tr = target.getBoundingClientRect();
+                                const cr = ykNewsScrollEl.getBoundingClientRect();
+                                const top = tr.top - cr.top;
                                 ykNewsScrollEl.scrollTo({ top: Math.max(0, ykNewsScrollEl.scrollTop + top - 110), behavior: 'smooth' });
                             }
                         });
@@ -1996,22 +2012,16 @@ if (top.length === 0) {
                 }
             };
 
-            const closeNewsOverlay = async () => {
+                        const closeNewsOverlay = async () => {
                 if (!ykNewsOverlayOpen || !ykNewsOverlayEl) return;
 
-                // Hide content fade class quickly (so it "compresses" cleanly)
+                // Hide inner fade blocks quickly (so slide-out feels clean)
                 ykNewsOverlayEl.querySelectorAll('.yk-fade').forEach(el => el.classList.remove('show'));
 
-                const collapseAnim = ykNewsShellEl?.animate?.([
-                    { transform: 'translate3d(0,0,0) scale(1,1)', borderRadius: '0px', opacity: 1 },
-                    { transform: ykNewsStartTransform || 'translate3d(0,0,0) scale(0.7,0.2)', borderRadius: ykNewsStartRadius, opacity: 0.98 }
-                ], {
-                    duration: 460,
-                    easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-                    fill: 'forwards'
-                });
+                // Slide back (news to right, main page from left)
+                document.documentElement.classList.remove('yk-news-open');
 
-                try { await collapseAnim?.finished; } catch (_) {}
+                await waitForTransformTransition(ykNewsShellEl, 680);
 
                 ykNewsOverlayEl.classList.remove('active');
                 ykNewsOverlayEl.setAttribute('aria-hidden', 'true');
@@ -2025,13 +2035,46 @@ if (top.length === 0) {
                 }
             };
 
-            // Intercept in-page navigation to news.html for SPA-like feel
+                        // Intercept in-page navigation to news.html for SPA-like feel
             document.addEventListener('click', (e) => {
                 if (!isPlainLeftClick(e)) return;
 
                 const a = e.target?.closest?.('a');
                 if (!a) return;
+
                 const href = a.getAttribute('href') || '';
+                if (!href) return;
+
+                // While News overlay is open: header/nav anchors should go to the main page (and NOT bounce back to News)
+                if (ykNewsOverlayOpen && a.closest('#header')) {
+                    const isHashOnly = href.startsWith('#');
+                    const isIndexAnchor = href.startsWith('index.html#') || href.startsWith('./index.html#');
+                    const isIndexRoot = (href === 'index.html' || href === './index.html');
+
+                    if (isHashOnly || isIndexAnchor || isIndexRoot) {
+                        e.preventDefault();
+
+                        const hashPart = href.includes('#') ? href.split('#')[1] : '';
+                        const targetId = (hashPart && hashPart !== '#') ? hashPart : '';
+
+                        const targetUrl = targetId ? `index.html#${targetId}` : 'index.html';
+
+                        // Replace the current "news.html" history entry so back won't return to News overlay
+                        try { history.replaceState(null, '', targetUrl); } catch (_) {}
+
+                        closeNewsOverlay().then(() => {
+                            if (targetId) {
+                                const el = document.getElementById(targetId);
+                                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            } else {
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }
+                        });
+                        return;
+                    }
+                }
+
+                // Open the overlay for news.html links
                 if (!href.startsWith('news.html')) return;
                 if (a.target === '_blank') return;
 
@@ -2042,7 +2085,7 @@ if (top.length === 0) {
 
                 const hash = href.includes('#') ? href.split('#')[1] : '';
                 openNewsOverlay('news.html', hash || null, true);
-            });
+            });;
 
             // Popstate: close/open overlay with browser back/forward
             window.addEventListener('popstate', () => {
