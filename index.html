@@ -1980,8 +1980,7 @@ if (top.length === 0) {
                     }
 
                     if (ykNewsPostsEl) {
-                        ykNewsPostsEl.innerHTML = sorted.map(buildOverlayPost).join('
-');
+                        ykNewsPostsEl.innerHTML = sorted.map(buildOverlayPost).join('\n');
                         if (ykNewsLoadingEl) ykNewsLoadingEl.classList.add('hidden');
                         ykNewsPostsEl.classList.remove('hidden');
                     }
