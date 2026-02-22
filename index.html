@@ -725,6 +725,95 @@
             justify-content: flex-start;
         }
 
+
+        /* ------------------------------------------------------------
+           News Overlay Floating Bar (Back to Main + Search)
+        ------------------------------------------------------------ */
+        #yk-news-overlay .yk-floatbar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 76px; /* JS will update (header height + gap) */
+            z-index: 45; /* below header (z-50) */
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.22s ease, transform 0.22s ease;
+            pointer-events: none;
+            color: #111827;
+        }
+        .dark #yk-news-overlay .yk-floatbar { color: #e5e7eb; }
+
+        #yk-news-overlay .yk-floatbar.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        #yk-news-overlay .yk-floatbar .yk-floatbar-inner {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.55rem 0.75rem;
+            border-radius: 0.9rem;
+            background: rgba(255, 255, 255, 0.86);
+            border: 1px solid rgba(229, 231, 235, 0.85);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+        }
+        .dark #yk-news-overlay .yk-floatbar .yk-floatbar-inner {
+            background: rgba(17, 24, 39, 0.72);
+            border-color: rgba(55, 65, 81, 0.85);
+            box-shadow: 0 16px 55px rgba(0,0,0,0.35);
+        }
+
+        #yk-news-overlay .yk-floatbar .yk-float-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.55rem 0.9rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: inherit;
+            background: rgba(245, 158, 11, 0.16);
+            border: 1px solid rgba(245, 158, 11, 0.24);
+            transition: background-color 0.18s ease, transform 0.18s ease;
+            white-space: nowrap;
+        }
+        #yk-news-overlay .yk-floatbar .yk-float-btn:hover {
+            background: rgba(245, 158, 11, 0.24);
+            transform: translateY(-1px);
+        }
+
+        #yk-news-overlay .yk-floatbar .yk-float-search {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.55rem 0.8rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(229, 231, 235, 0.9);
+            min-width: 160px;
+        }
+        .dark #yk-news-overlay .yk-floatbar .yk-float-search {
+            background: rgba(31, 41, 55, 0.62);
+            border-color: rgba(55, 65, 81, 0.9);
+        }
+        #yk-news-overlay .yk-floatbar .yk-float-search i { color: rgba(107, 114, 128, 0.9); }
+        .dark #yk-news-overlay .yk-floatbar .yk-float-search i { color: rgba(148, 163, 184, 0.9); }
+
+        #yk-news-overlay .yk-floatbar .yk-float-search input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: inherit;
+            font-size: 0.95rem;
+        }
+        #yk-news-overlay .yk-floatbar .yk-float-search input::placeholder { color: rgba(107, 114, 128, 0.75); }
+        .dark #yk-news-overlay .yk-floatbar .yk-float-search input::placeholder { color: rgba(148, 163, 184, 0.72); }
+
 </style>
     <script>
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
@@ -1747,6 +1836,11 @@ if (top.length === 0) {
             let ykNewsPostsEl = null;
             let ykNewsLoadingEl = null;
             let ykNewsEmptyEl = null;
+            let ykNewsNoResultsEl = null;
+            let ykNewsFloatbarEl = null;
+            let ykNewsSearchHeroEl = null;
+            let ykNewsSearchFloatEl = null;
+            let ykNewsSearchQuery = '';
             let ykNewsStartTransform = null;
             let ykNewsStartRadius = '18px';
             let ykNewsLastFocus = null;
@@ -1776,6 +1870,21 @@ if (top.length === 0) {
 
                 overlay.innerHTML = `
                     <div class="yk-shell">
+                        <div id="yk-news-overlay-floatbar" class="yk-floatbar" aria-hidden="true">
+                            <div class="container mx-auto px-6">
+                                <div class="max-w-4xl mx-auto">
+                                    <div class="yk-floatbar-inner">
+                                        <button id="yk-news-overlay-float-back" class="yk-float-btn" type="button">
+                                            <i class="fas fa-arrow-left"></i> Back to Main
+                                        </button>
+                                        <div class="yk-float-search" role="search" aria-label="Search news titles">
+                                            <i class="fas fa-search" aria-hidden="true"></i>
+                                            <input id="yk-news-search-input-float" type="text" placeholder="Search titles..." autocomplete="off">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="yk-scroll">
                             <section class="yk-hero pt-28 pb-14 text-white">
                                 <div class="container mx-auto px-6 yk-fade">
@@ -1787,13 +1896,18 @@ if (top.length === 0) {
                                         <p class="mt-4 text-lg md:text-xl text-gray-200/90">
                                             Updates on publications, talks, reviews, and research milestones.
                                         </p>
-                                        <div class="mt-8 flex flex-wrap gap-3">
-                                            <button id="yk-news-overlay-back" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg px-5 py-2.5 transition-colors">
+                                        
+                                        <div class="mt-8 flex flex-wrap items-center gap-3">
+                                            <button id="yk-news-overlay-back" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg px-5 py-2.5 transition-colors" type="button">
                                                 <i class="fas fa-arrow-left"></i> Back to Main
                                             </button>
-                                            <button id="yk-news-overlay-browse" class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-lg px-5 py-2.5 transition-colors">
-                                                Browse Posts <i class="fas fa-arrow-down text-sm"></i>
-                                            </button>
+
+                                            <!-- Search (title only) -->
+                                            <div class="relative flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white rounded-lg px-4 py-2.5 backdrop-blur-sm border border-white/10">
+                                                <i class="fas fa-search text-white/80"></i>
+                                                <input id="yk-news-search-input-hero" type="text" placeholder="Search titles..." autocomplete="off"
+                                                       class="bg-transparent border-none focus:ring-0 focus:outline-none text-white placeholder-white/60 w-56 md:w-72">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1811,7 +1925,13 @@ if (top.length === 0) {
                                                 </p>
                                             </div>
 
+                                            
                                             <div id="yk-news-overlay-posts" class="space-y-8 hidden"></div>
+
+                                            <div id="yk-news-overlay-no-results" class="hidden text-center py-12">
+                                                <i class="fas fa-magnifying-glass text-4xl text-gray-400 mb-4"></i>
+                                                <p class="text-xl text-gray-500 dark:text-gray-400">No posts match your search.</p>
+                                            </div>
 
                                             <div id="yk-news-overlay-empty" class="hidden text-center py-12">
                                                 <i class="fas fa-newspaper text-4xl text-gray-400 mb-4"></i>
@@ -1839,6 +1959,10 @@ if (top.length === 0) {
                 ykNewsPostsEl = overlay.querySelector('#yk-news-overlay-posts');
                 ykNewsLoadingEl = overlay.querySelector('#yk-news-overlay-loading');
                 ykNewsEmptyEl = overlay.querySelector('#yk-news-overlay-empty');
+                ykNewsNoResultsEl = overlay.querySelector('#yk-news-overlay-no-results');
+                ykNewsFloatbarEl = overlay.querySelector('#yk-news-overlay-floatbar');
+                ykNewsSearchHeroEl = overlay.querySelector('#yk-news-search-input-hero');
+                ykNewsSearchFloatEl = overlay.querySelector('#yk-news-search-input-float');
 
                 const backBtn = overlay.querySelector('#yk-news-overlay-back');
                 if (backBtn) {
@@ -1848,22 +1972,54 @@ if (top.length === 0) {
                     });
                 }
 
-                const browseBtn = overlay.querySelector('#yk-news-overlay-browse');
-                if (browseBtn) {
-                    browseBtn.addEventListener('click', () => {
-                        const anchor = overlay.querySelector('#yk-news-overlay-posts-anchor');
-                        if (!anchor || !ykNewsScrollEl) return;
-
-                        const tr = anchor.getBoundingClientRect();
-                        const cr = ykNewsScrollEl.getBoundingClientRect();
-                        const top = tr.top - cr.top;
-
-                        ykNewsScrollEl.scrollTo({
-                            top: Math.max(0, ykNewsScrollEl.scrollTop + top - 110),
-                            behavior: 'smooth'
-                        });
+                const floatBackBtn = overlay.querySelector('#yk-news-overlay-float-back');
+                if (floatBackBtn) {
+                    floatBackBtn.addEventListener('click', () => {
+                        // Let popstate drive the close animation
+                        history.back();
                     });
                 }
+
+                // Search inputs (title only)
+                if (ykNewsSearchHeroEl) {
+                    ykNewsSearchHeroEl.addEventListener('input', () => setOverlayNewsQuery(ykNewsSearchHeroEl.value, 'hero'));
+                }
+                if (ykNewsSearchFloatEl) {
+                    ykNewsSearchFloatEl.addEventListener('input', () => setOverlayNewsQuery(ykNewsSearchFloatEl.value, 'float'));
+                }
+
+                // Floating bar positioning/visibility (follows under the main header)
+                const getHeaderH = () => {
+                    const h = document.getElementById('header')?.getBoundingClientRect()?.height;
+                    return (h && !Number.isNaN(h)) ? h : 64;
+                };
+
+                const updateNewsFloatBarTop = () => {
+                    if (!ykNewsFloatbarEl) return;
+                    ykNewsFloatbarEl.style.top = `${Math.round(getHeaderH() + 12)}px`;
+                };
+
+                const updateNewsFloatBarVisibility = () => {
+                    if (!ykNewsFloatbarEl || !ykNewsScrollEl) return;
+                    const hero = overlay.querySelector('.yk-hero');
+                    const headerH = getHeaderH();
+                    const threshold = hero ? Math.max(80, hero.offsetHeight - headerH - 12) : 160;
+                    const show = ykNewsScrollEl.scrollTop > threshold;
+                    ykNewsFloatbarEl.classList.toggle('show', show);
+                    ykNewsFloatbarEl.setAttribute('aria-hidden', show ? 'false' : 'true');
+                };
+
+                // Expose helpers for open/close
+                overlay.__ykUpdateNewsFloatBarTop = updateNewsFloatBarTop;
+                overlay.__ykUpdateNewsFloatBarVisibility = updateNewsFloatBarVisibility;
+
+                updateNewsFloatBarTop();
+                updateNewsFloatBarVisibility();
+
+                if (ykNewsScrollEl) {
+                    ykNewsScrollEl.addEventListener('scroll', updateNewsFloatBarVisibility, { passive: true });
+                }
+                window.addEventListener('resize', () => { updateNewsFloatBarTop(); updateNewsFloatBarVisibility(); });
 
                 const topBtn = overlay.querySelector('#yk-news-overlay-top');
                 if (topBtn) {
@@ -1907,7 +2063,7 @@ if (top.length === 0) {
                 const bodyHtml = bodyRaw.includes('<') ? bodyRaw : escapeHtml(bodyRaw).replace(/\n/g, '<br>');
 
                 return `
-                    <article id="post-${escapeHtml(id)}" class="yk-post bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm scroll-mt-28">
+                    <article id="post-${escapeHtml(id)}" data-title="${escapeHtml(title.toLowerCase())}" class="yk-post bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm scroll-mt-28">
                         <div class="flex flex-col md:flex-row gap-6 items-start">
                             <div class="relative w-full md:w-56 h-44 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                                 <i class="fas ${escapeHtml(icon)} text-gray-400 dark:text-gray-500 text-3xl absolute"></i>
@@ -1936,6 +2092,35 @@ if (top.length === 0) {
                 if (!res.ok) throw new Error(`Failed to load news.json (${res.status})`);
                 const news = await res.json();
                 return (news || []).slice().sort((a,b) => new Date(b.date) - new Date(a.date));
+            };
+
+
+            // --- News Overlay: search (title only) ---
+            const applyOverlayNewsFilter = () => {
+                if (!ykNewsPostsEl) return;
+
+                const q = String(ykNewsSearchQuery || '').trim().toLowerCase();
+                const posts = Array.from(ykNewsPostsEl.querySelectorAll('article.yk-post'));
+                let visible = 0;
+
+                for (const p of posts) {
+                    const key = String(p.dataset.title || '').toLowerCase();
+                    const match = !q || key.includes(q);
+                    p.classList.toggle('hidden', !match);
+                    if (match) visible++;
+                }
+
+                if (ykNewsNoResultsEl) {
+                    const showNoResults = (posts.length > 0 && visible === 0);
+                    ykNewsNoResultsEl.classList.toggle('hidden', !showNoResults);
+                }
+            };
+
+            const setOverlayNewsQuery = (val, source) => {
+                ykNewsSearchQuery = String(val || '');
+                if (ykNewsSearchHeroEl && source !== 'hero') ykNewsSearchHeroEl.value = ykNewsSearchQuery;
+                if (ykNewsSearchFloatEl && source !== 'float') ykNewsSearchFloatEl.value = ykNewsSearchQuery;
+                applyOverlayNewsFilter();
             };
 
                         const waitForTransformTransition = (el, timeout = 650) => {
@@ -1978,6 +2163,20 @@ if (top.length === 0) {
                 if (ykNewsPostsEl) { ykNewsPostsEl.classList.add('hidden'); ykNewsPostsEl.innerHTML = ''; }
                 if (ykNewsLoadingEl) ykNewsLoadingEl.classList.remove('hidden');
                 if (ykNewsEmptyEl) ykNewsEmptyEl.classList.add('hidden');
+                if (ykNewsNoResultsEl) ykNewsNoResultsEl.classList.add('hidden');
+
+                // Reset search state
+                ykNewsSearchQuery = '';
+                if (ykNewsSearchHeroEl) ykNewsSearchHeroEl.value = '';
+                if (ykNewsSearchFloatEl) ykNewsSearchFloatEl.value = '';
+
+                // Reset floating bar
+                if (ykNewsFloatbarEl) {
+                    ykNewsFloatbarEl.classList.remove('show');
+                    ykNewsFloatbarEl.setAttribute('aria-hidden', 'true');
+                    // keep position aligned with the main header
+                    if (ykNewsOverlayEl?.__ykUpdateNewsFloatBarTop) ykNewsOverlayEl.__ykUpdateNewsFloatBarTop();
+                }
 
                 ykNewsOverlayOpen = true;
 
@@ -2016,6 +2215,7 @@ if (top.length === 0) {
                         ykNewsPostsEl.innerHTML = sorted.map(buildOverlayPost).join('\n');
                         if (ykNewsLoadingEl) ykNewsLoadingEl.classList.add('hidden');
                         ykNewsPostsEl.classList.remove('hidden');
+                        applyOverlayNewsFilter();
                     }
 
                     // Scroll to anchor (if provided)
