@@ -504,6 +504,93 @@ const applyNewsSearch = () => {
                     .replace(/"/g, '&quot;')
                     .replace(/'/g, '&#039;');
             };
+            // --- Thumbnail rendering helper ---
+            // 1) Do NOT crop thumbnails (object-contain)
+            // 2) Fill remaining/transparent area with WHITE (even in dark mode)
+            // 3) Try common extension/case fallbacks so .jpg/.jpeg also work robustly
+            (() => {
+                const fallbackState = new WeakMap();
+
+                const splitUrl = (u = '') => {
+                    const s = String(u);
+                    const m = s.match(/^([^?#]+)(\?[^#]*)?(#.*)?$/);
+                    return {
+                        base: m ? (m[1] || '') : s,
+                        q: m ? (m[2] || '') : '',
+                        h: m ? (m[3] || '') : ''
+                    };
+                };
+
+                const buildCandidates = (src = '') => {
+                    const { base, q, h } = splitUrl(src);
+                    const m = base.match(/\.([^.\/]+)$/);
+                    const hasExt = !!m;
+                    const baseNoExt = hasExt ? base.slice(0, base.length - m[0].length) : base;
+
+                    // Keep to the formats you said you use (png/jpg/jpeg). Add webp as a bonus.
+                    const exts = ['jpg', 'jpeg', 'png', 'webp'];
+
+                    const out = [];
+                    const push = (s) => {
+                        if (!s) return;
+                        if (s === src) return;
+                        if (out.includes(s)) return;
+                        out.push(s);
+                    };
+
+                    if (hasExt) {
+                        // try same filename with different extension (lower + upper)
+                        for (const e of exts) {
+                            push(`${baseNoExt}.${e}${q}${h}`);
+                            push(`${baseNoExt}.${e.toUpperCase()}${q}${h}`);
+                        }
+                        // try swapping only the case of the current extension
+                        const curExt = m[1];
+                        push(`${baseNoExt}.${String(curExt).toLowerCase()}${q}${h}`);
+                        push(`${baseNoExt}.${String(curExt).toUpperCase()}${q}${h}`);
+                    } else {
+                        // if no extension was provided, try appending common ones
+                        for (const e of exts) {
+                            push(`${base}.${e}${q}${h}`);
+                            push(`${base}.${e.toUpperCase()}${q}${h}`);
+                        }
+                    }
+
+                    return out;
+                };
+
+                // Global handler used by inline onerror in the post template
+                window.ykThumbFallback = (imgEl) => {
+                    try {
+                        if (!imgEl) return;
+                        const cur = imgEl.getAttribute('src') || '';
+
+                        let st = fallbackState.get(imgEl);
+                        if (!st) {
+                            st = { idx: 0, list: buildCandidates(cur) };
+                            fallbackState.set(imgEl, st);
+                        }
+
+                        if (st.idx < st.list.length) {
+                            const nextSrc = st.list[st.idx++];
+                            imgEl.src = nextSrc;
+                            return;
+                        }
+
+                        // Give up: hide broken img, show the icon placeholder
+                        imgEl.style.display = 'none';
+                        const icon = imgEl.parentElement ? imgEl.parentElement.querySelector('i.fas') : null;
+                        if (icon) {
+                            icon.classList.remove('opacity-0');
+                            icon.classList.add('opacity-100');
+                        }
+                    } catch (e) {
+                        // last resort: hide the broken image
+                        try { imgEl.style.display = 'none'; } catch (_) {}
+                    }
+                };
+            })();
+
 
             const formatDate = (iso = '') => {
                 const d = new Date(iso);
@@ -534,9 +621,9 @@ const applyNewsSearch = () => {
                 return `
                     <article id="post-${escapeHtml(id)}" class="news-post bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm scroll-mt-28">
                         <div class="flex flex-col md:flex-row gap-6 items-start">
-                            <div class="relative w-full md:w-56 h-44 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                <i class="fas ${escapeHtml(icon)} text-gray-400 dark:text-gray-500 text-3xl absolute"></i>
-                                ${thumb ? `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(title)} thumbnail" class="w-full h-full object-cover relative z-10" loading="lazy" onerror="this.style.display='none';">` : ''}
+                            <div class="relative w-full md:w-56 h-44 rounded-lg overflow-hidden flex-shrink-0 bg-white dark:bg-white flex items-center justify-center">
+                                <i class="fas ${escapeHtml(icon)} text-gray-400 dark:text-gray-500 text-3xl absolute transition-opacity ${thumb ? 'opacity-0' : 'opacity-100'}"></i>
+                                ${thumb ? `<img src="${escapeHtml(thumb)}" alt="${escapeHtml(title)} thumbnail" class="w-full h-full object-contain relative z-10 bg-white" loading="lazy" decoding="async" onerror="window.ykThumbFallback ? window.ykThumbFallback(this) : (this.style.display='none')">` : ''}
                             </div>
                             <div class="flex-grow">
                                 <p class="text-sm text-gray-500 dark:text-gray-400">${escapeHtml(formatDate(dateIso))}</p>
