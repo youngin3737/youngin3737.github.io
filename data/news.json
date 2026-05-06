@@ -1,5 +1,41 @@
 [
   {
+    "id": "reviewer-2026",
+    "date": "2026-04-17",
+    "title": "Serving as a reviewer for ISMAR and UIST 2026",
+    "icon": "fa-pen-nib",
+    "tags": [
+      "UIST",
+      "ISMAR",
+      "Reviewer"
+    ],
+    "body": "I will be serving as a reviewer for the ISMAR 2026 and UIST 2026 conference. Honored to contribute to the HCI community."
+  },
+  {
+    "id": "chi26-presentation",
+    "date": "2026-04-15",
+    "title": "I presented my paper StringTouch at Busan",
+    "icon": "fa-bullhorn",
+    "tags": [
+      "CHI",
+      "Publication",
+      "Presentation"
+    ],
+    "body": "I presented a paper titled \"ConCon: A Wrist-Worn Clutch-Coupled Force-Feedback Device for VR Controller\" in Barcelona. I was also able to see many other interesting research projects and demos. The open-hardware GitHub repository for ConCon is planned to be updated within May."
+  },
+  {
+    "id": "phd, admission",
+    "date": "2026-03-03",
+    "title": "I started my career as a PhD Student in HCI Lab!",
+    "icon": "fa-newspaper",
+    "tags": [
+      "PhD",
+      "KAIST",
+      "HCI Lab"
+    ],
+    "body": "I have started my PhD in the same lab. I would like to continue working on a variety of research projects in the future!"
+  },
+  {
     "id": "master-thesis-prize",
     "date": "2026-01-30",
     "title": "I got an outstanding MS Thesis in School of Computing, KAIST for Year 2025!",
