@@ -23,7 +23,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Hanken+Grotesk:ital,wght@0,300..800;1,400..600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..700&display=swap" rel="stylesheet">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -824,8 +824,8 @@
             --shadow-amber: 0 22px 50px -18px rgba(245,158,11,0.45);
             --ease: cubic-bezier(0.22, 1, 0.36, 1);
             --spring: cubic-bezier(0.34, 1.4, 0.5, 1);
-            --display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
-            --sans: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+            --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+            --sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
         }
         .dark {
             --bg:        #0E1320;
@@ -1357,130 +1357,6 @@
         #home-content-wrapper > .container { padding-left: 2rem; padding-right: 2rem; }
         @media (min-width: 768px){ #home-content-wrapper > .container { padding-left: 3rem; padding-right: 3rem; } }
         #home-content-wrapper h1 { max-width: 16ch; }
-
-        
-        /* ============================================================
-           ✦ REFINEMENT v2 — new type system + de-default highlight
-        ============================================================ */
-        /* Bricolage is a grotesque sans: retune display weights/spacing */
-        #main-content h2, #home-content-wrapper h1,
-        #news .max-w-3xl + *, .yk-display {
-            font-family: var(--display) !important;
-            font-weight: 700 !important;
-            letter-spacing: -0.035em !important;
-        }
-        #main-content h2 { font-weight: 700 !important; }
-        #main-content h3, #publications .year-section > h3,
-        #main-content h4.publication-title { font-family: var(--display) !important; font-weight: 600 !important; letter-spacing: -0.02em; }
-
-        /* Hero headline: no italic (Bricolage italic is synthetic) */
-        #home-content-wrapper h1 { font-weight: 700 !important; line-height: 0.98 !important; }
-        #home-content-wrapper h1 .gradient-text { font-style: normal !important; font-weight: 800 !important; }
-
-        /* De-Claude the highlight: drop the peachy shimmer gradient.
-           Use a confident solid amber with a hand-drawn underline accent. */
-        .gradient-text {
-            background: none !important;
-            -webkit-text-fill-color: currentColor !important;
-            color: #FFC759 !important;       /* warm gold, distinct from Claude's terracotta */
-            animation: none !important;
-            position: relative;
-            display: inline-block !important;
-        }
-        .dark .gradient-text { color: #FFD27A !important; }
-        /* underline swash under the highlighted phrase */
-        .gradient-text::after {
-            content: "";
-            position: absolute; left: 0; right: 0; bottom: -0.06em;
-            height: 0.12em;
-            background: linear-gradient(90deg, transparent, #FFC759 12%, #FFC759 88%, transparent);
-            border-radius: 99px;
-            transform: scaleX(0.96);
-            opacity: 0.85;
-        }
-
-        /* eyebrow chips: switch to body grotesque, tighter, less "AI pill" */
-        .yk-eyebrow, #yk-news-eyebrow {
-            font-family: var(--sans) !important;
-            font-weight: 700 !important;
-            letter-spacing: 0.14em !important;
-        }
-
-        /* nav + body inherit Hanken */
-        .nav-link, #header a.text-2xl, body { font-family: var(--sans) !important; }
-        #header a.text-2xl { font-family: var(--display) !important; font-weight: 700; letter-spacing: -0.03em; }
-
-        /* ============================================================
-           ✦ TACTILE MOTION — cursor drift (horizontal only) + jelly overscroll
-        ============================================================ */
-        /* Horizontal cursor-follow drift. Uses the independent `translate`
-           property so it composes with hover `transform` without conflict.
-           Vertical is always 0 by design. */
-        .yk-drift {
-            translate: var(--yk-dx, 0px) 0px;
-            transition: translate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-            will-change: translate;
-        }
-        /* When the pointer is actively moving we shorten the transition so it
-           tracks the cursor; on rest it eases back smoothly (set via JS class). */
-        .yk-drift.yk-tracking { transition: translate 0.18s cubic-bezier(0.33, 1, 0.68, 1); }
-
-        /* Jelly overscroll: a wrapper we scale slightly past the scroll edges. */
-        #main-content, #posts {
-            transform-origin: center top;
-            will-change: transform;
-        }
-        .yk-overscroll-top { animation: ykJellyTop 0.5s cubic-bezier(0.22, 1.3, 0.4, 1); }
-        .yk-overscroll-bottom { animation: ykJellyBottom 0.5s cubic-bezier(0.22, 1.3, 0.4, 1); }
-        @keyframes ykJellyTop {
-            0%   { transform: scaleY(1); }
-            35%  { transform: scaleY(1.012) translateY(4px); }
-            100% { transform: scaleY(1); }
-        }
-        @keyframes ykJellyBottom {
-            0%   { transform: scaleY(1); }
-            35%  { transform: scaleY(1.012) translateY(-4px); }
-            100% { transform: scaleY(1); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .yk-drift { translate: 0 0 !important; transition: none !important; }
-            .yk-overscroll-top, .yk-overscroll-bottom { animation: none !important; }
-        }
-
-        /* ============================================================
-           ✦ NO-SHIFT FIX — reserve scrollbar gutter so opening the news
-           overlay (or navigating index↔news) never reflows page width.
-        ============================================================ */
-        html { scrollbar-gutter: stable; }
-        /* When the overlay locks scroll, keep the gutter reserved too */
-        html[data-yk-scroll-lock="1"] { overflow-y: hidden; }
-
-        
-        /* ============================================================
-           ✦ CARD SURFACE HARDENING — use background-color (not shorthand)
-           so Tailwind's bg-* utilities never win the cascade.
-        ============================================================ */
-        .research-card { background-color: var(--surface) !important; }
-        .publication-item { background-color: var(--surface) !important; }
-        .news-timeline-item { background-color: var(--surface) !important; }
-        #about .container > .flex { background-color: var(--surface) !important; }
-        #contact .container { background-color: var(--surface) !important; }
-        .news-post { background-color: var(--surface) !important; }
-        #yk-news-overlay .yk-post { background-color: var(--surface) !important; }
-        #search-bar-container { background-color: var(--surface) !important; }
-        .tag-btn { background-color: var(--surface) !important; }
-        .tag-btn.active { background-color: var(--amber) !important; }
-        .tag-btn.active.tag-all { background-color: var(--amber) !important; }
-        .pub-view-btn { background-color: var(--surface) !important; }
-        .pub-view-btn.active { background-color: var(--amber) !important; }
-        footer { background-color: var(--surface) !important; }
-        .abstract-container .border-l-4 { background-color: var(--surface-2) !important; }
-
-        
-        /* Hero headline: size down a touch so all lines incl. highlight read cleanly */
-        #home-content-wrapper h1 { font-size: clamp(2.3rem, 5.4vw, 4.2rem) !important; max-width: 20ch; }
-        #home-content-wrapper > .container > p { max-width: 44ch; }
 
         </style>
     <script>
@@ -2615,15 +2491,13 @@ if (top.length === 0) {
             );
 
             const lockPageScroll = (lock) => {
-                // Prevent background scroll while overlay is open.
-                // Only lock the vertical axis; scrollbar-gutter (CSS) keeps the
-                // gutter reserved so the page width never reflows (no judder).
+                // Prevent background scroll while overlay is open
                 if (lock) {
                     document.documentElement.dataset.ykScrollLock = '1';
-                    document.documentElement.style.overflowY = 'hidden';
+                    document.documentElement.style.overflow = 'hidden';
                 } else {
                     delete document.documentElement.dataset.ykScrollLock;
-                    document.documentElement.style.overflowY = '';
+                    document.documentElement.style.overflow = '';
                 }
             };
 
@@ -3656,125 +3530,6 @@ const filterPublications = () => {
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', decorate);
     else decorate();
-})();
-</script>
-
-<script>
-/* ✦ TACTILE MOTION — horizontal cursor drift on list items + jelly overscroll
-   Additive; respects reduced motion; never moves items vertically. */
-(function () {
-    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) return;
-
-    /* ---------- 1) Horizontal cursor-follow drift on list rows ---------- */
-    // Selectors for "list-like" rows on either page / overlay.
-    var DRIFT_SEL = '.news-timeline-item, .publication-item, #yk-news-overlay .yk-post, .news-post';
-    var MAX = 14;          // px max horizontal drift
-    var STAGGER = 5;       // px extra spread per alternating row
-    var rafId = null, lastX = null, restTimer = null;
-
-    function collect() { return Array.prototype.slice.call(document.querySelectorAll(DRIFT_SEL)); }
-
-    function apply(x) {
-        var vw = window.innerWidth || 1;
-        // -1 (left) .. +1 (right), centered
-        var t = (x / vw) * 2 - 1;
-        var items = collect();
-        items.forEach(function (el, i) {
-            if (!el.classList.contains('yk-drift')) el.classList.add('yk-drift');
-            // alternate direction + slight per-row factor → "loose" jelly feel
-            var dir = (i % 2 === 0) ? 1 : -1;
-            var depth = MAX + (i % 3) * STAGGER * 0.001 * STAGGER; // tiny variance
-            var dx = t * (MAX + (i % 2) * STAGGER) * dir;
-            el.style.setProperty('--yk-dx', dx.toFixed(2) + 'px');
-        });
-    }
-
-    function onMove(e) {
-        lastX = e.clientX;
-        if (rafId) return;
-        rafId = requestAnimationFrame(function () {
-            rafId = null;
-            // mark tracking (snappier) then schedule rest (smooth return-to-loose)
-            var items = collect();
-            items.forEach(function (el) { el.classList.add('yk-tracking'); });
-            apply(lastX);
-            clearTimeout(restTimer);
-            restTimer = setTimeout(function () {
-                items.forEach(function (el) { el.classList.remove('yk-tracking'); });
-            }, 120);
-        });
-    }
-
-    function onLeave() {
-        collect().forEach(function (el) {
-            el.classList.remove('yk-tracking');
-            el.style.setProperty('--yk-dx', '0px');
-        });
-    }
-
-    // Only react to a real mouse (not touch) for the drift
-    window.addEventListener('pointermove', function (e) {
-        if (e.pointerType && e.pointerType !== 'mouse') return;
-        onMove(e);
-    }, { passive: true });
-    window.addEventListener('mouseleave', onLeave);
-
-    /* ---------- 2) Jelly overscroll at very top / bottom ---------- */
-    function jellyTarget() {
-        // overlay scroll container if open, else the main page wrapper
-        var overlay = document.querySelector('html.yk-news-open #yk-news-overlay .yk-scroll');
-        if (overlay) return { el: overlay, scroller: overlay };
-        var main = document.getElementById('main-content') || document.getElementById('posts');
-        return { el: main, scroller: window };
-    }
-
-    var cooling = false;
-    function fireJelly(dir) {
-        if (cooling) return;
-        var t = jellyTarget();
-        if (!t.el) return;
-        cooling = true;
-        var cls = dir === 'top' ? 'yk-overscroll-top' : 'yk-overscroll-bottom';
-        t.el.classList.remove('yk-overscroll-top', 'yk-overscroll-bottom');
-        void t.el.offsetWidth;
-        t.el.classList.add(cls);
-        setTimeout(function () { t.el.classList.remove(cls); cooling = false; }, 520);
-    }
-
-    function atEdges() {
-        var t = jellyTarget();
-        var top, bottom;
-        if (t.scroller === window) {
-            var y = window.scrollY || document.documentElement.scrollTop || 0;
-            var max = (document.documentElement.scrollHeight - window.innerHeight);
-            top = y <= 1; bottom = y >= max - 2;
-        } else {
-            var s = t.scroller;
-            top = s.scrollTop <= 0;
-            bottom = s.scrollTop >= (s.scrollHeight - s.clientHeight - 2);
-        }
-        return { top: top, bottom: bottom };
-    }
-
-    window.addEventListener('wheel', function (e) {
-        var edge = atEdges();
-        if (edge.top && e.deltaY < -6) fireJelly('top');
-        else if (edge.bottom && e.deltaY > 6) fireJelly('bottom');
-    }, { passive: true });
-
-    // touch overscroll
-    var touchStartY = null;
-    window.addEventListener('touchstart', function (e) {
-        touchStartY = e.touches && e.touches[0] ? e.touches[0].clientY : null;
-    }, { passive: true });
-    window.addEventListener('touchmove', function (e) {
-        if (touchStartY == null || !e.touches || !e.touches[0]) return;
-        var dy = e.touches[0].clientY - touchStartY;
-        var edge = atEdges();
-        if (edge.top && dy > 24) { fireJelly('top'); touchStartY = null; }
-        else if (edge.bottom && dy < -24) { fireJelly('bottom'); touchStartY = null; }
-    }, { passive: true });
 })();
 </script>
 
