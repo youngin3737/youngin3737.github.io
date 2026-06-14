@@ -392,6 +392,147 @@
         footer { background-color: var(--surface) !important; }
         .abstract-container .border-l-4 { background-color: var(--surface-2) !important; }
 
+        
+        /* ============================================================
+           ✦ FIXES v3 — highlight visibility, drag cursor, glassmorphism
+        ============================================================ */
+
+        /* 1) HIGHLIGHT FIX: make "Make Our Lives Fun" / "News" reliably visible.
+           Override every earlier text-fill/clip rule with a clean solid fill. */
+        .gradient-text,
+        #home-content-wrapper h1 .gradient-text,
+        #news-hero h1 .gradient-text {
+            background: none !important;
+            background-image: none !important;
+            -webkit-background-clip: border-box !important;
+            background-clip: border-box !important;
+            -webkit-text-fill-color: #FFC759 !important;
+            color: #FFC759 !important;
+            animation: none !important;
+            text-shadow: 0 1px 18px rgba(245,158,11,0.35);
+        }
+        .dark .gradient-text,
+        .dark #home-content-wrapper h1 .gradient-text,
+        .dark #news-hero h1 .gradient-text {
+            -webkit-text-fill-color: #FFD27A !important;
+            color: #FFD27A !important;
+        }
+        /* keep the soft underline swash */
+        .gradient-text::after {
+            content: ""; position: absolute; left: 0; right: 0; bottom: -0.06em;
+            height: 0.12em; border-radius: 99px; transform: scaleX(0.96); opacity: 0.85;
+            background: linear-gradient(90deg, transparent, #FFC759 12%, #FFC759 88%, transparent);
+        }
+
+        /* 2) DRAG: cursor affordance + neutralize old zigzag drift */
+        .yk-drift { translate: none !important; }   /* disable leftover drift var */
+        #about .container > .flex, .research-card, .news-timeline-item,
+        .publication-item, .news-post, #yk-news-overlay .yk-post {
+            cursor: grab;
+            touch-action: pan-y;       /* let vertical scroll through, we capture drag */
+            will-change: transform;
+        }
+        .yk-grabbing { cursor: grabbing !important; }
+        /* lift shadow while grabbing for a tactile "picked up" feel */
+        .research-card.yk-grabbing, .publication-item.yk-grabbing,
+        .news-timeline-item.yk-grabbing, .news-post.yk-grabbing,
+        #about .container > .flex.yk-grabbing, #yk-news-overlay .yk-post.yk-grabbing {
+            box-shadow: var(--shadow-lg) !important;
+        }
+        /* interactive children keep normal cursor */
+        .research-card a, .publication-item a, .news-post a,
+        .publication-item button, .news-timeline-entry,
+        .tag-btn, .pub-view-btn, .abstract-toggle-btn { cursor: pointer; }
+
+        /* 3) GLASSMORPHIC HIGHLIGHTS — frosted accents on a few surfaces.
+           Light, tasteful; not a full reskin. */
+        :root {
+            --glass-light: rgba(255,255,255,0.55);
+            --glass-border: rgba(255,255,255,0.65);
+            --glass-shadow: 0 8px 32px -8px rgba(33,30,26,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+        .dark {
+            --glass-light: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.12);
+            --glass-shadow: 0 8px 32px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        /* eyebrow pills → frosted glass */
+        .yk-eyebrow, #yk-news-eyebrow {
+            background: var(--glass-light) !important;
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            backdrop-filter: blur(12px) saturate(160%);
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* hero CTA → glass over the amber, with a bright top edge */
+        #home-content-wrapper a.bg-amber-500, #news a.bg-amber-500 {
+            position: relative;
+            -webkit-backdrop-filter: blur(8px) saturate(140%);
+            backdrop-filter: blur(8px) saturate(140%);
+            border: 1px solid rgba(255,255,255,0.45) !important;
+            box-shadow: 0 10px 30px -8px rgba(245,158,11,0.5), inset 0 1px 0 rgba(255,255,255,0.7) !important;
+        }
+
+        /* research icon tiles → frosted glass chips */
+        .research-card .fas {
+            background: var(--glass-light) !important;
+            -webkit-backdrop-filter: blur(10px) saturate(160%);
+            backdrop-filter: blur(10px) saturate(160%);
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* tag filter + view-toggle pills → subtle glass */
+        .tag-btn, .pub-view-btn, #search-bar-container {
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
+            backdrop-filter: blur(10px) saturate(150%);
+        }
+
+        /* contact social buttons → glass discs */
+        #contact .mt-8 a {
+            background: var(--glass-light) !important;
+            -webkit-backdrop-filter: blur(10px) saturate(160%);
+            backdrop-filter: blur(10px) saturate(160%);
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* a faint frosted sheen strip across the top of each floating card */
+        .research-card::after, .publication-item::after {
+            content: ""; position: absolute; left: 0; right: 0; top: 0; height: 38%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0));
+            pointer-events: none; opacity: 0.7; border-radius: inherit;
+        }
+        .dark .research-card::after, .dark .publication-item::after {
+            background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0));
+        }
+        .research-card, .publication-item { position: relative; }
+        .research-card > *, .publication-item > * { position: relative; z-index: 1; }
+
+        @media (prefers-reduced-motion: reduce) {
+            #about .container > .flex, .research-card, .news-timeline-item,
+            .publication-item, .news-post { cursor: default; }
+        }
+
+        
+        /* Prevent text selection while dragging cards (avoids highlight artifact) */
+        #about .container > .flex, .research-card, .news-timeline-item,
+        .publication-item, .news-post, #yk-news-overlay .yk-post {
+            -webkit-user-select: none; user-select: none;
+        }
+        /* but allow selecting inside actual links/abstract text if needed */
+        .abstract-content, .pub-authors, .pub-venue { -webkit-user-select: text; user-select: text; }
+
+        
+        /* Harden all publication/news link states to amber (never blue) */
+        .pub-link-text, .pub-link-text:link, .pub-link-text:visited { color: var(--amber-deep) !important; }
+        .dark .pub-link-text, .dark .pub-link-text:visited { color: var(--peach) !important; }
+        #main-content a:visited:not(.bg-amber-500):not([class*="bg-gray-"]) { color: var(--amber-deep); }
+        .dark #main-content a:visited:not(.bg-amber-500):not([class*="bg-gray-"]) { color: var(--peach); }
+        #posts a:visited:not(.bg-amber-500) { color: var(--amber-deep); }
+
         </style>
 
     <script>
@@ -946,65 +1087,69 @@ const applyNewsSearch = () => {
 </script>
 
 <script>
-/* ✦ TACTILE MOTION — horizontal cursor drift on list items + jelly overscroll
-   Additive; respects reduced motion; never moves items vertically. */
+/* ✦ TACTILE MOTION — elastic drag on cards + jelly overscroll
+   Additive; respects reduced motion. */
 (function () {
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce) return;
 
-    /* ---------- 1) Horizontal cursor-follow drift on list rows ---------- */
-    // Selectors for "list-like" rows on either page / overlay.
-    var DRIFT_SEL = '.news-timeline-item, .publication-item, #yk-news-overlay .yk-post, .news-post';
-    var MAX = 14;          // px max horizontal drift
-    var STAGGER = 5;       // px extra spread per alternating row
-    var rafId = null, lastX = null, restTimer = null;
+    /* ---------- 1) Elastic drag: grab a card, it stretches toward the
+       cursor up to a limit, then springs back ("띠용") on release. -------- */
+    var DRAG_SEL = [
+        '#about .container > .flex',
+        '.research-card',
+        '.news-timeline-item',
+        '.publication-item',
+        '.news-post',
+        '#yk-news-overlay .yk-post'
+    ].join(', ');
 
-    function collect() { return Array.prototype.slice.call(document.querySelectorAll(DRIFT_SEL)); }
+    var MAX_PULL = 64;
+    var RESIST = 0.55;
+    var active = null;
 
-    function apply(x) {
-        var vw = window.innerWidth || 1;
-        // -1 (left) .. +1 (right), centered
-        var t = (x / vw) * 2 - 1;
-        var items = collect();
-        items.forEach(function (el, i) {
-            if (!el.classList.contains('yk-drift')) el.classList.add('yk-drift');
-            // alternate direction + slight per-row factor → "loose" jelly feel
-            var dir = (i % 2 === 0) ? 1 : -1;
-            var depth = MAX + (i % 3) * STAGGER * 0.001 * STAGGER; // tiny variance
-            var dx = t * (MAX + (i % 2) * STAGGER) * dir;
-            el.style.setProperty('--yk-dx', dx.toFixed(2) + 'px');
-        });
+    function fromInteractive(target) {
+        return !!(target.closest && target.closest('a, button, input, textarea, select, .abstract-toggle-btn, .tag-btn, .pub-view-btn'));
     }
-
+    function elastic(d, max) {
+        var s = Math.sign(d), a = Math.abs(d);
+        return s * (max * (1 - Math.exp(-a / (max * 0.9))));
+    }
+    function onDown(e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        var card = e.target.closest(DRAG_SEL);
+        if (!card || fromInteractive(e.target)) return;
+        active = { el: card, sx: e.clientX, sy: e.clientY, dx: 0, dy: 0, pid: e.pointerId };
+        card.classList.add('yk-grabbing');
+        card.style.transition = 'none';
+        try { card.setPointerCapture(e.pointerId); } catch (_) {}
+    }
     function onMove(e) {
-        lastX = e.clientX;
-        if (rafId) return;
-        rafId = requestAnimationFrame(function () {
-            rafId = null;
-            // mark tracking (snappier) then schedule rest (smooth return-to-loose)
-            var items = collect();
-            items.forEach(function (el) { el.classList.add('yk-tracking'); });
-            apply(lastX);
-            clearTimeout(restTimer);
-            restTimer = setTimeout(function () {
-                items.forEach(function (el) { el.classList.remove('yk-tracking'); });
-            }, 120);
-        });
+        if (!active || e.pointerId !== active.pid) return;
+        var rawX = e.clientX - active.sx, rawY = e.clientY - active.sy;
+        active.dx = elastic(rawX * RESIST, MAX_PULL);
+        active.dy = elastic(rawY * RESIST, MAX_PULL);
+        var dist = Math.hypot(active.dx, active.dy);
+        var rot = (active.dx / MAX_PULL) * 3.2;
+        var scale = 1 + Math.min(dist / MAX_PULL, 1) * 0.03;
+        active.el.style.transform =
+            'translate(' + active.dx.toFixed(1) + 'px,' + active.dy.toFixed(1) + 'px) rotate(' + rot.toFixed(2) + 'deg) scale(' + scale.toFixed(3) + ')';
+        active.el.style.zIndex = '30';
     }
-
-    function onLeave() {
-        collect().forEach(function (el) {
-            el.classList.remove('yk-tracking');
-            el.style.setProperty('--yk-dx', '0px');
-        });
+    function springBack() {
+        if (!active) return;
+        var el = active.el;
+        el.classList.remove('yk-grabbing');
+        el.style.transition = 'transform 0.62s cubic-bezier(0.18, 1.5, 0.4, 1)';
+        el.style.transform = 'translate(0px,0px) rotate(0deg) scale(1)';
+        var done = el;
+        setTimeout(function () { done.style.transition = ''; done.style.transform = ''; done.style.zIndex = ''; }, 640);
+        active = null;
     }
-
-    // Only react to a real mouse (not touch) for the drift
-    window.addEventListener('pointermove', function (e) {
-        if (e.pointerType && e.pointerType !== 'mouse') return;
-        onMove(e);
-    }, { passive: true });
-    window.addEventListener('mouseleave', onLeave);
+    document.addEventListener('pointerdown', onDown, { passive: true });
+    document.addEventListener('pointermove', onMove, { passive: true });
+    document.addEventListener('pointerup', springBack, { passive: true });
+    document.addEventListener('pointercancel', springBack, { passive: true });
 
     /* ---------- 2) Jelly overscroll at very top / bottom ---------- */
     function jellyTarget() {
