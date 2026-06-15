@@ -533,6 +533,376 @@
         .dark #main-content a:visited:not(.bg-amber-500):not([class*="bg-gray-"]) { color: var(--peach); }
         #posts a:visited:not(.bg-amber-500) { color: var(--amber-deep); }
 
+        
+        /* ============================================================
+           ✦ FIXES v4 — mobile menu, hero nav, real glassmorphism,
+              glass drag, drag clip, year gaps, abstract clipping
+        ============================================================ */
+
+        /* ---- (6)(7) De-clamp publications: visible items grow naturally,
+           no phantom gaps, no abstract clipping. Keep max-height only for
+           the filter-collapse animation; in the RESTING state overflow is
+           visible and JS sets --mh to true content height (no padding fudge). ---- */
+        .publication-item, .year-section, #no-results-message {
+            overflow: visible !important;    /* let abstracts & drag escape */
+        }
+        .hidden-filter {
+            max-height: 0 !important;
+            overflow: hidden !important;
+            opacity: 0;
+            transform: scale(0.97);
+            padding-top: 0 !important; padding-bottom: 0 !important;
+            margin-top: 0 !important; margin-bottom: 0 !important;
+            border-width: 0 !important;
+            pointer-events: none;
+        }
+        /* the abstract drawer keeps its own clip + animation (unchanged) */
+        .abstract-container { overflow: hidden !important; }
+
+        /* (6) kill the extra vertical gap the year header used to leave.
+           Year heading sits tight above its items regardless of year. */
+        #publications .year-section > h3 { margin-bottom: 1rem !important; }
+
+        /* ---- (5) Dragged cards must render ABOVE everything & never clip ---- */
+        .yk-grabbing { position: relative; z-index: 999 !important; }
+        /* while any card in a year-section is grabbed, lift the section's clip */
+        .year-section.yk-has-grab { overflow: visible !important; z-index: 50; position: relative; }
+        #research .grid, #news .max-w-3xl, #publications .space-y-8,
+        .space-y-8, #news-list { overflow: visible !important; }
+
+        /* ============================================================
+           (2) HERO TOP BAR — all white, no amber, no dot highlight
+        ============================================================ */
+        /* Only when header is in its transparent (top-of-hero) state */
+        #header:not(.backdrop-blur-md) .nav-link,
+        #header:not(.backdrop-blur-md) a.text-2xl,
+        #header:not(.backdrop-blur-md) #theme-toggle,
+        #header:not(.backdrop-blur-md) #mobile-menu-button {
+            color: #ffffff !important;
+        }
+        #header:not(.backdrop-blur-md) .nav-link.active { color: #ffffff !important; }
+        /* hide the dot indicator entirely while over the hero */
+        #header:not(.backdrop-blur-md) .nav-link::after { display: none !important; }
+        #header:not(.backdrop-blur-md) .nav-link:hover { color: #ffffff !important; opacity: 0.85; }
+
+        /* ============================================================
+           (3) REAL GLASSMORPHISM — translucent + background blur that
+           shows what's behind (like the hero "Latest News" chip).
+           No hover flash; the frost is the resting state.
+        ============================================================ */
+        :root {
+            --glass-bg: rgba(255,255,255,0.45);
+            --glass-bg-strong: rgba(255,255,255,0.55);
+            --glass-brd: rgba(255,255,255,0.55);
+            --glass-blur: blur(16px) saturate(150%);
+            --glass-sh: 0 8px 30px -10px rgba(33,30,26,0.22);
+        }
+        .dark {
+            --glass-bg: rgba(30,38,56,0.45);
+            --glass-bg-strong: rgba(30,38,56,0.58);
+            --glass-brd: rgba(255,255,255,0.12);
+            --glass-sh: 0 10px 34px -12px rgba(0,0,0,0.6);
+        }
+
+        /* eyebrow pills */
+        .yk-eyebrow, #yk-news-eyebrow {
+            background: var(--glass-bg) !important;
+            -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-brd) !important;
+            box-shadow: var(--glass-sh) !important;
+        }
+
+        /* research icon tiles — frosted, see-through */
+        .research-card .fas {
+            background: var(--glass-bg) !important;
+            -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-brd) !important;
+            box-shadow: var(--glass-sh) !important;
+        }
+
+        /* tag + view-toggle + search — translucent frosted */
+        .tag-btn, .pub-view-btn {
+            background: var(--glass-bg) !important;
+            -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-brd) !important;
+        }
+        .tag-btn.active, .pub-view-btn.active { background: var(--amber) !important; border-color: transparent !important; }
+        #search-bar-container {
+            background: var(--glass-bg) !important;
+            -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-brd) !important;
+        }
+
+        /* contact social discs — frosted */
+        #contact .mt-8 a {
+            background: var(--glass-bg) !important;
+            -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-brd) !important;
+            box-shadow: var(--glass-sh) !important;
+        }
+        /* hover = gentle tint only, no flash */
+        #contact .mt-8 a:hover { background: rgba(245,158,11,0.18) !important; }
+
+        /* hero CTA: keep amber but give it a glassy translucent skin */
+        #home-content-wrapper a.bg-amber-500, #news a.bg-amber-500 {
+            background: linear-gradient(135deg, rgba(251,191,119,0.92), rgba(245,158,11,0.92)) !important;
+            -webkit-backdrop-filter: blur(8px) saturate(140%);
+            backdrop-filter: blur(8px) saturate(140%);
+            border: 1px solid rgba(255,255,255,0.5) !important;
+            box-shadow: 0 10px 30px -10px rgba(245,158,11,0.45) !important;
+        }
+
+        /* remove the old non-glass "sheen strip" hover flash on cards */
+        .research-card::after, .publication-item::after { display: none !important; }
+
+        /* ============================================================
+           (4) DRAGGABLE CARDS — half-glass while grabbed: background
+           shows through with blur. Resting = solid; grabbing = frosted.
+        ============================================================ */
+        #about .container > .flex, .research-card, .news-timeline-item,
+        .publication-item, .news-post, #yk-news-overlay .yk-post {
+            transition: background-color 0.3s var(--ease), backdrop-filter 0.3s var(--ease);
+        }
+        .yk-grabbing {
+            background-color: var(--glass-bg-strong) !important;
+            -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+            backdrop-filter: blur(18px) saturate(160%) !important;
+            border: 1px solid var(--glass-brd) !important;
+            box-shadow: var(--shadow-lg) !important;
+        }
+
+        /* ============================================================
+           (1) MOBILE MENU — slide/fade open + active-section highlight
+           (scoped to mobile widths; desktop keeps it hidden)
+        ============================================================ */
+        @media (max-width: 767px) {
+        #mobile-menu {
+            display: block !important;
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: max-height 0.4s var(--ease), opacity 0.3s ease, transform 0.4s var(--ease);
+            background: var(--glass-bg-strong) !important;
+            -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+            border-top: 1px solid var(--glass-brd) !important;
+        }
+        #mobile-menu.yk-open {
+            max-height: 320px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        }
+        @media (min-width: 768px) {
+            #mobile-menu { display: none !important; }
+        }
+        #mobile-menu a {
+            position: relative;
+            border-radius: 12px;
+            padding: 0.65rem 0.9rem !important;
+            margin: 0.15rem 0;
+            font-weight: 600;
+            transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+        }
+        #mobile-menu a:hover { background: rgba(245,158,11,0.12); }
+        /* active section highlight */
+        #mobile-menu a.active {
+            background: rgba(245,158,11,0.16);
+            color: var(--amber-deep) !important;
+            padding-left: 1.2rem !important;
+        }
+        .dark #mobile-menu a.active { color: var(--peach) !important; }
+        #mobile-menu a.active::before {
+            content: ""; position: absolute; left: 0.35rem; top: 50%;
+            width: 4px; height: 1.1em; border-radius: 99px;
+            background: linear-gradient(180deg, var(--amber), var(--rose));
+            transform: translateY(-50%);
+        }
+
+        /* hamburger icon → animated bars (CSS-only morph to X) */
+        #mobile-menu-button { width: 30px; height: 30px; position: relative; display: inline-flex; align-items: center; justify-content: center; }
+        #mobile-menu-button .fa-bars { display: none !important; }  /* replace FA icon */
+        #mobile-menu-button .yk-bars { position: relative; width: 22px; height: 16px; }
+        #mobile-menu-button .yk-bars span {
+            position: absolute; left: 0; height: 2.5px; width: 100%; border-radius: 99px;
+            background: currentColor;
+            transition: transform 0.35s var(--spring), opacity 0.2s ease, top 0.35s var(--ease);
+        }
+        #mobile-menu-button .yk-bars span:nth-child(1) { top: 0; }
+        #mobile-menu-button .yk-bars span:nth-child(2) { top: 6.75px; }
+        #mobile-menu-button .yk-bars span:nth-child(3) { top: 13.5px; }
+        #mobile-menu-button.yk-active .yk-bars span:nth-child(1) { top: 6.75px; transform: rotate(45deg); }
+        #mobile-menu-button.yk-active .yk-bars span:nth-child(2) { opacity: 0; }
+        #mobile-menu-button.yk-active .yk-bars span:nth-child(3) { top: 6.75px; transform: rotate(-45deg); }
+
+        @media (prefers-reduced-motion: reduce) {
+            #mobile-menu { transition: opacity 0.2s ease; }
+            .yk-grabbing { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+        }
+
+        
+        /* Detailed-view publication link buttons: ensure readable text (never raw blue) */
+        .pub-links-detailed a[class*="bg-gray-2"], .pub-links-detailed a[class*="bg-gray-3"] { color: #1f2937 !important; }
+        .dark .pub-links-detailed a[class*="bg-gray-6"], .dark .pub-links-detailed a[class*="bg-gray-7"] { color: #f3f4f6 !important; }
+        .pub-links-detailed a { text-decoration: none !important; }
+        /* any stray link inside a publication item that isn't a styled chip → amber */
+        .publication-item a:not([class*="bg-"]):not(.pub-link-text) { color: var(--amber-deep) !important; text-decoration: none !important; }
+        .dark .publication-item a:not([class*="bg-"]):not(.pub-link-text) { color: var(--peach) !important; }
+
+        
+        /* ============================================================
+           ✦ FIXES v5 — true iPhone-style glassmorphism + header line fix
+        ============================================================ */
+
+        /* ---- Frosted-glass tokens — matched to the header's look ---- */
+        :root {
+            --ios-fill: rgba(255,255,255,0.68);
+            --ios-fill-2: rgba(255,255,255,0.58);
+            --ios-brd: rgba(255,255,255,0.55);
+            --ios-blur: blur(24px) saturate(165%);
+            --ios-blur-strong: blur(30px) saturate(175%);
+            --ios-sh: 0 12px 40px -14px rgba(33,30,26,0.30), inset 0 1px 0 rgba(255,255,255,0.55);
+        }
+        .dark {
+            --ios-fill: rgba(22,29,46,0.66);
+            --ios-fill-2: rgba(22,29,46,0.55);
+            --ios-brd: rgba(255,255,255,0.14);
+            --ios-sh: 0 14px 44px -16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.10);
+        }
+
+        /* The aurora needs to be visible THROUGH the cards, so make sure the
+           page background paints behind them (already does) and cards become
+           translucent + blurred. */
+
+        /* ABOUT card */
+        #about .container > .flex {
+            background: var(--ios-fill) !important;
+            background-color: var(--ios-fill) !important;
+            -webkit-backdrop-filter: var(--ios-blur-strong) !important;
+            backdrop-filter: var(--ios-blur-strong) !important;
+            border: 1px solid var(--ios-brd) !important;
+            box-shadow: var(--ios-sh) !important;
+        }
+
+        /* RESEARCH cards */
+        .research-card {
+            background: var(--ios-fill) !important;
+            background-color: var(--ios-fill) !important;
+            -webkit-backdrop-filter: var(--ios-blur) !important;
+            backdrop-filter: var(--ios-blur) !important;
+            border: 1px solid var(--ios-brd) !important;
+            box-shadow: var(--ios-sh) !important;
+        }
+
+        /* NEWS rows */
+        .news-timeline-item {
+            background: var(--ios-fill) !important;
+            background-color: var(--ios-fill) !important;
+            -webkit-backdrop-filter: var(--ios-blur) !important;
+            backdrop-filter: var(--ios-blur) !important;
+            border: 1px solid var(--ios-brd) !important;
+            box-shadow: var(--ios-sh) !important;
+        }
+
+        /* PUBLICATION cards (detailed view) */
+        #publications:not(.pub-compact) .publication-item {
+            background: var(--ios-fill) !important;
+            background-color: var(--ios-fill) !important;
+            -webkit-backdrop-filter: var(--ios-blur) !important;
+            backdrop-filter: var(--ios-blur) !important;
+            border: 1px solid var(--ios-brd) !important;
+            box-shadow: var(--ios-sh) !important;
+        }
+
+        /* NEWS PAGE posts + overlay posts */
+        .news-post, #yk-news-overlay .yk-post {
+            background: var(--ios-fill) !important;
+            background-color: var(--ios-fill) !important;
+            -webkit-backdrop-filter: var(--ios-blur) !important;
+            backdrop-filter: var(--ios-blur) !important;
+            border: 1px solid var(--ios-brd) !important;
+            box-shadow: var(--ios-sh) !important;
+        }
+
+        /* the inner abstract drawer should also read as glass, not a solid slab */
+        .abstract-container .border-l-4 {
+            background: var(--ios-fill-2) !important;
+            background-color: var(--ios-fill-2) !important;
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            backdrop-filter: blur(14px) saturate(160%);
+        }
+
+        /* While dragging: keep glass but slightly more opaque so text stays legible */
+        .yk-grabbing {
+            background: var(--ios-fill) !important;
+            background-color: var(--ios-fill) !important;
+            -webkit-backdrop-filter: var(--ios-blur-strong) !important;
+            backdrop-filter: var(--ios-blur-strong) !important;
+            box-shadow: 0 30px 70px -20px rgba(33,30,26,0.4), inset 0 1px 0 rgba(255,255,255,0.5) !important;
+        }
+
+        /* ---- (2) Hero CTA: remove the shiny sweep, just calm glass ---- */
+        #home-content-wrapper a.bg-amber-500::after,
+        #news a.bg-amber-500::after { display: none !important; content: none !important; }
+        #home-content-wrapper a.bg-amber-500, #news a.bg-amber-500 {
+            background: rgba(245,158,11,0.30) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+            backdrop-filter: blur(20px) saturate(160%) !important;
+            border: 1px solid rgba(255,255,255,0.40) !important;
+            box-shadow: 0 10px 30px -12px rgba(245,158,11,0.35) !important;
+            color: #ffffff !important;
+            text-shadow: 0 1px 8px rgba(0,0,0,0.25);
+        }
+        #home-content-wrapper a.bg-amber-500:hover, #news a.bg-amber-500:hover {
+            background: rgba(245,158,11,0.42) !important;
+            transform: translateY(-2px);
+        }
+
+        /* ---- (3) Header bottom white-line flash fix ----
+           Remove the transitioning border-bottom; use a non-animating divider
+           that only exists in the scrolled (frosted) state. */
+        #header { transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease !important; }
+        #header.backdrop-blur-md {
+            border-bottom: none !important;
+            box-shadow: 0 8px 30px -16px rgba(33,30,26,0.28), 0 1px 0 0 var(--line) !important;
+        }
+        #header:not(.backdrop-blur-md) {
+            border-bottom: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ---- (4) overscroll: drop the old one-shot bounce animation ---- */
+        .yk-overscroll-top, .yk-overscroll-bottom { animation: none !important; }
+        /* the rubber-band JS drives transform directly; ensure smooth origin */
+        #main-content, #posts { transform-origin: center top; }
+
+        @media (prefers-reduced-motion: reduce) {
+            #about .container > .flex, .research-card, .news-timeline-item,
+            .publication-item, .news-post, .yk-grabbing {
+                -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+            }
+        }
+
+        
+        /* ✦ FROST SUBSTRATE (news.html) */
+        #posts { position: relative; }
+        #posts > .container, #posts > * { position: relative; z-index: 1; }
+        #yk-orbs { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        #yk-orbs b { position: absolute; display: block; border-radius: 50%; filter: blur(55px); opacity: 0.28; mix-blend-mode: multiply; }
+        .dark #yk-orbs b { mix-blend-mode: screen; opacity: 0.30; }
+        #yk-orbs b:nth-child(1){ width:340px;height:340px; left:4%;  top:8%;   background:#FBBF24; }
+        #yk-orbs b:nth-child(2){ width:300px;height:300px; right:6%; top:20%;  background:#A78BFA; }
+        #yk-orbs b:nth-child(3){ width:380px;height:380px; left:18%; top:48%;  background:#FB7185; }
+        #yk-orbs b:nth-child(4){ width:320px;height:320px; right:12%;top:62%;  background:#5EEAD4; }
+        #yk-orbs b:nth-child(5){ width:360px;height:360px; left:8%;  top:82%;  background:#F59E0B; }
+        #yk-orbs b:nth-child(6){ width:300px;height:300px; right:16%;top:90%;  background:#C084FC; }
+
         </style>
 
     <script>
@@ -562,8 +932,9 @@
                     <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                     <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
                 </button>
-                <button id="mobile-menu-button" class="md:hidden">
+                <button id="mobile-menu-button" class="md:hidden" aria-label="Toggle menu" aria-expanded="false">
                     <i class="fas fa-bars text-2xl"></i>
+                    <span class="yk-bars" aria-hidden="true"><span></span><span></span><span></span></span>
                 </button>
             </div>
         </nav>
@@ -652,14 +1023,22 @@
             // Set current year in footer
             document.getElementById('year').textContent = new Date().getFullYear();
 
-            // Mobile menu toggle
+            // Mobile menu toggle (animated open/close + hamburger morph)
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
+            const setMobileMenu = (open) => {
+                mobileMenu.classList.toggle('yk-open', open);
+                mobileMenuButton.classList.toggle('yk-active', open);
+                mobileMenuButton.setAttribute('aria-expanded', open ? 'true' : 'false');
                 updateHeaderH();
                 updateFloatingBackX();
                 updateFloatingBack();
+            };
+            mobileMenuButton.addEventListener('click', () => {
+                setMobileMenu(!mobileMenu.classList.contains('yk-open'));
+            });
+            mobileMenu.querySelectorAll('a').forEach(a => {
+                a.addEventListener('click', () => setMobileMenu(false));
             });
 const header = document.getElementById('header');
 
@@ -1063,6 +1442,14 @@ const applyNewsSearch = () => {
 /* ✦ PREMIUM SOFT REDESIGN (news.html) — decorative DOM */
 (function(){
     function decorate(){
+        var posts = document.getElementById('posts');
+        if (posts && !document.getElementById('yk-orbs')) {
+            var orbs = document.createElement('div');
+            orbs.id = 'yk-orbs';
+            orbs.setAttribute('aria-hidden','true');
+            orbs.innerHTML = '<b></b><b></b><b></b><b></b><b></b><b></b>';
+            posts.insertBefore(orbs, posts.firstChild);
+        }
         var wrap = document.querySelector('#news-hero .container .max-w-4xl');
         if (wrap && !document.getElementById('yk-news-eyebrow')) {
             var e=document.createElement('div');
@@ -1151,26 +1538,12 @@ const applyNewsSearch = () => {
     document.addEventListener('pointerup', springBack, { passive: true });
     document.addEventListener('pointercancel', springBack, { passive: true });
 
-    /* ---------- 2) Jelly overscroll at very top / bottom ---------- */
+    /* ---------- 2) Rubber-band overscroll (iOS/Android style) ---------- */
     function jellyTarget() {
-        // overlay scroll container if open, else the main page wrapper
         var overlay = document.querySelector('html.yk-news-open #yk-news-overlay .yk-scroll');
         if (overlay) return { el: overlay, scroller: overlay };
         var main = document.getElementById('main-content') || document.getElementById('posts');
         return { el: main, scroller: window };
-    }
-
-    var cooling = false;
-    function fireJelly(dir) {
-        if (cooling) return;
-        var t = jellyTarget();
-        if (!t.el) return;
-        cooling = true;
-        var cls = dir === 'top' ? 'yk-overscroll-top' : 'yk-overscroll-bottom';
-        t.el.classList.remove('yk-overscroll-top', 'yk-overscroll-bottom');
-        void t.el.offsetWidth;
-        t.el.classList.add(cls);
-        setTimeout(function () { t.el.classList.remove(cls); cooling = false; }, 520);
     }
 
     function atEdges() {
@@ -1185,27 +1558,56 @@ const applyNewsSearch = () => {
             top = s.scrollTop <= 0;
             bottom = s.scrollTop >= (s.scrollHeight - s.clientHeight - 2);
         }
-        return { top: top, bottom: bottom };
+        return { top: top, bottom: bottom, el: t.el };
     }
 
+    var pull = 0, rafPull = null, releasing = false, MAXPULL = 140, curEl = null;
+    function damp(raw) { var s = Math.sign(raw), a = Math.abs(raw); return s * MAXPULL * (1 - Math.exp(-a / (MAXPULL * 1.1))); }
+    function render() { if (curEl) curEl.style.transform = 'translateY(' + pull.toFixed(1) + 'px)'; }
+    function springBackPull() {
+        releasing = true;
+        function step() {
+            pull *= 0.82;
+            if (Math.abs(pull) < 0.4) { pull = 0; if (curEl){ curEl.style.transition=''; curEl.style.transform=''; } curEl=null; releasing=false; rafPull=null; return; }
+            render(); rafPull = requestAnimationFrame(step);
+        }
+        if (rafPull) cancelAnimationFrame(rafPull);
+        if (curEl) curEl.style.transition = 'none';
+        rafPull = requestAnimationFrame(step);
+    }
+    var rawAccum = 0, settleTimer = null;
+    function addPull(amount, el) {
+        if (!el) return;
+        if (curEl && curEl !== el) { curEl.style.transform=''; curEl.style.transition=''; }
+        curEl = el; releasing = false;
+        if (rafPull) { cancelAnimationFrame(rafPull); rafPull = null; }
+        curEl.style.transition = 'none';
+        rawAccum += amount; pull = damp(rawAccum); render();
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(function () { rawAccum = 0; springBackPull(); }, 90);
+    }
     window.addEventListener('wheel', function (e) {
         var edge = atEdges();
-        if (edge.top && e.deltaY < -6) fireJelly('top');
-        else if (edge.bottom && e.deltaY > 6) fireJelly('bottom');
+        if (edge.top && e.deltaY < 0) addPull(-e.deltaY * 0.6, edge.el);
+        else if (edge.bottom && e.deltaY > 0) addPull(-e.deltaY * 0.6, edge.el);
+        else if (Math.abs(pull) > 0 && !releasing) { rawAccum = 0; springBackPull(); }
     }, { passive: true });
-
-    // touch overscroll
-    var touchStartY = null;
-    window.addEventListener('touchstart', function (e) {
-        touchStartY = e.touches && e.touches[0] ? e.touches[0].clientY : null;
-    }, { passive: true });
+    var touchStartY = null, touchPulling = false;
+    window.addEventListener('touchstart', function (e) { touchStartY = e.touches && e.touches[0] ? e.touches[0].clientY : null; touchPulling = false; }, { passive: true });
     window.addEventListener('touchmove', function (e) {
         if (touchStartY == null || !e.touches || !e.touches[0]) return;
         var dy = e.touches[0].clientY - touchStartY;
         var edge = atEdges();
-        if (edge.top && dy > 24) { fireJelly('top'); touchStartY = null; }
-        else if (edge.bottom && dy < -24) { fireJelly('bottom'); touchStartY = null; }
+        if ((edge.top && dy > 0) || (edge.bottom && dy < 0)) {
+            touchPulling = true;
+            if (curEl && curEl !== edge.el) { curEl.style.transform=''; curEl.style.transition=''; }
+            curEl = edge.el; releasing = false;
+            if (rafPull) { cancelAnimationFrame(rafPull); rafPull = null; }
+            curEl.style.transition = 'none';
+            pull = damp(dy * 0.55); render();
+        }
     }, { passive: true });
+    window.addEventListener('touchend', function () { touchStartY = null; if (touchPulling) { rawAccum = 0; springBackPull(); touchPulling = false; } }, { passive: true });
 })();
 </script>
 

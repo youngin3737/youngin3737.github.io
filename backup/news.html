@@ -13,7 +13,7 @@
     <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Hanken+Grotesk:ital,wght@0,300..800;1,400..600&display=swap" rel="stylesheet">
 
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -152,6 +152,387 @@
         }
 
     
+        
+        /* ============================================================
+           ✦ PREMIUM SOFT REDESIGN (news.html) — matches index
+        ============================================================ */
+        :root {
+            --bg:#FBF7F1; --bg-tint:#F4EEE4; --surface:#FFFFFF; --surface-2:#FBF8F3;
+            --ink:#211E1A; --ink-soft:#574F47; --muted:#8A8076; --line:rgba(33,30,26,0.08);
+            --amber:#F59E0B; --amber-deep:#D97706; --plum:#7C6BD9; --peach:#FBBF77; --rose:#F6957E; --teal:#5AC8C0;
+            --radius:28px; --radius-sm:16px; --radius-lg:40px;
+            --shadow-sm:0 4px 16px -6px rgba(33,30,26,0.10),0 2px 6px -4px rgba(33,30,26,0.08);
+            --shadow:0 18px 50px -22px rgba(33,30,26,0.28),0 6px 18px -10px rgba(33,30,26,0.12);
+            --shadow-lg:0 40px 90px -30px rgba(33,30,26,0.34);
+            --shadow-amber:0 22px 50px -18px rgba(245,158,11,0.45);
+            --ease:cubic-bezier(0.22,1,0.36,1); --spring:cubic-bezier(0.34,1.4,0.5,1);
+            --display:'Bricolage Grotesque',ui-sans-serif,system-ui,sans-serif; --sans:'Hanken Grotesk',ui-sans-serif,system-ui,sans-serif;
+        }
+        .dark {
+            --bg:#0E1320; --bg-tint:#131A2B; --surface:#161D2E; --surface-2:#1B2236;
+            --ink:#F3F0EA; --ink-soft:#C4C0BA; --muted:#8C93A6; --line:rgba(255,255,255,0.09);
+            --shadow-sm:0 4px 16px -6px rgba(0,0,0,0.5);
+            --shadow:0 20px 55px -24px rgba(0,0,0,0.7),0 8px 20px -12px rgba(0,0,0,0.5);
+            --shadow-lg:0 44px 100px -32px rgba(0,0,0,0.8);
+        }
+        html{ scroll-behavior:smooth; }
+        body,.dark body{ font-family:var(--sans)!important; background-color:var(--bg)!important; color:var(--ink); -webkit-font-smoothing:antialiased; }
+        ::selection{ background:rgba(245,158,11,0.26); }
+        *{ scrollbar-width:thin; scrollbar-color:var(--amber) transparent; }
+        *::-webkit-scrollbar{ width:11px; } *::-webkit-scrollbar-thumb{ background:linear-gradient(180deg,var(--peach),var(--amber)); border-radius:99px; border:3px solid transparent; background-clip:padding-box; }
+
+        /* Hero */
+        #news-hero{
+            position:relative; overflow:hidden;
+            background-color:#1a1530;
+            background-image:
+                radial-gradient(at 6% 12%, hsla(38,96%,60%,0.55) 0px, transparent 45%),
+                radial-gradient(at 84% 18%, hsla(18,92%,64%,0.50) 0px, transparent 45%),
+                radial-gradient(at 22% 84%, hsla(258,74%,62%,0.55) 0px, transparent 50%),
+                radial-gradient(at 72% 72%, hsla(180,64%,56%,0.40) 0px, transparent 48%);
+            background-size:200% 200%; animation:moveGradient 24s ease-in-out infinite;
+            padding-bottom:7rem !important;
+        }
+        #news-hero h1{ font-family:var(--display)!important; font-weight:500!important; font-optical-sizing:auto; letter-spacing:-0.025em; font-size:clamp(3rem,9vw,5.5rem)!important; line-height:1; }
+        #news-hero .gradient-text{ font-style:italic; font-weight:600!important; }
+        .gradient-text{
+            background:linear-gradient(100deg,#FDE68A,#FBBF77 40%,#F6957E 70%,#FDE68A)!important;
+            background-size:220% auto; -webkit-background-clip:text!important; background-clip:text!important;
+            -webkit-text-fill-color:transparent!important; color:transparent!important;
+            display:inline-block!important; animation:ykShimmer 7s linear infinite;
+        }
+        @keyframes ykShimmer{ to{ background-position:220% center; } }
+        #news-hero .text-sm{ font-family:var(--sans); font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--peach)!important; }
+        #news-hero p:not(.text-sm){ color:rgba(255,255,255,0.88)!important; }
+        /* eyebrow (JS) */
+        #yk-news-eyebrow{
+            display:inline-flex; align-items:center; gap:0.5rem;
+            font-weight:700; font-size:0.74rem; letter-spacing:0.18em; text-transform:uppercase;
+            color:#2A1A02; background:linear-gradient(135deg,var(--peach),var(--amber));
+            padding:0.4rem 0.95rem; border-radius:99px; margin-bottom:1.1rem;
+            box-shadow:var(--shadow-amber);
+        }
+        #yk-news-eyebrow::before{ content:"✦"; }
+        /* hero buttons → pills */
+        #news-search-hero{ border-radius:99px!important; background:rgba(255,255,255,0.12)!important; border:1px solid rgba(255,255,255,0.2)!important; backdrop-filter:blur(14px); }
+        #news-search-input-hero{ font-family:var(--sans); }
+        #back-to-main-hero{ border-radius:99px!important; background:rgba(255,255,255,0.12)!important; transition:transform 0.3s var(--spring); }
+        #back-to-main-hero:hover{ transform:translateY(-2px); }
+        /* wave divider (JS) */
+        #yk-news-wave{ position:absolute; left:0; right:0; bottom:-1px; width:100%; height:90px; pointer-events:none; display:block; z-index:2; }
+        #yk-news-wave path{ fill:var(--bg)!important; }
+
+        /* Main posts */
+        #posts{ background-color:var(--bg)!important;
+            background-image:
+                radial-gradient(40% 30% at 12% 4%,rgba(245,158,11,0.12),transparent 70%),
+                radial-gradient(38% 26% at 90% 30%,rgba(124,107,217,0.12),transparent 70%),
+                radial-gradient(42% 28% at 80% 80%,rgba(246,149,126,0.10),transparent 70%);
+        }
+        .dark #posts{ background-image:
+                radial-gradient(40% 30% at 12% 4%,rgba(245,158,11,0.16),transparent 70%),
+                radial-gradient(38% 26% at 90% 30%,rgba(124,107,217,0.2),transparent 70%),
+                radial-gradient(42% 28% at 80% 80%,rgba(246,149,126,0.12),transparent 70%); }
+        #posts h2,#posts h3{ font-family:var(--display)!important; color:var(--ink)!important; }
+        #posts p{ color:var(--ink-soft)!important; }
+        .news-post{
+            border-radius:var(--radius)!important;
+            background:var(--surface)!important;
+            border:1px solid var(--line)!important;
+            box-shadow:var(--shadow-sm)!important;
+            padding:2rem!important; backdrop-filter:none!important;
+            transition:transform 0.4s var(--spring),box-shadow 0.4s var(--ease),border-color 0.4s ease,
+                opacity 0.38s ease,max-height 0.55s cubic-bezier(0.25,0.46,0.45,0.94),
+                padding 0.55s cubic-bezier(0.25,0.46,0.45,0.94),
+                margin 0.55s cubic-bezier(0.25,0.46,0.45,0.94),
+                border-width 0.55s cubic-bezier(0.25,0.46,0.45,0.94)!important;
+        }
+        .news-post:hover{ transform:translateY(-6px); box-shadow:var(--shadow-lg)!important; border-color:rgba(245,158,11,0.32)!important; }
+        #posts a:not(.bg-amber-500):not(.nav-link){ color:var(--amber-deep); text-decoration:none; }
+        .dark #posts a:not(.bg-amber-500):not(.nav-link){ color:var(--peach); }
+
+        /* header + nav */
+        #header a.text-2xl{ font-family:var(--display)!important; font-weight:600; }
+        .nav-link{ font-family:var(--sans); position:relative; }
+        .nav-link::after{ content:""; position:absolute; left:50%; bottom:-7px; width:6px; height:6px; border-radius:50%; background:var(--amber); transform:translateX(-50%) scale(0); transition:transform 0.3s var(--spring); }
+        .nav-link:hover::after,.nav-link.active::after{ transform:translateX(-50%) scale(1); }
+        #header.backdrop-blur-md{ background:color-mix(in srgb,var(--bg) 82%,transparent)!important; backdrop-filter:blur(18px) saturate(160%)!important; border-bottom:1px solid var(--line); }
+
+        /* floating back pill */
+        #back-to-main-float{ border-radius:99px!important; background:color-mix(in srgb,var(--surface) 90%,transparent)!important; border:1px solid var(--line)!important; color:var(--ink)!important; box-shadow:var(--shadow); backdrop-filter:blur(14px); }
+
+        /* footer */
+        footer{ background:var(--surface)!important; color:var(--ink-soft)!important; border-top:1px solid var(--line); border-radius:var(--radius-lg) var(--radius-lg) 0 0; }
+        footer p{ color:var(--muted)!important; }
+
+        .fade-in-section{ transform:translateY(40px); filter:blur(6px); transition:opacity 0.9s var(--ease),transform 0.9s var(--ease),filter 0.9s var(--ease); }
+        .fade-in-section.is-visible{ transform:translateY(0); filter:blur(0); }
+
+        @media (prefers-reduced-motion:reduce){
+            #news-hero,.gradient-text{ animation:none!important; }
+            .fade-in-section{ filter:none; transform:none; }
+            *{ scroll-behavior:auto!important; }
+        }
+
+        
+        /* news.html header readable at top (hero doesn't sit behind it) */
+        body:not(.dark) #header:not(.backdrop-blur-md) .nav-link,
+        body:not(.dark) #header:not(.backdrop-blur-md) a.text-2xl { color: var(--ink) !important; }
+        .dark #header:not(.backdrop-blur-md) .nav-link,
+        .dark #header:not(.backdrop-blur-md) a.text-2xl { color: var(--ink) !important; }
+        #header .nav-link, #header a.text-2xl { text-decoration: none !important; }
+        #header .nav-link.text-amber-300 { color: var(--amber-deep) !important; }
+        .dark #header .nav-link.text-amber-300 { color: var(--peach) !important; }
+        /* mobile nav row links */
+        #header + nav a, #mobile-menu a { color: var(--ink) !important; text-decoration: none !important; }
+
+        
+        /* news hero links never blue; harden nav list */
+        #news-hero a:not(.bg-amber-500), #news-hero a:link, #news-hero a:visited { color: rgba(255,255,255,0.92) !important; text-decoration: none !important; }
+        #news-hero #back-to-main-hero { color: #fff !important; }
+        #news-hero #back-to-main-hero:hover { color: var(--peach) !important; }
+        #back-to-main-float, #back-to-main-float:link, #back-to-main-float:visited { text-decoration: none !important; }
+        /* ensure desktop nav stays horizontal & unbulleted even if utility race occurs */
+        #header nav ul { list-style: none !important; }
+        @media (min-width: 768px){ #header nav ul.hidden { display: flex !important; } }
+
+        
+        /* ============================================================
+           ✦ REFINEMENT v2 (news.html) — new type + de-default highlight
+        ============================================================ */
+        #news-hero h1, #posts h2, #posts h3 {
+            font-family: var(--display) !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.035em !important;
+        }
+        #news-hero h1 { line-height: 0.98 !important; }
+        #news-hero .gradient-text { font-style: normal !important; font-weight: 800 !important; }
+        .gradient-text {
+            background: none !important;
+            -webkit-text-fill-color: currentColor !important;
+            color: #FFC759 !important;
+            animation: none !important;
+            position: relative; display: inline-block !important;
+        }
+        .dark .gradient-text { color: #FFD27A !important; }
+        .gradient-text::after {
+            content: ""; position: absolute; left: 0; right: 0; bottom: -0.06em;
+            height: 0.12em; border-radius: 99px; transform: scaleX(0.96); opacity: 0.85;
+            background: linear-gradient(90deg, transparent, #FFC759 12%, #FFC759 88%, transparent);
+        }
+        #yk-news-eyebrow { font-family: var(--sans) !important; font-weight: 700 !important; letter-spacing: 0.14em !important; }
+        .nav-link, #header a.text-2xl, body { font-family: var(--sans) !important; }
+        #header a.text-2xl { font-family: var(--display) !important; font-weight: 700; letter-spacing: -0.03em; }
+        #posts h2, #posts h3 { letter-spacing: -0.02em !important; }
+
+        /* ============================================================
+           ✦ TACTILE MOTION — cursor drift (horizontal only) + jelly overscroll
+        ============================================================ */
+        /* Horizontal cursor-follow drift. Uses the independent `translate`
+           property so it composes with hover `transform` without conflict.
+           Vertical is always 0 by design. */
+        .yk-drift {
+            translate: var(--yk-dx, 0px) 0px;
+            transition: translate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: translate;
+        }
+        /* When the pointer is actively moving we shorten the transition so it
+           tracks the cursor; on rest it eases back smoothly (set via JS class). */
+        .yk-drift.yk-tracking { transition: translate 0.18s cubic-bezier(0.33, 1, 0.68, 1); }
+
+        /* Jelly overscroll: a wrapper we scale slightly past the scroll edges. */
+        #main-content, #posts {
+            transform-origin: center top;
+            will-change: transform;
+        }
+        .yk-overscroll-top { animation: ykJellyTop 0.5s cubic-bezier(0.22, 1.3, 0.4, 1); }
+        .yk-overscroll-bottom { animation: ykJellyBottom 0.5s cubic-bezier(0.22, 1.3, 0.4, 1); }
+        @keyframes ykJellyTop {
+            0%   { transform: scaleY(1); }
+            35%  { transform: scaleY(1.012) translateY(4px); }
+            100% { transform: scaleY(1); }
+        }
+        @keyframes ykJellyBottom {
+            0%   { transform: scaleY(1); }
+            35%  { transform: scaleY(1.012) translateY(-4px); }
+            100% { transform: scaleY(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .yk-drift { translate: 0 0 !important; transition: none !important; }
+            .yk-overscroll-top, .yk-overscroll-bottom { animation: none !important; }
+        }
+
+        /* ============================================================
+           ✦ NO-SHIFT FIX — reserve scrollbar gutter so opening the news
+           overlay (or navigating index↔news) never reflows page width.
+        ============================================================ */
+        html { scrollbar-gutter: stable; }
+        /* When the overlay locks scroll, keep the gutter reserved too */
+        html[data-yk-scroll-lock="1"] { overflow-y: hidden; }
+
+        
+        /* ============================================================
+           ✦ CARD SURFACE HARDENING — use background-color (not shorthand)
+           so Tailwind's bg-* utilities never win the cascade.
+        ============================================================ */
+        .research-card { background-color: var(--surface) !important; }
+        .publication-item { background-color: var(--surface) !important; }
+        .news-timeline-item { background-color: var(--surface) !important; }
+        #about .container > .flex { background-color: var(--surface) !important; }
+        #contact .container { background-color: var(--surface) !important; }
+        .news-post { background-color: var(--surface) !important; }
+        #yk-news-overlay .yk-post { background-color: var(--surface) !important; }
+        #search-bar-container { background-color: var(--surface) !important; }
+        .tag-btn { background-color: var(--surface) !important; }
+        .tag-btn.active { background-color: var(--amber) !important; }
+        .tag-btn.active.tag-all { background-color: var(--amber) !important; }
+        .pub-view-btn { background-color: var(--surface) !important; }
+        .pub-view-btn.active { background-color: var(--amber) !important; }
+        footer { background-color: var(--surface) !important; }
+        .abstract-container .border-l-4 { background-color: var(--surface-2) !important; }
+
+        
+        /* ============================================================
+           ✦ FIXES v3 — highlight visibility, drag cursor, glassmorphism
+        ============================================================ */
+
+        /* 1) HIGHLIGHT FIX: make "Make Our Lives Fun" / "News" reliably visible.
+           Override every earlier text-fill/clip rule with a clean solid fill. */
+        .gradient-text,
+        #home-content-wrapper h1 .gradient-text,
+        #news-hero h1 .gradient-text {
+            background: none !important;
+            background-image: none !important;
+            -webkit-background-clip: border-box !important;
+            background-clip: border-box !important;
+            -webkit-text-fill-color: #FFC759 !important;
+            color: #FFC759 !important;
+            animation: none !important;
+            text-shadow: 0 1px 18px rgba(245,158,11,0.35);
+        }
+        .dark .gradient-text,
+        .dark #home-content-wrapper h1 .gradient-text,
+        .dark #news-hero h1 .gradient-text {
+            -webkit-text-fill-color: #FFD27A !important;
+            color: #FFD27A !important;
+        }
+        /* keep the soft underline swash */
+        .gradient-text::after {
+            content: ""; position: absolute; left: 0; right: 0; bottom: -0.06em;
+            height: 0.12em; border-radius: 99px; transform: scaleX(0.96); opacity: 0.85;
+            background: linear-gradient(90deg, transparent, #FFC759 12%, #FFC759 88%, transparent);
+        }
+
+        /* 2) DRAG: cursor affordance + neutralize old zigzag drift */
+        .yk-drift { translate: none !important; }   /* disable leftover drift var */
+        #about .container > .flex, .research-card, .news-timeline-item,
+        .publication-item, .news-post, #yk-news-overlay .yk-post {
+            cursor: grab;
+            touch-action: pan-y;       /* let vertical scroll through, we capture drag */
+            will-change: transform;
+        }
+        .yk-grabbing { cursor: grabbing !important; }
+        /* lift shadow while grabbing for a tactile "picked up" feel */
+        .research-card.yk-grabbing, .publication-item.yk-grabbing,
+        .news-timeline-item.yk-grabbing, .news-post.yk-grabbing,
+        #about .container > .flex.yk-grabbing, #yk-news-overlay .yk-post.yk-grabbing {
+            box-shadow: var(--shadow-lg) !important;
+        }
+        /* interactive children keep normal cursor */
+        .research-card a, .publication-item a, .news-post a,
+        .publication-item button, .news-timeline-entry,
+        .tag-btn, .pub-view-btn, .abstract-toggle-btn { cursor: pointer; }
+
+        /* 3) GLASSMORPHIC HIGHLIGHTS — frosted accents on a few surfaces.
+           Light, tasteful; not a full reskin. */
+        :root {
+            --glass-light: rgba(255,255,255,0.55);
+            --glass-border: rgba(255,255,255,0.65);
+            --glass-shadow: 0 8px 32px -8px rgba(33,30,26,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+        .dark {
+            --glass-light: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.12);
+            --glass-shadow: 0 8px 32px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        /* eyebrow pills → frosted glass */
+        .yk-eyebrow, #yk-news-eyebrow {
+            background: var(--glass-light) !important;
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            backdrop-filter: blur(12px) saturate(160%);
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* hero CTA → glass over the amber, with a bright top edge */
+        #home-content-wrapper a.bg-amber-500, #news a.bg-amber-500 {
+            position: relative;
+            -webkit-backdrop-filter: blur(8px) saturate(140%);
+            backdrop-filter: blur(8px) saturate(140%);
+            border: 1px solid rgba(255,255,255,0.45) !important;
+            box-shadow: 0 10px 30px -8px rgba(245,158,11,0.5), inset 0 1px 0 rgba(255,255,255,0.7) !important;
+        }
+
+        /* research icon tiles → frosted glass chips */
+        .research-card .fas {
+            background: var(--glass-light) !important;
+            -webkit-backdrop-filter: blur(10px) saturate(160%);
+            backdrop-filter: blur(10px) saturate(160%);
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* tag filter + view-toggle pills → subtle glass */
+        .tag-btn, .pub-view-btn, #search-bar-container {
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
+            backdrop-filter: blur(10px) saturate(150%);
+        }
+
+        /* contact social buttons → glass discs */
+        #contact .mt-8 a {
+            background: var(--glass-light) !important;
+            -webkit-backdrop-filter: blur(10px) saturate(160%);
+            backdrop-filter: blur(10px) saturate(160%);
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* a faint frosted sheen strip across the top of each floating card */
+        .research-card::after, .publication-item::after {
+            content: ""; position: absolute; left: 0; right: 0; top: 0; height: 38%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0));
+            pointer-events: none; opacity: 0.7; border-radius: inherit;
+        }
+        .dark .research-card::after, .dark .publication-item::after {
+            background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0));
+        }
+        .research-card, .publication-item { position: relative; }
+        .research-card > *, .publication-item > * { position: relative; z-index: 1; }
+
+        @media (prefers-reduced-motion: reduce) {
+            #about .container > .flex, .research-card, .news-timeline-item,
+            .publication-item, .news-post { cursor: default; }
+        }
+
+        
+        /* Prevent text selection while dragging cards (avoids highlight artifact) */
+        #about .container > .flex, .research-card, .news-timeline-item,
+        .publication-item, .news-post, #yk-news-overlay .yk-post {
+            -webkit-user-select: none; user-select: none;
+        }
+        /* but allow selecting inside actual links/abstract text if needed */
+        .abstract-content, .pub-authors, .pub-venue { -webkit-user-select: text; user-select: text; }
+
+        
+        /* Harden all publication/news link states to amber (never blue) */
+        .pub-link-text, .pub-link-text:link, .pub-link-text:visited { color: var(--amber-deep) !important; }
+        .dark .pub-link-text, .dark .pub-link-text:visited { color: var(--peach) !important; }
+        #main-content a:visited:not(.bg-amber-500):not([class*="bg-gray-"]) { color: var(--amber-deep); }
+        .dark #main-content a:visited:not(.bg-amber-500):not([class*="bg-gray-"]) { color: var(--peach); }
+        #posts a:visited:not(.bg-amber-500) { color: var(--amber-deep); }
+
         </style>
 
     <script>
@@ -678,5 +1059,155 @@ const applyNewsSearch = () => {
 
         });
     </script>
+<script>
+/* ✦ PREMIUM SOFT REDESIGN (news.html) — decorative DOM */
+(function(){
+    function decorate(){
+        var wrap = document.querySelector('#news-hero .container .max-w-4xl');
+        if (wrap && !document.getElementById('yk-news-eyebrow')) {
+            var e=document.createElement('div');
+            e.id='yk-news-eyebrow'; e.textContent='Latest updates';
+            wrap.insertBefore(e, wrap.firstChild);
+        }
+        var hero=document.getElementById('news-hero');
+        if (hero && !document.getElementById('yk-news-wave')) {
+            var ns='http://www.w3.org/2000/svg';
+            var svg=document.createElementNS(ns,'svg');
+            svg.setAttribute('id','yk-news-wave');
+            svg.setAttribute('viewBox','0 0 1440 90');
+            svg.setAttribute('preserveAspectRatio','none');
+            var path=document.createElementNS(ns,'path');
+            path.setAttribute('d','M0,52 C240,98 480,8 720,40 C960,72 1200,98 1440,46 L1440,90 L0,90 Z');
+            svg.appendChild(path); hero.appendChild(svg);
+        }
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',decorate);
+    else decorate();
+})();
+</script>
+
+<script>
+/* ✦ TACTILE MOTION — elastic drag on cards + jelly overscroll
+   Additive; respects reduced motion. */
+(function () {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+
+    /* ---------- 1) Elastic drag: grab a card, it stretches toward the
+       cursor up to a limit, then springs back ("띠용") on release. -------- */
+    var DRAG_SEL = [
+        '#about .container > .flex',
+        '.research-card',
+        '.news-timeline-item',
+        '.publication-item',
+        '.news-post',
+        '#yk-news-overlay .yk-post'
+    ].join(', ');
+
+    var MAX_PULL = 64;
+    var RESIST = 0.55;
+    var active = null;
+
+    function fromInteractive(target) {
+        return !!(target.closest && target.closest('a, button, input, textarea, select, .abstract-toggle-btn, .tag-btn, .pub-view-btn'));
+    }
+    function elastic(d, max) {
+        var s = Math.sign(d), a = Math.abs(d);
+        return s * (max * (1 - Math.exp(-a / (max * 0.9))));
+    }
+    function onDown(e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        var card = e.target.closest(DRAG_SEL);
+        if (!card || fromInteractive(e.target)) return;
+        active = { el: card, sx: e.clientX, sy: e.clientY, dx: 0, dy: 0, pid: e.pointerId };
+        card.classList.add('yk-grabbing');
+        card.style.transition = 'none';
+        try { card.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+    function onMove(e) {
+        if (!active || e.pointerId !== active.pid) return;
+        var rawX = e.clientX - active.sx, rawY = e.clientY - active.sy;
+        active.dx = elastic(rawX * RESIST, MAX_PULL);
+        active.dy = elastic(rawY * RESIST, MAX_PULL);
+        var dist = Math.hypot(active.dx, active.dy);
+        var rot = (active.dx / MAX_PULL) * 3.2;
+        var scale = 1 + Math.min(dist / MAX_PULL, 1) * 0.03;
+        active.el.style.transform =
+            'translate(' + active.dx.toFixed(1) + 'px,' + active.dy.toFixed(1) + 'px) rotate(' + rot.toFixed(2) + 'deg) scale(' + scale.toFixed(3) + ')';
+        active.el.style.zIndex = '30';
+    }
+    function springBack() {
+        if (!active) return;
+        var el = active.el;
+        el.classList.remove('yk-grabbing');
+        el.style.transition = 'transform 0.62s cubic-bezier(0.18, 1.5, 0.4, 1)';
+        el.style.transform = 'translate(0px,0px) rotate(0deg) scale(1)';
+        var done = el;
+        setTimeout(function () { done.style.transition = ''; done.style.transform = ''; done.style.zIndex = ''; }, 640);
+        active = null;
+    }
+    document.addEventListener('pointerdown', onDown, { passive: true });
+    document.addEventListener('pointermove', onMove, { passive: true });
+    document.addEventListener('pointerup', springBack, { passive: true });
+    document.addEventListener('pointercancel', springBack, { passive: true });
+
+    /* ---------- 2) Jelly overscroll at very top / bottom ---------- */
+    function jellyTarget() {
+        // overlay scroll container if open, else the main page wrapper
+        var overlay = document.querySelector('html.yk-news-open #yk-news-overlay .yk-scroll');
+        if (overlay) return { el: overlay, scroller: overlay };
+        var main = document.getElementById('main-content') || document.getElementById('posts');
+        return { el: main, scroller: window };
+    }
+
+    var cooling = false;
+    function fireJelly(dir) {
+        if (cooling) return;
+        var t = jellyTarget();
+        if (!t.el) return;
+        cooling = true;
+        var cls = dir === 'top' ? 'yk-overscroll-top' : 'yk-overscroll-bottom';
+        t.el.classList.remove('yk-overscroll-top', 'yk-overscroll-bottom');
+        void t.el.offsetWidth;
+        t.el.classList.add(cls);
+        setTimeout(function () { t.el.classList.remove(cls); cooling = false; }, 520);
+    }
+
+    function atEdges() {
+        var t = jellyTarget();
+        var top, bottom;
+        if (t.scroller === window) {
+            var y = window.scrollY || document.documentElement.scrollTop || 0;
+            var max = (document.documentElement.scrollHeight - window.innerHeight);
+            top = y <= 1; bottom = y >= max - 2;
+        } else {
+            var s = t.scroller;
+            top = s.scrollTop <= 0;
+            bottom = s.scrollTop >= (s.scrollHeight - s.clientHeight - 2);
+        }
+        return { top: top, bottom: bottom };
+    }
+
+    window.addEventListener('wheel', function (e) {
+        var edge = atEdges();
+        if (edge.top && e.deltaY < -6) fireJelly('top');
+        else if (edge.bottom && e.deltaY > 6) fireJelly('bottom');
+    }, { passive: true });
+
+    // touch overscroll
+    var touchStartY = null;
+    window.addEventListener('touchstart', function (e) {
+        touchStartY = e.touches && e.touches[0] ? e.touches[0].clientY : null;
+    }, { passive: true });
+    window.addEventListener('touchmove', function (e) {
+        if (touchStartY == null || !e.touches || !e.touches[0]) return;
+        var dy = e.touches[0].clientY - touchStartY;
+        var edge = atEdges();
+        if (edge.top && dy > 24) { fireJelly('top'); touchStartY = null; }
+        else if (edge.bottom && dy < -24) { fireJelly('bottom'); touchStartY = null; }
+    }, { passive: true });
+})();
+</script>
+
 </body>
 </html>

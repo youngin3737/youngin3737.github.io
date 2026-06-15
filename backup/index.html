@@ -23,7 +23,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=Hanken+Grotesk:ital,wght@0,300..800;1,400..600&display=swap" rel="stylesheet">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -792,7 +792,838 @@
             justify-content: flex-start;
         }
 
-</style>
+
+        /* ============================================================
+           ✦ PREMIUM SOFT REDESIGN — "Atelier" theme
+           Light + Dark · amber accent · rounded, mesh-gradient, airy.
+           Functional CSS above is preserved; this layer restyles the
+           visual surface only. No data/asset paths or JS hooks changed.
+        ============================================================ */
+        :root {
+            /* light palette */
+            --bg:        #FBF7F1;
+            --bg-tint:   #F4EEE4;
+            --surface:   #FFFFFF;
+            --surface-2: #FBF8F3;
+            --ink:       #211E1A;
+            --ink-soft:  #574F47;
+            --muted:     #8A8076;
+            --line:      rgba(33,30,26,0.08);
+            --amber:     #F59E0B;
+            --amber-deep:#D97706;
+            --plum:      #7C6BD9;
+            --peach:     #FBBF77;
+            --rose:      #F6957E;
+            --teal:      #5AC8C0;
+            --radius:    28px;
+            --radius-sm: 16px;
+            --radius-lg: 40px;
+            --shadow-sm: 0 4px 16px -6px rgba(33,30,26,0.10), 0 2px 6px -4px rgba(33,30,26,0.08);
+            --shadow:    0 18px 50px -22px rgba(33,30,26,0.28), 0 6px 18px -10px rgba(33,30,26,0.12);
+            --shadow-lg: 0 40px 90px -30px rgba(33,30,26,0.34), 0 12px 30px -16px rgba(33,30,26,0.16);
+            --shadow-amber: 0 22px 50px -18px rgba(245,158,11,0.45);
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
+            --spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+            --display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+            --sans: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+        }
+        .dark {
+            --bg:        #0E1320;
+            --bg-tint:   #131A2B;
+            --surface:   #161D2E;
+            --surface-2: #1B2236;
+            --ink:       #F3F0EA;
+            --ink-soft:  #C4C0BA;
+            --muted:     #8C93A6;
+            --line:      rgba(255,255,255,0.09);
+            --shadow-sm: 0 4px 16px -6px rgba(0,0,0,0.5);
+            --shadow:    0 20px 55px -24px rgba(0,0,0,0.7), 0 8px 20px -12px rgba(0,0,0,0.5);
+            --shadow-lg: 0 44px 100px -32px rgba(0,0,0,0.8);
+            --shadow-amber: 0 22px 55px -18px rgba(245,158,11,0.5);
+        }
+
+        html { scroll-behavior: smooth; }
+        body, .dark body {
+            font-family: var(--sans) !important;
+            background-color: var(--bg) !important;
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        ::selection { background: rgba(245,158,11,0.26); color: inherit; }
+        * { scrollbar-width: thin; scrollbar-color: var(--amber) transparent; }
+        *::-webkit-scrollbar { width: 11px; height: 11px; }
+        *::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--peach), var(--amber));
+            border-radius: 99px; border: 3px solid transparent; background-clip: padding-box;
+        }
+
+        /* Display typography */
+        #main-content h2, .yk-display { font-family: var(--display) !important; }
+        #main-content h2 {
+            font-optical-sizing: auto;
+            font-weight: 600 !important;
+            letter-spacing: -0.02em;
+            font-size: clamp(2.1rem, 4.6vw, 3.4rem) !important;
+            color: var(--ink) !important;
+            line-height: 1.05;
+        }
+        #main-content h3 { font-family: var(--display) !important; color: var(--ink) !important; }
+        #main-content h4.publication-title { font-family: var(--display) !important; font-weight: 600; }
+        #main-content p { color: var(--ink-soft) !important; }
+        #main-content .text-gray-700, #main-content .text-gray-600,
+        #main-content .text-gray-500, #main-content .text-gray-400,
+        #main-content .dark\:text-gray-300, #main-content .dark\:text-gray-400 { color: var(--ink-soft) !important; }
+        #main-content .text-amber-500, #main-content .dark\:text-amber-400 { color: var(--amber-deep) !important; }
+        .dark #main-content .text-amber-500, .dark #main-content .dark\:text-amber-400 { color: var(--amber) !important; }
+
+        /* ---- Eyebrow above each section heading (added via JS .yk-eyebrow) ---- */
+        .yk-eyebrow {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-family: var(--sans); font-weight: 700;
+            font-size: 0.74rem; letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--amber-deep);
+            background: linear-gradient(90deg, rgba(245,158,11,0.14), rgba(245,158,11,0.04));
+            padding: 0.4rem 0.95rem; border-radius: 99px;
+            border: 1px solid rgba(245,158,11,0.22);
+            margin-bottom: 1.1rem;
+        }
+        .dark .yk-eyebrow { color: var(--peach); }
+        .yk-eyebrow::before { content: "✦"; font-size: 0.7rem; }
+
+        /* Replace the hard amber bar under headings with a soft gradient dot-rule */
+        section .text-center .w-24.h-1.bg-amber-500,
+        section .w-24.h-1.bg-amber-500 {
+            height: 5px !important;
+            width: 76px !important;
+            border-radius: 99px !important;
+            background: linear-gradient(90deg, var(--amber), var(--rose)) !important;
+            box-shadow: 0 4px 14px -2px rgba(245,158,11,0.5);
+        }
+
+        /* ============================================================
+           BACKDROP: soft mesh aurora blobs behind everything
+        ============================================================ */
+        #main-content { position: relative; background: transparent !important; isolation: isolate; }
+        #main-content::before {
+            content: ""; position: absolute; inset: 0; z-index: -2;
+            background:
+                radial-gradient(40% 30% at 12% 8%,  rgba(245,158,11,0.16), transparent 70%),
+                radial-gradient(38% 28% at 88% 22%, rgba(124,107,217,0.14), transparent 70%),
+                radial-gradient(45% 32% at 78% 70%, rgba(246,149,126,0.12), transparent 70%),
+                radial-gradient(40% 30% at 16% 88%, rgba(90,200,192,0.10), transparent 70%);
+            pointer-events: none;
+        }
+        .dark #main-content::before {
+            background:
+                radial-gradient(40% 30% at 12% 8%,  rgba(245,158,11,0.18), transparent 70%),
+                radial-gradient(38% 28% at 88% 22%, rgba(124,107,217,0.20), transparent 70%),
+                radial-gradient(45% 32% at 78% 70%, rgba(246,149,126,0.12), transparent 70%),
+                radial-gradient(40% 30% at 16% 88%, rgba(90,200,192,0.12), transparent 70%);
+        }
+
+        /* sections sit transparent over the aurora; alternating bands removed */
+        #main-content > main > section { background: transparent !important; position: relative; }
+        #main-content > main > section { padding-top: 5.5rem !important; padding-bottom: 5.5rem !important; }
+
+        /* ============================================================
+           HERO — big rounded gradient card + wave divider
+        ============================================================ */
+        #home {
+            background-color: #1a1530;
+            background-image:
+                radial-gradient(at 6% 12%, hsla(38, 96%, 60%, 0.55) 0px, transparent 45%),
+                radial-gradient(at 84% 18%, hsla(18, 92%, 64%, 0.50) 0px, transparent 45%),
+                radial-gradient(at 22% 84%, hsla(258, 74%, 62%, 0.55) 0px, transparent 50%),
+                radial-gradient(at 72% 72%, hsla(180, 64%, 56%, 0.40) 0px, transparent 48%);
+            background-size: 200% 200%;
+            animation: moveGradient 24s ease-in-out infinite;
+        }
+        /* soft grain/vignette + bottom curve mask */
+        #home::before {
+            content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            background: radial-gradient(130% 120% at 50% 10%, transparent 52%, rgba(10,8,20,0.55) 100%);
+        }
+        #home-content-wrapper h1 {
+            font-family: var(--display) !important;
+            font-weight: 500 !important;
+            font-optical-sizing: auto;
+            letter-spacing: -0.025em;
+            font-size: clamp(2.6rem, 7vw, 5rem) !important;
+            line-height: 1.02;
+            text-shadow: 0 4px 40px rgba(0,0,0,0.3);
+        }
+        #home-content-wrapper h1 .gradient-text { font-style: italic; font-weight: 600 !important; }
+        .gradient-text {
+            background: linear-gradient(100deg, #FDE68A, #FBBF77 40%, #F6957E 70%, #FDE68A) !important;
+            background-size: 220% auto;
+            -webkit-background-clip: text; background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: ykShimmer 7s linear infinite;
+        }
+        @keyframes ykShimmer { to { background-position: 220% center; } }
+        #home-content-wrapper > .container > p {
+            font-size: clamp(1.05rem, 1.6vw, 1.3rem) !important;
+            color: rgba(255,255,255,0.86) !important;
+            font-weight: 400;
+        }
+        /* Hero CTA → pill with soft glow + sheen */
+        #home-content-wrapper a.bg-amber-500 {
+            position: relative; overflow: hidden;
+            border-radius: 99px !important;
+            background: linear-gradient(135deg, #FBBF77, var(--amber)) !important;
+            color: #2A1A02 !important;
+            font-family: var(--sans); font-weight: 700;
+            letter-spacing: 0.01em;
+            padding: 0.95rem 2.1rem !important;
+            box-shadow: var(--shadow-amber);
+            border: none;
+            transition: transform 0.35s var(--spring), box-shadow 0.35s var(--ease) !important;
+        }
+        #home-content-wrapper a.bg-amber-500::after {
+            content:""; position:absolute; top:0; left:-130%; width:55%; height:100%;
+            background: linear-gradient(110deg, transparent, rgba(255,255,255,0.55), transparent);
+            transform: skewX(-18deg); transition: left 0.75s var(--ease);
+        }
+        #home-content-wrapper a.bg-amber-500:hover { transform: translateY(-3px) scale(1.03); }
+        #home-content-wrapper a.bg-amber-500:hover::after { left: 140%; }
+        /* Latest-news floating chip → glass pill */
+        .latest-news-float {
+            border-radius: 99px !important;
+            background: rgba(255,255,255,0.12) !important;
+            border: 1px solid rgba(255,255,255,0.20) !important;
+            backdrop-filter: blur(14px) saturate(150%);
+            box-shadow: 0 16px 40px -16px rgba(0,0,0,0.4);
+            transition: transform 0.35s var(--spring), background-color 0.3s ease !important;
+        }
+        .latest-news-float:hover { transform: translateY(-3px); background: rgba(255,255,255,0.18) !important; }
+        .latest-news-float .text-amber-300 { color: var(--peach) !important; }
+
+        /* curvy SVG wave sits at hero bottom (added via JS #yk-hero-wave) */
+        #yk-hero-wave {
+            position: absolute; left: 0; right: 0; bottom: -1px; z-index: 4;
+            width: 100%; height: 90px; pointer-events: none; display: block;
+        }
+        #yk-hero-wave path { fill: var(--bg); transition: fill 0.5s ease; }
+
+        /* ============================================================
+           ABOUT — portrait in soft blob frame + floating card
+        ============================================================ */
+        #about .container > .flex {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: clamp(1.5rem, 4vw, 3.5rem);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--line);
+            gap: clamp(2rem, 4vw, 3.5rem) !important;
+        }
+        #about img[alt="Young-in's Portrait"] {
+            width: 256px !important; height: 256px !important;
+            border-radius: 42% 58% 56% 44% / 48% 42% 58% 52% !important;
+            object-fit: cover;
+            border: 5px solid var(--surface);
+            box-shadow: var(--shadow), 0 0 0 1px var(--line), 0 0 0 10px rgba(245,158,11,0.07);
+            animation: ykMorph 14s ease-in-out infinite, ykFloat 7s ease-in-out infinite;
+        }
+        @keyframes ykMorph {
+            0%,100% { border-radius: 42% 58% 56% 44% / 48% 42% 58% 52%; }
+            50%     { border-radius: 56% 44% 43% 57% / 56% 54% 46% 44%; }
+        }
+        @keyframes ykFloat { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-12px);} }
+        #about a { color: var(--amber-deep) !important; font-weight: 600; }
+        .dark #about a { color: var(--peach) !important; }
+
+        /* ============================================================
+           RESEARCH — floating glass cards, soft tilt on hover
+        ============================================================ */
+        #research .grid { gap: clamp(1.25rem, 2.5vw, 2rem) !important; }
+        .research-card {
+            border-radius: var(--radius) !important;
+            background: var(--surface) !important;
+            border: 1px solid var(--line) !important;
+            box-shadow: var(--shadow-sm) !important;
+            padding: 2.5rem 2rem !important;
+            position: relative; overflow: hidden;
+            transition: transform 0.45s var(--spring), box-shadow 0.45s var(--ease) !important;
+        }
+        .research-card::before {
+            content:""; position:absolute; inset:0; z-index:0; opacity:0; pointer-events:none;
+            background: radial-gradient(120% 90% at 50% 0%, rgba(245,158,11,0.12), transparent 70%);
+            transition: opacity 0.45s var(--ease);
+        }
+        .research-card:hover { transform: translateY(-12px); box-shadow: var(--shadow-lg) !important; }
+        .research-card:hover::before { opacity: 1; }
+        .research-card > * { position: relative; z-index: 1; }
+        /* icon → soft rounded amber tile */
+        .research-card .fas {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 72px; height: 72px;
+            background: linear-gradient(135deg, rgba(251,191,119,0.25), rgba(245,158,11,0.18));
+            color: var(--amber-deep) !important;
+            border-radius: 22px;
+            margin-bottom: 1.5rem !important;
+            font-size: 1.8rem !important;
+            box-shadow: inset 0 0 0 1px rgba(245,158,11,0.18);
+            transition: transform 0.45s var(--spring), border-radius 0.45s var(--ease) !important;
+        }
+        .dark .research-card .fas { color: var(--peach) !important; }
+        .research-card:hover .fas { transform: scale(1.08) rotate(-6deg); border-radius: 50%; }
+        .research-card h3 { font-size: 1.4rem !important; margin-bottom: 0.6rem !important; }
+
+        /* ============================================================
+           NEWS — timeline as soft cards
+        ============================================================ */
+        #news .max-w-3xl { max-width: 760px !important; }
+        .news-timeline::before { background: linear-gradient(180deg, var(--amber), var(--line)) !important; left: 0.85rem; }
+        .news-timeline-date { font-family: var(--sans); font-weight: 700; color: var(--amber-deep) !important; }
+        .dark .news-timeline-date { color: var(--peach) !important; }
+        .news-timeline-item {
+            border-radius: var(--radius-sm) !important;
+            background: var(--surface) !important;
+            border: 1px solid var(--line) !important;
+            box-shadow: var(--shadow-sm) !important;
+            backdrop-filter: none !important;
+            padding: 0.85rem 1.2rem !important;
+            transition: transform 0.3s var(--spring), box-shadow 0.3s var(--ease), border-color 0.3s ease !important;
+        }
+        .news-timeline-title { color: var(--ink) !important; font-weight: 600; }
+        .news-timeline-entry:hover .news-timeline-item {
+            transform: translateX(6px); box-shadow: var(--shadow) !important;
+            border-color: rgba(245,158,11,0.4) !important;
+        }
+        .news-timeline-marker {
+            width: 12px; height: 12px;
+            background: var(--amber) !important;
+            box-shadow: 0 0 0 4px var(--bg), 0 0 0 6px rgba(245,158,11,0.25) !important;
+        }
+
+        /* ============================================================
+           PUBLICATIONS — soft cards, pill controls
+        ============================================================ */
+        #publications .year-section > h3 {
+            font-family: var(--display) !important;
+            color: var(--ink) !important;
+            border: none !important;
+            font-size: 1.7rem !important;
+            display: flex; align-items: center; gap: 0.8rem;
+        }
+        #publications .year-section > h3::after {
+            content:""; flex:1; height:1px; background: var(--line);
+        }
+        .publication-item {
+            border-radius: var(--radius) !important;
+            background: var(--surface) !important;
+            border: 1px solid var(--line) !important;
+            box-shadow: var(--shadow-sm) !important;
+            padding: 1.75rem !important;
+            transition: transform 0.35s var(--spring), box-shadow 0.35s var(--ease), border-color 0.35s ease,
+                        opacity 0.38s ease, max-height 0.55s cubic-bezier(0.25,0.46,0.45,0.94),
+                        padding 0.55s cubic-bezier(0.25,0.46,0.45,0.94),
+                        margin 0.55s cubic-bezier(0.25,0.46,0.45,0.94),
+                        border-width 0.55s cubic-bezier(0.25,0.46,0.45,0.94) !important;
+        }
+        #publications:not(.pub-compact) .publication-item:hover {
+            transform: translateY(-6px); box-shadow: var(--shadow-lg) !important;
+            border-color: rgba(245,158,11,0.32) !important;
+        }
+        .publication-title { color: var(--ink) !important; font-size: 1.3rem !important; }
+        .pub-venue { color: var(--muted) !important; }
+        .pub-thumb { border-radius: var(--radius-sm) !important; border-color: var(--line) !important; }
+
+        /* search bar → big rounded pill */
+        #search-bar-container {
+            border-radius: 99px !important;
+            background: var(--surface) !important;
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-sm);
+        }
+        #search-input { color: var(--ink) !important; }
+        #search-bar-container:focus-within { box-shadow: 0 0 0 4px rgba(245,158,11,0.18), var(--shadow-sm); }
+        /* tag filter buttons → soft pills */
+        .tag-btn {
+            border-radius: 99px !important;
+            background: var(--surface) !important;
+            color: var(--ink-soft) !important;
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-sm);
+            font-family: var(--sans); font-weight: 600;
+            transition: transform 0.25s var(--spring), box-shadow 0.25s var(--ease), background-color 0.25s, color 0.25s !important;
+        }
+        .tag-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .tag-btn.active { color: #2A1A02 !important; box-shadow: var(--shadow-amber); border-color: transparent; }
+        .dark .tag-btn.active { color: #2A1A02 !important; }
+        .pub-view-btn {
+            border-radius: 50% !important;
+            background: var(--surface) !important;
+            border-color: var(--line) !important;
+            color: var(--ink-soft) !important;
+            box-shadow: var(--shadow-sm);
+        }
+        .pub-view-btn.active { background: var(--amber) !important; color: #2A1A02 !important; border-color: transparent !important; }
+        .publication-tag { border-radius: 99px !important; font-family: var(--sans); }
+        .abstract-toggle-btn { border-radius: 99px !important; }
+        .abstract-container .border-l-4 { border-radius: var(--radius-sm) !important; background: var(--surface-2) !important; border-left-width: 4px !important; }
+        .pub-links-detailed a, .pub-link-text { border-radius: 99px !important; }
+        .pub-links-detailed a { box-shadow: var(--shadow-sm); }
+
+        /* ============================================================
+           CONTACT — centered glass card with mesh glow
+        ============================================================ */
+        #contact .container {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: clamp(2.5rem, 6vw, 4.5rem) !important;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--line);
+            position: relative; overflow: hidden;
+            max-width: 880px;
+        }
+        #contact .container::before {
+            content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+            background:
+                radial-gradient(60% 50% at 50% -10%, rgba(245,158,11,0.14), transparent 70%),
+                radial-gradient(50% 50% at 100% 120%, rgba(124,107,217,0.12), transparent 70%);
+        }
+        #contact .container > * { position: relative; z-index: 1; }
+        #contact .mt-8 a {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 58px; height: 58px; border-radius: 50%;
+            background: var(--surface-2); border: 1px solid var(--line);
+            color: var(--ink-soft) !important;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s var(--spring), color 0.3s, background-color 0.3s, box-shadow 0.3s !important;
+        }
+        #contact .mt-8 a:hover {
+            transform: translateY(-5px);
+            color: #2A1A02 !important;
+            background: linear-gradient(135deg, var(--peach), var(--amber)) !important;
+            box-shadow: var(--shadow-amber);
+        }
+        #contact .mt-8 { gap: 1rem; }
+
+        /* ============================================================
+           HEADER + NAV
+        ============================================================ */
+        #header a.text-2xl { font-family: var(--display) !important; font-weight: 600; letter-spacing: -0.01em; }
+        .nav-link { font-family: var(--sans); position: relative; }
+        .nav-link::after {
+            content:""; position:absolute; left:50%; bottom:-7px; height:6px; width:6px; border-radius:50%;
+            background: var(--amber); transform: translateX(-50%) scale(0); transition: transform 0.3s var(--spring);
+        }
+        .nav-link:hover::after, .nav-link.active::after { transform: translateX(-50%) scale(1); }
+        .nav-link.active { color: var(--amber-deep); }
+        #header.backdrop-blur-md {
+            background: color-mix(in srgb, var(--bg) 82%, transparent) !important;
+            backdrop-filter: blur(18px) saturate(160%) !important;
+            box-shadow: 0 8px 30px -16px rgba(33,30,26,0.28) !important;
+            border-bottom: 1px solid var(--line);
+        }
+
+        /* "View all News" button reuse hero pill style */
+        #news a.bg-amber-500 {
+            border-radius: 99px !important;
+            background: linear-gradient(135deg, #FBBF77, var(--amber)) !important;
+            color: #2A1A02 !important;
+            box-shadow: var(--shadow-amber); border: none;
+            transition: transform 0.3s var(--spring) !important;
+        }
+        #news a.bg-amber-500:hover { transform: translateY(-3px) scale(1.03); }
+
+        /* ============================================================
+           FOOTER — soft, rounded top
+        ============================================================ */
+        footer {
+            background: var(--surface) !important;
+            color: var(--ink-soft) !important;
+            border-top: 1px solid var(--line);
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            margin-top: 2rem;
+        }
+        footer p { color: var(--muted) !important; font-family: var(--sans); }
+
+        /* ============================================================
+           Scroll reveal: gentle rise + soft blur
+        ============================================================ */
+        .fade-in-section {
+            transform: translateY(40px); filter: blur(6px);
+            transition: opacity 0.9s var(--ease), transform 0.9s var(--ease), filter 0.9s var(--ease);
+        }
+        .fade-in-section.is-visible { transform: translateY(0); filter: blur(0); }
+
+        /* mobile menu polish */
+        #mobile-menu { border-radius: 0 0 var(--radius) var(--radius); }
+
+        @media (max-width: 767px) {
+            #about .container > .flex { flex-direction: column; text-align: center; }
+            #about img[alt="Young-in's Portrait"] { margin-left: auto; margin-right: auto; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #home, .gradient-text, #about img[alt="Young-in's Portrait"] { animation: none !important; }
+            .fade-in-section { filter: none; transform: none; }
+            * { scroll-behavior: auto !important; }
+        }
+
+        
+        /* ============================================================
+           ✦ REDESIGN FIXES (layering, contrast, links)
+        ============================================================ */
+        /* 1) Solid opaque canvas so the fixed hero never bleeds through.
+              Aurora is painted as a layered background ON the solid color. */
+        #main-content {
+            background-color: var(--bg) !important;
+            background-image:
+                radial-gradient(40% 30% at 12% 4%,  rgba(245,158,11,0.14), transparent 70%),
+                radial-gradient(38% 26% at 90% 16%, rgba(124,107,217,0.12), transparent 70%),
+                radial-gradient(46% 30% at 80% 52%, rgba(246,149,126,0.11), transparent 70%),
+                radial-gradient(42% 28% at 14% 70%, rgba(90,200,192,0.10), transparent 70%),
+                radial-gradient(40% 28% at 88% 90%, rgba(245,158,11,0.10), transparent 70%);
+            background-attachment: scroll;
+        }
+        .dark #main-content {
+            background-image:
+                radial-gradient(40% 30% at 12% 4%,  rgba(245,158,11,0.16), transparent 70%),
+                radial-gradient(38% 26% at 90% 16%, rgba(124,107,217,0.20), transparent 70%),
+                radial-gradient(46% 30% at 80% 52%, rgba(246,149,126,0.12), transparent 70%),
+                radial-gradient(42% 28% at 14% 70%, rgba(90,200,192,0.12), transparent 70%),
+                radial-gradient(40% 28% at 88% 90%, rgba(245,158,11,0.12), transparent 70%);
+        }
+        /* drop the old -2 pseudo aurora (now redundant) and isolation */
+        #main-content::before { display: none !important; }
+        #main-content { isolation: auto !important; }
+
+        /* footer also opaque */
+        footer { position: relative; z-index: 1; }
+
+        /* 2) Hero headline white + working gradient clip (no text-shadow on the span) */
+        #home-content-wrapper h1 { color: #ffffff !important; }
+        #home-content-wrapper h1 .gradient-text {
+            text-shadow: none !important;
+            -webkit-text-fill-color: transparent !important;
+        }
+
+        /* 3) Link normalization — amber, never browser-blue */
+        #main-content a:not(.bg-amber-500):not(.nav-link):not(.tag-btn):not(.pub-view-btn):not(.abstract-toggle-btn):not(.latest-news-float):not(.news-timeline-entry):not([class*="bg-gray-"]):not([class*="bg-amber"]) {
+            color: var(--amber-deep);
+            text-decoration: none;
+        }
+        .dark #main-content a:not(.bg-amber-500):not(.nav-link):not(.tag-btn):not(.pub-view-btn):not(.abstract-toggle-btn):not(.latest-news-float):not(.news-timeline-entry):not([class*="bg-gray-"]):not([class*="bg-amber"]) {
+            color: var(--peach);
+        }
+        /* DOI/Paper/Project detailed pills keep their colored bg + white text */
+        .pub-links-detailed a.bg-amber-500 { color:#2A1A02 !important; background: linear-gradient(135deg,#FBBF77,var(--amber)) !important; }
+        .pub-links-detailed a[class*="bg-gray-7"], .pub-links-detailed a[class*="bg-gray-8"] { color:#fff !important; }
+        .pub-link-text { color: var(--amber-deep) !important; text-decoration: none !important; border-bottom: 2px solid rgba(245,158,11,0.4); }
+        .dark .pub-link-text { color: var(--peach) !important; }
+        .latest-news-float, .latest-news-float * { text-decoration: none !important; }
+        .news-timeline-entry { text-decoration: none !important; }
+
+        /* 4) Research grid: keep 3-up on desktop, full-width cells only on mobile */
+        #research .grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); }
+        @media (max-width: 900px) { #research .grid { grid-template-columns: 1fr; } }
+
+        /* heading wave divider fill must match canvas in both themes */
+        #yk-hero-wave path { fill: var(--bg) !important; }
+
+        
+        /* ============================================================
+           ✦ HERO TEXT FIXES — gradient clip + latest-news link color
+        ============================================================ */
+        /* Force background-clip:text to actually clip to the glyphs */
+        .gradient-text {
+            display: inline-block !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            color: transparent !important;
+            text-shadow: none !important;
+            padding-bottom: 0.08em; /* keep descenders from clipping */
+        }
+
+        /* Latest News chip: kill the blue link color, set readable text */
+        .latest-news-float, .latest-news-float:link, .latest-news-float:visited,
+        .latest-news-float p, .latest-news-float span,
+        #hero-latest-news-title {
+            color: rgba(255,255,255,0.92) !important;
+            text-decoration: none !important;
+        }
+        .latest-news-float .text-amber-300, .latest-news-float .font-bold {
+            color: #FBBF77 !important;
+        }
+
+        
+        /* Hero container breathing room so the display type doesn't kiss the edge */
+        #home-content-wrapper > .container { padding-left: 2rem; padding-right: 2rem; }
+        @media (min-width: 768px){ #home-content-wrapper > .container { padding-left: 3rem; padding-right: 3rem; } }
+        #home-content-wrapper h1 { max-width: 16ch; }
+
+        
+        /* ============================================================
+           ✦ REFINEMENT v2 — new type system + de-default highlight
+        ============================================================ */
+        /* Bricolage is a grotesque sans: retune display weights/spacing */
+        #main-content h2, #home-content-wrapper h1,
+        #news .max-w-3xl + *, .yk-display {
+            font-family: var(--display) !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.035em !important;
+        }
+        #main-content h2 { font-weight: 700 !important; }
+        #main-content h3, #publications .year-section > h3,
+        #main-content h4.publication-title { font-family: var(--display) !important; font-weight: 600 !important; letter-spacing: -0.02em; }
+
+        /* Hero headline: no italic (Bricolage italic is synthetic) */
+        #home-content-wrapper h1 { font-weight: 700 !important; line-height: 0.98 !important; }
+        #home-content-wrapper h1 .gradient-text { font-style: normal !important; font-weight: 800 !important; }
+
+        /* De-Claude the highlight: drop the peachy shimmer gradient.
+           Use a confident solid amber with a hand-drawn underline accent. */
+        .gradient-text {
+            background: none !important;
+            -webkit-text-fill-color: currentColor !important;
+            color: #FFC759 !important;       /* warm gold, distinct from Claude's terracotta */
+            animation: none !important;
+            position: relative;
+            display: inline-block !important;
+        }
+        .dark .gradient-text { color: #FFD27A !important; }
+        /* underline swash under the highlighted phrase */
+        .gradient-text::after {
+            content: "";
+            position: absolute; left: 0; right: 0; bottom: -0.06em;
+            height: 0.12em;
+            background: linear-gradient(90deg, transparent, #FFC759 12%, #FFC759 88%, transparent);
+            border-radius: 99px;
+            transform: scaleX(0.96);
+            opacity: 0.85;
+        }
+
+        /* eyebrow chips: switch to body grotesque, tighter, less "AI pill" */
+        .yk-eyebrow, #yk-news-eyebrow {
+            font-family: var(--sans) !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.14em !important;
+        }
+
+        /* nav + body inherit Hanken */
+        .nav-link, #header a.text-2xl, body { font-family: var(--sans) !important; }
+        #header a.text-2xl { font-family: var(--display) !important; font-weight: 700; letter-spacing: -0.03em; }
+
+        /* ============================================================
+           ✦ TACTILE MOTION — cursor drift (horizontal only) + jelly overscroll
+        ============================================================ */
+        /* Horizontal cursor-follow drift. Uses the independent `translate`
+           property so it composes with hover `transform` without conflict.
+           Vertical is always 0 by design. */
+        .yk-drift {
+            translate: var(--yk-dx, 0px) 0px;
+            transition: translate 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: translate;
+        }
+        /* When the pointer is actively moving we shorten the transition so it
+           tracks the cursor; on rest it eases back smoothly (set via JS class). */
+        .yk-drift.yk-tracking { transition: translate 0.18s cubic-bezier(0.33, 1, 0.68, 1); }
+
+        /* Jelly overscroll: a wrapper we scale slightly past the scroll edges. */
+        #main-content, #posts {
+            transform-origin: center top;
+            will-change: transform;
+        }
+        .yk-overscroll-top { animation: ykJellyTop 0.5s cubic-bezier(0.22, 1.3, 0.4, 1); }
+        .yk-overscroll-bottom { animation: ykJellyBottom 0.5s cubic-bezier(0.22, 1.3, 0.4, 1); }
+        @keyframes ykJellyTop {
+            0%   { transform: scaleY(1); }
+            35%  { transform: scaleY(1.012) translateY(4px); }
+            100% { transform: scaleY(1); }
+        }
+        @keyframes ykJellyBottom {
+            0%   { transform: scaleY(1); }
+            35%  { transform: scaleY(1.012) translateY(-4px); }
+            100% { transform: scaleY(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .yk-drift { translate: 0 0 !important; transition: none !important; }
+            .yk-overscroll-top, .yk-overscroll-bottom { animation: none !important; }
+        }
+
+        /* ============================================================
+           ✦ NO-SHIFT FIX — reserve scrollbar gutter so opening the news
+           overlay (or navigating index↔news) never reflows page width.
+        ============================================================ */
+        html { scrollbar-gutter: stable; }
+        /* When the overlay locks scroll, keep the gutter reserved too */
+        html[data-yk-scroll-lock="1"] { overflow-y: hidden; }
+
+        
+        /* ============================================================
+           ✦ CARD SURFACE HARDENING — use background-color (not shorthand)
+           so Tailwind's bg-* utilities never win the cascade.
+        ============================================================ */
+        .research-card { background-color: var(--surface) !important; }
+        .publication-item { background-color: var(--surface) !important; }
+        .news-timeline-item { background-color: var(--surface) !important; }
+        #about .container > .flex { background-color: var(--surface) !important; }
+        #contact .container { background-color: var(--surface) !important; }
+        .news-post { background-color: var(--surface) !important; }
+        #yk-news-overlay .yk-post { background-color: var(--surface) !important; }
+        #search-bar-container { background-color: var(--surface) !important; }
+        .tag-btn { background-color: var(--surface) !important; }
+        .tag-btn.active { background-color: var(--amber) !important; }
+        .tag-btn.active.tag-all { background-color: var(--amber) !important; }
+        .pub-view-btn { background-color: var(--surface) !important; }
+        .pub-view-btn.active { background-color: var(--amber) !important; }
+        footer { background-color: var(--surface) !important; }
+        .abstract-container .border-l-4 { background-color: var(--surface-2) !important; }
+
+        
+        /* Hero headline: size down a touch so all lines incl. highlight read cleanly */
+        #home-content-wrapper h1 { font-size: clamp(2.3rem, 5.4vw, 4.2rem) !important; max-width: 20ch; }
+        #home-content-wrapper > .container > p { max-width: 44ch; }
+
+        
+        /* ============================================================
+           ✦ FIXES v3 — highlight visibility, drag cursor, glassmorphism
+        ============================================================ */
+
+        /* 1) HIGHLIGHT FIX: make "Make Our Lives Fun" / "News" reliably visible.
+           Override every earlier text-fill/clip rule with a clean solid fill. */
+        .gradient-text,
+        #home-content-wrapper h1 .gradient-text,
+        #news-hero h1 .gradient-text {
+            background: none !important;
+            background-image: none !important;
+            -webkit-background-clip: border-box !important;
+            background-clip: border-box !important;
+            -webkit-text-fill-color: #FFC759 !important;
+            color: #FFC759 !important;
+            animation: none !important;
+            text-shadow: 0 1px 18px rgba(245,158,11,0.35);
+        }
+        .dark .gradient-text,
+        .dark #home-content-wrapper h1 .gradient-text,
+        .dark #news-hero h1 .gradient-text {
+            -webkit-text-fill-color: #FFD27A !important;
+            color: #FFD27A !important;
+        }
+        /* keep the soft underline swash */
+        .gradient-text::after {
+            content: ""; position: absolute; left: 0; right: 0; bottom: -0.06em;
+            height: 0.12em; border-radius: 99px; transform: scaleX(0.96); opacity: 0.85;
+            background: linear-gradient(90deg, transparent, #FFC759 12%, #FFC759 88%, transparent);
+        }
+
+        /* 2) DRAG: cursor affordance + neutralize old zigzag drift */
+        .yk-drift { translate: none !important; }   /* disable leftover drift var */
+        #about .container > .flex, .research-card, .news-timeline-item,
+        .publication-item, .news-post, #yk-news-overlay .yk-post {
+            cursor: grab;
+            touch-action: pan-y;       /* let vertical scroll through, we capture drag */
+            will-change: transform;
+        }
+        .yk-grabbing { cursor: grabbing !important; }
+        /* lift shadow while grabbing for a tactile "picked up" feel */
+        .research-card.yk-grabbing, .publication-item.yk-grabbing,
+        .news-timeline-item.yk-grabbing, .news-post.yk-grabbing,
+        #about .container > .flex.yk-grabbing, #yk-news-overlay .yk-post.yk-grabbing {
+            box-shadow: var(--shadow-lg) !important;
+        }
+        /* interactive children keep normal cursor */
+        .research-card a, .publication-item a, .news-post a,
+        .publication-item button, .news-timeline-entry,
+        .tag-btn, .pub-view-btn, .abstract-toggle-btn { cursor: pointer; }
+
+        /* 3) GLASSMORPHIC HIGHLIGHTS — frosted accents on a few surfaces.
+           Light, tasteful; not a full reskin. */
+        :root {
+            --glass-light: rgba(255,255,255,0.55);
+            --glass-border: rgba(255,255,255,0.65);
+            --glass-shadow: 0 8px 32px -8px rgba(33,30,26,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+        .dark {
+            --glass-light: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.12);
+            --glass-shadow: 0 8px 32px -8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+
+        /* eyebrow pills → frosted glass */
+        .yk-eyebrow, #yk-news-eyebrow {
+            background: var(--glass-light) !important;
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            backdrop-filter: blur(12px) saturate(160%);
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* hero CTA → glass over the amber, with a bright top edge */
+        #home-content-wrapper a.bg-amber-500, #news a.bg-amber-500 {
+            position: relative;
+            -webkit-backdrop-filter: blur(8px) saturate(140%);
+            backdrop-filter: blur(8px) saturate(140%);
+            border: 1px solid rgba(255,255,255,0.45) !important;
+            box-shadow: 0 10px 30px -8px rgba(245,158,11,0.5), inset 0 1px 0 rgba(255,255,255,0.7) !important;
+        }
+
+        /* research icon tiles → frosted glass chips */
+        .research-card .fas {
+            background: var(--glass-light) !important;
+            -webkit-backdrop-filter: blur(10px) saturate(160%);
+            backdrop-filter: blur(10px) saturate(160%);
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* tag filter + view-toggle pills → subtle glass */
+        .tag-btn, .pub-view-btn, #search-bar-container {
+            -webkit-backdrop-filter: blur(10px) saturate(150%);
+            backdrop-filter: blur(10px) saturate(150%);
+        }
+
+        /* contact social buttons → glass discs */
+        #contact .mt-8 a {
+            background: var(--glass-light) !important;
+            -webkit-backdrop-filter: blur(10px) saturate(160%);
+            backdrop-filter: blur(10px) saturate(160%);
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* a faint frosted sheen strip across the top of each floating card */
+        .research-card::after, .publication-item::after {
+            content: ""; position: absolute; left: 0; right: 0; top: 0; height: 38%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0));
+            pointer-events: none; opacity: 0.7; border-radius: inherit;
+        }
+        .dark .research-card::after, .dark .publication-item::after {
+            background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0));
+        }
+        .research-card, .publication-item { position: relative; }
+        .research-card > *, .publication-item > * { position: relative; z-index: 1; }
+
+        @media (prefers-reduced-motion: reduce) {
+            #about .container > .flex, .research-card, .news-timeline-item,
+            .publication-item, .news-post { cursor: default; }
+        }
+
+        
+        /* Prevent text selection while dragging cards (avoids highlight artifact) */
+        #about .container > .flex, .research-card, .news-timeline-item,
+        .publication-item, .news-post, #yk-news-overlay .yk-post {
+            -webkit-user-select: none; user-select: none;
+        }
+        /* but allow selecting inside actual links/abstract text if needed */
+        .abstract-content, .pub-authors, .pub-venue { -webkit-user-select: text; user-select: text; }
+
+        
+        /* Harden all publication/news link states to amber (never blue) */
+        .pub-link-text, .pub-link-text:link, .pub-link-text:visited { color: var(--amber-deep) !important; }
+        .dark .pub-link-text, .dark .pub-link-text:visited { color: var(--peach) !important; }
+        #main-content a:visited:not(.bg-amber-500):not([class*="bg-gray-"]) { color: var(--amber-deep); }
+        .dark #main-content a:visited:not(.bg-amber-500):not([class*="bg-gray-"]) { color: var(--peach); }
+        #posts a:visited:not(.bg-amber-500) { color: var(--amber-deep); }
+
+        </style>
     <script>
         // On page load or when changing themes, best to add inline in `head` to avoid FOUC
         if (localStorage.getItem('color-theme') === 'dark') {
@@ -1925,13 +2756,15 @@ if (top.length === 0) {
             );
 
             const lockPageScroll = (lock) => {
-                // Prevent background scroll while overlay is open
+                // Prevent background scroll while overlay is open.
+                // Only lock the vertical axis; scrollbar-gutter (CSS) keeps the
+                // gutter reserved so the page width never reflows (no judder).
                 if (lock) {
                     document.documentElement.dataset.ykScrollLock = '1';
-                    document.documentElement.style.overflow = 'hidden';
+                    document.documentElement.style.overflowY = 'hidden';
                 } else {
                     delete document.documentElement.dataset.ykScrollLock;
-                    document.documentElement.style.overflow = '';
+                    document.documentElement.style.overflowY = '';
                 }
             };
 
@@ -2925,5 +3758,194 @@ const filterPublications = () => {
             loadPublications();
         });
 </script>
+<script>
+/* ✦ PREMIUM SOFT REDESIGN — decorative DOM (additive, post-load) */
+(function () {
+    function decorate() {
+        // Eyebrows above each section heading
+        var labels = {
+            about:        'Hello there',
+            research:     'What I explore',
+            news:         'Latest updates',
+            publications: 'Selected work',
+            contact:      'Say hi'
+        };
+        Object.keys(labels).forEach(function (id) {
+            var sec = document.getElementById(id);
+            if (!sec) return;
+            var head = sec.querySelector('.text-center.mb-12');
+            if (!head || head.querySelector('.yk-eyebrow')) return;
+            var e = document.createElement('span');
+            e.className = 'yk-eyebrow';
+            e.textContent = labels[id];
+            head.insertBefore(e, head.firstChild);
+        });
+
+        // Curvy wave divider at the bottom of the hero
+        var home = document.getElementById('home');
+        if (home && !document.getElementById('yk-hero-wave')) {
+            var ns = 'http://www.w3.org/2000/svg';
+            var svg = document.createElementNS(ns, 'svg');
+            svg.setAttribute('id', 'yk-hero-wave');
+            svg.setAttribute('viewBox', '0 0 1440 90');
+            svg.setAttribute('preserveAspectRatio', 'none');
+            var path = document.createElementNS(ns, 'path');
+            path.setAttribute('d', 'M0,52 C240,98 480,8 720,40 C960,72 1200,98 1440,46 L1440,90 L0,90 Z');
+            svg.appendChild(path);
+            home.appendChild(svg);
+        }
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', decorate);
+    else decorate();
+})();
+</script>
+
+<script>
+/* ✦ TACTILE MOTION — elastic drag on cards + jelly overscroll
+   Additive; respects reduced motion. */
+(function () {
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return;
+
+    /* ---------- 1) Elastic drag: grab a card, it stretches toward the
+       cursor up to a limit, then springs back ("띠용") on release. -------- */
+    var DRAG_SEL = [
+        '#about .container > .flex',       // About card
+        '.research-card',                  // Research cards
+        '.news-timeline-item',             // News rows (index)
+        '.publication-item',               // Publication cards
+        '.news-post',                      // News page posts
+        '#yk-news-overlay .yk-post'        // News overlay posts
+    ].join(', ');
+
+    var MAX_PULL = 64;     // px — furthest the card can be pulled from origin
+    var RESIST = 0.55;     // how much of the cursor delta the card follows
+    var active = null;     // currently dragged element state
+
+    // A card should NOT start a drag from an interactive child (links/buttons/inputs)
+    function fromInteractive(target) {
+        return !!(target.closest && target.closest('a, button, input, textarea, select, .abstract-toggle-btn, .tag-btn, .pub-view-btn'));
+    }
+
+    // soft clamp with diminishing returns so it feels rubbery near the limit
+    function elastic(d, max) {
+        var s = Math.sign(d), a = Math.abs(d);
+        // asymptotic ease toward max
+        return s * (max * (1 - Math.exp(-a / (max * 0.9))));
+    }
+
+    function onDown(e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        var card = e.target.closest(DRAG_SEL);
+        if (!card || fromInteractive(e.target)) return;
+
+        active = {
+            el: card,
+            sx: e.clientX,
+            sy: e.clientY,
+            dx: 0, dy: 0,
+            pid: e.pointerId
+        };
+        card.classList.add('yk-grabbing');
+        // disable the spring transition while actively dragging
+        card.style.transition = 'none';
+        try { card.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+
+    function onMove(e) {
+        if (!active || e.pointerId !== active.pid) return;
+        var rawX = e.clientX - active.sx;
+        var rawY = e.clientY - active.sy;
+        active.dx = elastic(rawX * RESIST, MAX_PULL);
+        active.dy = elastic(rawY * RESIST, MAX_PULL);
+        // subtle scale + rotate for "쫀득" feel
+        var dist = Math.hypot(active.dx, active.dy);
+        var rot = (active.dx / MAX_PULL) * 3.2; // deg
+        var scale = 1 + Math.min(dist / MAX_PULL, 1) * 0.03;
+        active.el.style.transform =
+            'translate(' + active.dx.toFixed(1) + 'px,' + active.dy.toFixed(1) + 'px) rotate(' + rot.toFixed(2) + 'deg) scale(' + scale.toFixed(3) + ')';
+        active.el.style.zIndex = '30';
+    }
+
+    function springBack() {
+        if (!active) return;
+        var el = active.el;
+        el.classList.remove('yk-grabbing');
+        // springy return
+        el.style.transition = 'transform 0.62s cubic-bezier(0.18, 1.5, 0.4, 1)';
+        el.style.transform = 'translate(0px,0px) rotate(0deg) scale(1)';
+        var done = el;
+        setTimeout(function () {
+            // clean up inline styles so hover transforms work again
+            done.style.transition = '';
+            done.style.transform = '';
+            done.style.zIndex = '';
+        }, 640);
+        active = null;
+    }
+
+    document.addEventListener('pointerdown', onDown, { passive: true });
+    document.addEventListener('pointermove', onMove, { passive: true });
+    document.addEventListener('pointerup', springBack, { passive: true });
+    document.addEventListener('pointercancel', springBack, { passive: true });
+
+    /* ---------- 2) Jelly overscroll at very top / bottom ---------- */
+    function jellyTarget() {
+        // overlay scroll container if open, else the main page wrapper
+        var overlay = document.querySelector('html.yk-news-open #yk-news-overlay .yk-scroll');
+        if (overlay) return { el: overlay, scroller: overlay };
+        var main = document.getElementById('main-content') || document.getElementById('posts');
+        return { el: main, scroller: window };
+    }
+
+    var cooling = false;
+    function fireJelly(dir) {
+        if (cooling) return;
+        var t = jellyTarget();
+        if (!t.el) return;
+        cooling = true;
+        var cls = dir === 'top' ? 'yk-overscroll-top' : 'yk-overscroll-bottom';
+        t.el.classList.remove('yk-overscroll-top', 'yk-overscroll-bottom');
+        void t.el.offsetWidth;
+        t.el.classList.add(cls);
+        setTimeout(function () { t.el.classList.remove(cls); cooling = false; }, 520);
+    }
+
+    function atEdges() {
+        var t = jellyTarget();
+        var top, bottom;
+        if (t.scroller === window) {
+            var y = window.scrollY || document.documentElement.scrollTop || 0;
+            var max = (document.documentElement.scrollHeight - window.innerHeight);
+            top = y <= 1; bottom = y >= max - 2;
+        } else {
+            var s = t.scroller;
+            top = s.scrollTop <= 0;
+            bottom = s.scrollTop >= (s.scrollHeight - s.clientHeight - 2);
+        }
+        return { top: top, bottom: bottom };
+    }
+
+    window.addEventListener('wheel', function (e) {
+        var edge = atEdges();
+        if (edge.top && e.deltaY < -6) fireJelly('top');
+        else if (edge.bottom && e.deltaY > 6) fireJelly('bottom');
+    }, { passive: true });
+
+    // touch overscroll
+    var touchStartY = null;
+    window.addEventListener('touchstart', function (e) {
+        touchStartY = e.touches && e.touches[0] ? e.touches[0].clientY : null;
+    }, { passive: true });
+    window.addEventListener('touchmove', function (e) {
+        if (touchStartY == null || !e.touches || !e.touches[0]) return;
+        var dy = e.touches[0].clientY - touchStartY;
+        var edge = atEdges();
+        if (edge.top && dy > 24) { fireJelly('top'); touchStartY = null; }
+        else if (edge.bottom && dy < -24) { fireJelly('bottom'); touchStartY = null; }
+    }, { passive: true });
+})();
+</script>
+
 </body>
 </html>
