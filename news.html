@@ -1508,14 +1508,18 @@ const applyNewsSearch = () => {
         if (e.pointerType === 'mouse' && e.button !== 0) return;
         var card = e.target.closest(DRAG_SEL);
         if (!card || fromInteractive(e.target)) return;
-        active = { el: card, sx: e.clientX, sy: e.clientY, dx: 0, dy: 0, pid: e.pointerId,
+        var moveEl = card;
+        if (card.classList.contains('news-timeline-entry')) {
+            moveEl = card.querySelector('.news-timeline-item') || card;
+        }
+        active = { el: card, moveEl: moveEl, sx: e.clientX, sy: e.clientY, dx: 0, dy: 0, pid: e.pointerId,
                    moved: false, _started: false,
                    link: card.matches('a') ? card : (card.closest('a') || card.querySelector('a')) };
     }
     function beginDrag() {
         active._started = true;
-        active.el.classList.add('yk-grabbing');
-        active.el.style.transition = 'none';
+        active.moveEl.classList.add('yk-grabbing');
+        active.moveEl.style.transition = 'none';
         try { active.el.setPointerCapture(active.pid); } catch (_) {}
     }
     function onMove(e) {
@@ -1530,18 +1534,46 @@ const applyNewsSearch = () => {
         var dist = Math.hypot(active.dx, active.dy);
         var rot = (active.dx / MAX_PULL) * 3.2;
         var scale = 1 + Math.min(dist / MAX_PULL, 1) * 0.03;
-        active.el.style.transform =
+        active.moveEl.style.transform =
             'translate(' + active.dx.toFixed(1) + 'px,' + active.dy.toFixed(1) + 'px) rotate(' + rot.toFixed(2) + 'deg) scale(' + scale.toFixed(3) + ')';
-        active.el.style.zIndex = '30';
+        active.moveEl.style.zIndex = '30';
+    }
+    function wobble(el, dirX, dirY, delay) {
+        if (!el) return;
+        var ax = (dirX * 7).toFixed(1), ay = (dirY * 7).toFixed(1);
+        setTimeout(function () {
+            var prev = el.style.transition;
+            el.style.transition = 'transform 0.5s cubic-bezier(0.22, 1.4, 0.4, 1)';
+            el.style.transform = 'translate(' + ax + 'px,' + ay + 'px)';
+            setTimeout(function () {
+                el.style.transform = '';
+                setTimeout(function () { el.style.transition = prev || ''; }, 500);
+            }, 70);
+        }, delay);
+    }
+    function neighbours(card) {
+        var out = [];
+        function ok(n){ return n && n.matches && n.matches('.research-card, .publication-item, .news-timeline-entry, .news-post, #yk-news-overlay .yk-post'); }
+        if (ok(card.previousElementSibling)) out.push(card.previousElementSibling);
+        if (ok(card.nextElementSibling)) out.push(card.nextElementSibling);
+        return out;
     }
     function springBack() {
         if (!active) return;
         if (!active._started) { active = null; return; }
-        var el = active.el, wasDrag = active.moved, link = active.link;
+        var el = active.moveEl, card = active.el, wasDrag = active.moved, link = active.link;
+        var mag = Math.hypot(active.dx, active.dy) || 1;
+        var ndx = active.dx / mag, ndy = active.dy / mag;
         el.classList.remove('yk-grabbing');
         el.style.transition = 'transform 0.62s cubic-bezier(0.18, 1.5, 0.4, 1)';
         el.style.transform = 'translate(0px,0px) rotate(0deg) scale(1)';
         setTimeout(function () { el.style.transition = ''; el.style.transform = ''; el.style.zIndex = ''; }, 640);
+        if (wasDrag) {
+            neighbours(card).forEach(function (n, i) {
+                var t = n.classList.contains('news-timeline-entry') ? (n.querySelector('.news-timeline-item') || n) : n;
+                wobble(t, ndx, ndy, 40 + i * 30);
+            });
+        }
         if (wasDrag && link) {
             var swallow = function (ev) { ev.preventDefault(); ev.stopPropagation(); link.removeEventListener('click', swallow, true); };
             link.addEventListener('click', swallow, true);
