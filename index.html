@@ -1428,7 +1428,9 @@
         /* Jelly overscroll: a wrapper we scale slightly past the scroll edges. */
         #main-content, #posts {
             transform-origin: center top;
-            will-change: transform;
+            /* will-change applied dynamically by the rubber-band JS only while
+               pulling; keeping it off at rest avoids isolating the layer (which
+               would weaken the cards' backdrop-filter blur). */
         }
         .yk-overscroll-top { animation: ykJellyTop 0.5s cubic-bezier(0.22, 1.3, 0.4, 1); }
         .yk-overscroll-bottom { animation: ykJellyBottom 0.5s cubic-bezier(0.22, 1.3, 0.4, 1); }
@@ -1517,12 +1519,19 @@
         /* 2) DRAG: cursor affordance + neutralize old zigzag drift */
         .yk-drift { translate: none !important; }   /* disable leftover drift var */
         #about .container > .flex, .research-card, .news-timeline-item,
-        .publication-item, .news-post, #yk-news-overlay .yk-post {
+        .publication-item, .news-post, #yk-news-overlay .yk-post,
+        .news-timeline-entry, #contact .container {
             cursor: grab;
             touch-action: pan-y;       /* let vertical scroll through, we capture drag */
-            will-change: transform;
+            -webkit-user-drag: none;   /* stop native link/image drag stealing the gesture */
+            /* NOTE: no `will-change: transform` here — promoting these to their
+               own compositing layer at rest breaks backdrop-filter (the card can
+               no longer sample the orb substrate behind it, so the frost/blur
+               disappears). will-change is applied only while actually dragging
+               via .yk-grabbing below. */
         }
-        .yk-grabbing { cursor: grabbing !important; }
+        .news-timeline-entry, .news-timeline-entry * { -webkit-user-drag: none; }
+        .yk-grabbing { cursor: grabbing !important; will-change: transform; }
         /* lift shadow while grabbing for a tactile "picked up" feel */
         .research-card.yk-grabbing, .publication-item.yk-grabbing,
         .news-timeline-item.yk-grabbing, .news-post.yk-grabbing,
@@ -1629,12 +1638,24 @@
               glass drag, drag clip, year gaps, abstract clipping
         ============================================================ */
 
-        /* ---- (6)(7) De-clamp publications: visible items grow naturally,
-           no phantom gaps, no abstract clipping. Keep max-height only for
-           the filter-collapse animation; in the RESTING state overflow is
-           visible and JS sets --mh to true content height (no padding fudge). ---- */
+        /* ---- (6)(7) De-clamp publications COMPLETELY: visible items size
+           to their natural content height — no max-height clamp at rest, so
+           switching views, expanding abstracts, and dragging never collapse,
+           clip, or overlap. The filter-out collapse is driven by an explicit
+           transient class set by JS at the moment of filtering. ---- */
         .publication-item, .year-section, #no-results-message {
+            max-height: none !important;     /* kill the var(--mh) clamp */
             overflow: visible !important;    /* let abstracts & drag escape */
+            will-change: auto !important;
+        }
+        /* Filtered-out items: collapse to nothing. JS sets an explicit pixel
+           start height (.yk-collapsing) so the transition animates, then adds
+           .hidden-filter to reach 0. */
+        .yk-collapsing {
+            overflow: hidden !important;
+            transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1),
+                        opacity 0.3s ease, transform 0.3s ease,
+                        padding 0.45s ease, margin 0.45s ease, border-width 0.45s ease !important;
         }
         .hidden-filter {
             max-height: 0 !important;
@@ -1649,13 +1670,11 @@
         /* the abstract drawer keeps its own clip + animation (unchanged) */
         .abstract-container { overflow: hidden !important; }
 
-        /* (6) kill the extra vertical gap the year header used to leave.
-           Year heading sits tight above its items regardless of year. */
+        /* (6) tight, uniform gap under each year heading */
         #publications .year-section > h3 { margin-bottom: 1rem !important; }
 
         /* ---- (5) Dragged cards must render ABOVE everything & never clip ---- */
         .yk-grabbing { position: relative; z-index: 999 !important; }
-        /* while any card in a year-section is grabbed, lift the section's clip */
         .year-section.yk-has-grab { overflow: visible !important; z-index: 50; position: relative; }
         #research .grid, #news .max-w-3xl, #publications .space-y-8,
         .space-y-8, #news-list { overflow: visible !important; }
@@ -1854,15 +1873,15 @@
            a mostly-opaque tinted panel (~70%) + blur, so the background
            shows only as a soft blurred tint/outline, not sharply. ---- */
         :root {
-            --ios-fill: rgba(255,255,255,0.68);
-            --ios-fill-2: rgba(255,255,255,0.58);
+            --ios-fill: rgba(255,255,255,0.62);
+            --ios-fill-2: rgba(255,255,255,0.50);
             --ios-brd: rgba(255,255,255,0.55);
             --ios-blur: blur(24px) saturate(165%);
             --ios-blur-strong: blur(30px) saturate(175%);
             --ios-sh: 0 12px 40px -14px rgba(33,30,26,0.30), inset 0 1px 0 rgba(255,255,255,0.55);
         }
         .dark {
-            --ios-fill: rgba(22,29,46,0.66);
+            --ios-fill: rgba(22,29,46,0.60);
             --ios-fill-2: rgba(22,29,46,0.55);
             --ios-brd: rgba(255,255,255,0.14);
             --ios-sh: 0 14px 44px -16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.10);
@@ -3803,26 +3822,44 @@ const _applyOverlaySearch = () => {
 
                 const isCompactView = () => publicationsSection && publicationsSection.classList.contains('pub-compact');
 
-                // Keep max-height values synced to real content height.
-                // This restores smooth filter animations while preventing clipping when abstracts expand.
-                const setMH = (el, extra = 0) => {
+                // Collapse an element to height 0 with a smooth animation, then
+                // mark it filtered-out. Expanding just removes both classes so the
+                // element returns to its natural (unclamped) height — no overlap.
+                const collapseOut = (el) => {
+                    if (!el || el.classList.contains('hidden-filter')) return;
+                    var start = el.scrollHeight;
+                    el.classList.add('yk-collapsing');
+                    el.style.maxHeight = start + 'px';
+                    // force reflow so the start height is registered
+                    void el.offsetHeight;
+                    el.classList.add('hidden-filter');   // CSS transitions max-height → 0
+                };
+                const expandIn = (el) => {
                     if (!el) return;
-                    el.style.setProperty('--mh', (el.scrollHeight + extra) + 'px');
+                    if (el.classList.contains('hidden-filter')) {
+                        el.classList.remove('hidden-filter');
+                        // animate from 0 up to natural height, then release the clamp
+                        var target = el.scrollHeight;
+                        el.style.maxHeight = '0px';
+                        void el.offsetHeight;
+                        el.style.maxHeight = target + 'px';
+                        var done = function (ev) {
+                            if (ev && ev.propertyName !== 'max-height') return;
+                            el.classList.remove('yk-collapsing');
+                            el.style.maxHeight = '';   // back to natural (max-height:none)
+                            el.removeEventListener('transitionend', done);
+                        };
+                        el.addEventListener('transitionend', done);
+                        // safety release
+                        setTimeout(done, 520);
+                    } else {
+                        // already visible — make sure no stale clamp lingers
+                        el.classList.remove('yk-collapsing');
+                        el.style.maxHeight = '';
+                    }
                 };
-
-                const getMHExtras = () => {
-                    // Small, uniform buffer. With overflow:visible in the resting
-                    // state this only needs to cover sub-pixel rounding, so keep it
-                    // tiny to avoid phantom gaps under the year headings.
-                    return { item: 8, year: 8 };
-                };
-
-                const refreshPublicationHeights = () => {
-                    const ex = getMHExtras();
-                    document.querySelectorAll('.publication-item').forEach(el => setMH(el, ex.item));
-                    document.querySelectorAll('.year-section').forEach(el => setMH(el, ex.year));
-                    setMH(noResultsMessage, ex.item);
-                };
+                // kept as a no-op shim (older calls reference it)
+                const refreshPublicationHeights = () => {};
 
 
                 // Expand/Collapse search bar
@@ -3890,12 +3927,9 @@ const filterPublications = () => {
                     const activeTagBtn = filterContainer?.querySelector('.tag-btn.active');
                     const selectedTag = activeTagBtn ? activeTagBtn.dataset.tag : 'all';
 
-                    const ex = getMHExtras();
-
                     let visibleItemsCount = 0;
 
                     publicationItems.forEach(item => {
-                        setMH(item, ex.item);
                         const title = item.querySelector('.publication-title')?.textContent?.toLowerCase() || '';
                         const tags = item.dataset.tags || '';
 
@@ -3903,36 +3937,31 @@ const filterPublications = () => {
                         const tagMatch = selectedTag === 'all' || tags.includes(selectedTag);
 
                         if (searchMatch && tagMatch) {
-                            item.classList.remove('hidden-filter');
+                            expandIn(item);
                             visibleItemsCount++;
                         } else {
-                            item.classList.add('hidden-filter');
+                            collapseOut(item);
                         }
                     });
 
                     // Hide empty year sections
                     yearSections.forEach(section => {
-                        setMH(section, ex.year);
                         const visibleItems = section.querySelectorAll('.publication-item:not(.hidden-filter)');
                         if (visibleItems.length > 0) {
-                            section.classList.remove('hidden-filter');
+                            expandIn(section);
                         } else {
-                            section.classList.add('hidden-filter');
+                            collapseOut(section);
                         }
                     });
 
                     // Show/hide no results message
                     if (noResultsMessage) {
                         if (visibleItemsCount === 0) {
-                            noResultsMessage.classList.remove('hidden-filter');
+                            expandIn(noResultsMessage);
                         } else {
-                            noResultsMessage.classList.add('hidden-filter');
+                            collapseOut(noResultsMessage);
                         }
                     }
-
-
-                    // Sync max-heights after filtering so transitions stay smooth
-                    requestAnimationFrame(refreshPublicationHeights);
                 };
 
                 // Event listeners
@@ -4232,25 +4261,28 @@ const filterPublications = () => {
     var DRAG_SEL = [
         '#about .container > .flex',       // About card
         '.research-card',                  // Research cards
-        '.news-timeline-item',             // News rows (index)
+        '.news-timeline-entry',            // News rows (index) — links, drag-aware
         '.publication-item',               // Publication cards
         '.news-post',                      // News page posts
+        '#contact .container',             // Get In Touch card
         '#yk-news-overlay .yk-post'        // News overlay posts
     ].join(', ');
 
     var MAX_PULL = 64;     // px — furthest the card can be pulled from origin
     var RESIST = 0.55;     // how much of the cursor delta the card follows
+    var DRAG_THRESHOLD = 6; // px the pointer must move before it counts as a drag
     var active = null;     // currently dragged element state
 
-    // A card should NOT start a drag from an interactive child (links/buttons/inputs)
+    // A drag should NOT start from a control the user means to operate
+    // (buttons, inputs, the abstract toggle, tag/view buttons). Plain links
+    // ARE allowed to start a drag — we suppress their navigation only if the
+    // pointer actually moved (drag), preserving short-click navigation.
     function fromInteractive(target) {
-        return !!(target.closest && target.closest('a, button, input, textarea, select, .abstract-toggle-btn, .tag-btn, .pub-view-btn'));
+        return !!(target.closest && target.closest('button, input, textarea, select, .abstract-toggle-btn, .tag-btn, .pub-view-btn'));
     }
 
-    // soft clamp with diminishing returns so it feels rubbery near the limit
     function elastic(d, max) {
         var s = Math.sign(d), a = Math.abs(d);
-        // asymptotic ease toward max
         return s * (max * (1 - Math.exp(-a / (max * 0.9))));
     }
 
@@ -4265,26 +4297,34 @@ const filterPublications = () => {
             sy: e.clientY,
             dx: 0, dy: 0,
             pid: e.pointerId,
-            section: card.closest('.year-section')
+            section: card.closest('.year-section'),
+            moved: false,
+            _started: false,
+            link: card.matches('a') ? card : (card.closest('a') || card.querySelector('a'))
         };
-        card.classList.add('yk-grabbing');
-        // Lift the parent year-section's overflow clip so the dragged card
-        // is never cut off at the section edge.
+    }
+
+    function beginDrag(e) {
+        active._started = true;
+        active.el.classList.add('yk-grabbing');
         if (active.section) active.section.classList.add('yk-has-grab');
-        // disable the spring transition while actively dragging
-        card.style.transition = 'none';
-        try { card.setPointerCapture(e.pointerId); } catch (_) {}
+        active.el.style.transition = 'none';
+        try { active.el.setPointerCapture(active.pid); } catch (_) {}
     }
 
     function onMove(e) {
         if (!active || e.pointerId !== active.pid) return;
         var rawX = e.clientX - active.sx;
         var rawY = e.clientY - active.sy;
+        if (!active._started) {
+            if (Math.hypot(rawX, rawY) < DRAG_THRESHOLD) return;  // still a potential click
+            active.moved = true;
+            beginDrag(e);
+        }
         active.dx = elastic(rawX * RESIST, MAX_PULL);
         active.dy = elastic(rawY * RESIST, MAX_PULL);
-        // subtle scale + rotate for "쫀득" feel
         var dist = Math.hypot(active.dx, active.dy);
-        var rot = (active.dx / MAX_PULL) * 3.2; // deg
+        var rot = (active.dx / MAX_PULL) * 3.2;
         var scale = 1 + Math.min(dist / MAX_PULL, 1) * 0.03;
         active.el.style.transform =
             'translate(' + active.dx.toFixed(1) + 'px,' + active.dy.toFixed(1) + 'px) rotate(' + rot.toFixed(2) + 'deg) scale(' + scale.toFixed(3) + ')';
@@ -4293,20 +4333,31 @@ const filterPublications = () => {
 
     function springBack() {
         if (!active) return;
+        var wasDrag = active.moved;
+        var link = active.link;
+        if (!active._started) { active = null; return; }  // was a click, nothing to undo
         var el = active.el;
         var section = active.section;
         el.classList.remove('yk-grabbing');
-        // springy return
         el.style.transition = 'transform 0.62s cubic-bezier(0.18, 1.5, 0.4, 1)';
         el.style.transform = 'translate(0px,0px) rotate(0deg) scale(1)';
-        var done = el;
         setTimeout(function () {
-            // clean up inline styles so hover transforms work again
-            done.style.transition = '';
-            done.style.transform = '';
-            done.style.zIndex = '';
+            el.style.transition = '';
+            el.style.transform = '';
+            el.style.zIndex = '';
             if (section) section.classList.remove('yk-has-grab');
         }, 640);
+        // If this was a real drag on a link, swallow the click that follows
+        // so it doesn't navigate.
+        if (wasDrag && link) {
+            var swallow = function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                link.removeEventListener('click', swallow, true);
+            };
+            link.addEventListener('click', swallow, true);
+            setTimeout(function () { link.removeEventListener('click', swallow, true); }, 350);
+        }
         active = null;
     }
 
@@ -4314,6 +4365,10 @@ const filterPublications = () => {
     document.addEventListener('pointermove', onMove, { passive: true });
     document.addEventListener('pointerup', springBack, { passive: true });
     document.addEventListener('pointercancel', springBack, { passive: true });
+    // Stop native link/image drag (would steal the gesture from our handler)
+    document.addEventListener('dragstart', function (e) {
+        if (e.target.closest && e.target.closest(DRAG_SEL)) e.preventDefault();
+    });
 
     /* ---------- 2) Rubber-band overscroll (iOS/Android style) ----------
        While the user keeps pulling past an edge, the content is pulled in

@@ -762,15 +762,15 @@
 
         /* ---- Frosted-glass tokens — matched to the header's look ---- */
         :root {
-            --ios-fill: rgba(255,255,255,0.68);
-            --ios-fill-2: rgba(255,255,255,0.58);
+            --ios-fill: rgba(255,255,255,0.62);
+            --ios-fill-2: rgba(255,255,255,0.50);
             --ios-brd: rgba(255,255,255,0.55);
             --ios-blur: blur(24px) saturate(165%);
             --ios-blur-strong: blur(30px) saturate(175%);
             --ios-sh: 0 12px 40px -14px rgba(33,30,26,0.30), inset 0 1px 0 rgba(255,255,255,0.55);
         }
         .dark {
-            --ios-fill: rgba(22,29,46,0.66);
+            --ios-fill: rgba(22,29,46,0.60);
             --ios-fill-2: rgba(22,29,46,0.55);
             --ios-brd: rgba(255,255,255,0.14);
             --ios-sh: 0 14px 44px -16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.10);
@@ -1485,18 +1485,20 @@ const applyNewsSearch = () => {
     var DRAG_SEL = [
         '#about .container > .flex',
         '.research-card',
-        '.news-timeline-item',
+        '.news-timeline-entry',
         '.publication-item',
         '.news-post',
+        '#contact .container',
         '#yk-news-overlay .yk-post'
     ].join(', ');
 
     var MAX_PULL = 64;
     var RESIST = 0.55;
+    var DRAG_THRESHOLD = 6;
     var active = null;
 
     function fromInteractive(target) {
-        return !!(target.closest && target.closest('a, button, input, textarea, select, .abstract-toggle-btn, .tag-btn, .pub-view-btn'));
+        return !!(target.closest && target.closest('button, input, textarea, select, .abstract-toggle-btn, .tag-btn, .pub-view-btn'));
     }
     function elastic(d, max) {
         var s = Math.sign(d), a = Math.abs(d);
@@ -1506,14 +1508,23 @@ const applyNewsSearch = () => {
         if (e.pointerType === 'mouse' && e.button !== 0) return;
         var card = e.target.closest(DRAG_SEL);
         if (!card || fromInteractive(e.target)) return;
-        active = { el: card, sx: e.clientX, sy: e.clientY, dx: 0, dy: 0, pid: e.pointerId };
-        card.classList.add('yk-grabbing');
-        card.style.transition = 'none';
-        try { card.setPointerCapture(e.pointerId); } catch (_) {}
+        active = { el: card, sx: e.clientX, sy: e.clientY, dx: 0, dy: 0, pid: e.pointerId,
+                   moved: false, _started: false,
+                   link: card.matches('a') ? card : (card.closest('a') || card.querySelector('a')) };
+    }
+    function beginDrag() {
+        active._started = true;
+        active.el.classList.add('yk-grabbing');
+        active.el.style.transition = 'none';
+        try { active.el.setPointerCapture(active.pid); } catch (_) {}
     }
     function onMove(e) {
         if (!active || e.pointerId !== active.pid) return;
         var rawX = e.clientX - active.sx, rawY = e.clientY - active.sy;
+        if (!active._started) {
+            if (Math.hypot(rawX, rawY) < DRAG_THRESHOLD) return;
+            active.moved = true; beginDrag();
+        }
         active.dx = elastic(rawX * RESIST, MAX_PULL);
         active.dy = elastic(rawY * RESIST, MAX_PULL);
         var dist = Math.hypot(active.dx, active.dy);
@@ -1525,18 +1536,26 @@ const applyNewsSearch = () => {
     }
     function springBack() {
         if (!active) return;
-        var el = active.el;
+        if (!active._started) { active = null; return; }
+        var el = active.el, wasDrag = active.moved, link = active.link;
         el.classList.remove('yk-grabbing');
         el.style.transition = 'transform 0.62s cubic-bezier(0.18, 1.5, 0.4, 1)';
         el.style.transform = 'translate(0px,0px) rotate(0deg) scale(1)';
-        var done = el;
-        setTimeout(function () { done.style.transition = ''; done.style.transform = ''; done.style.zIndex = ''; }, 640);
+        setTimeout(function () { el.style.transition = ''; el.style.transform = ''; el.style.zIndex = ''; }, 640);
+        if (wasDrag && link) {
+            var swallow = function (ev) { ev.preventDefault(); ev.stopPropagation(); link.removeEventListener('click', swallow, true); };
+            link.addEventListener('click', swallow, true);
+            setTimeout(function () { link.removeEventListener('click', swallow, true); }, 350);
+        }
         active = null;
     }
     document.addEventListener('pointerdown', onDown, { passive: true });
     document.addEventListener('pointermove', onMove, { passive: true });
     document.addEventListener('pointerup', springBack, { passive: true });
     document.addEventListener('pointercancel', springBack, { passive: true });
+    document.addEventListener('dragstart', function (e) {
+        if (e.target.closest && e.target.closest(DRAG_SEL)) e.preventDefault();
+    });
 
     /* ---------- 2) Rubber-band overscroll (iOS/Android style) ---------- */
     function jellyTarget() {
