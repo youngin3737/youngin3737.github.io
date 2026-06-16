@@ -1675,6 +1675,13 @@
         /* the abstract drawer keeps its own clip + animation (unchanged) */
         .abstract-container { overflow: hidden !important; }
 
+        /* Native scroll anchoring: when items above the viewport collapse or
+           expand during filtering, the browser keeps the currently-visible
+           content fixed in place — so the list only grows/shrinks downward and
+           the reader's position never jumps. (Explicitly enabled here.) */
+        html { overflow-anchor: auto; }
+        #publications, .year-section, .publication-item { overflow-anchor: auto; }
+
         /* (6) tight, uniform gap under each year heading */
         #publications .year-section > h3 { margin-bottom: 1rem !important; }
 
@@ -3932,26 +3939,18 @@ const filterPublications = () => {
                     const activeTagBtn = filterContainer?.querySelector('.tag-btn.active');
                     const selectedTag = activeTagBtn ? activeTagBtn.dataset.tag : 'all';
 
-                    // --- Scroll anchoring: hold the reader's viewport steady so
-                    // filtering only grows/shrinks the list without the page
-                    // jumping. Strategy: record every item's screen position now;
-                    // after filtering, find the item closest to the viewport top
-                    // that SURVIVED, and restore its on-screen position. ---
-                    const VTOP = 90; // a little below the fixed header
-                    const beforeTops = new Map();
-                    document.querySelectorAll('.publication-item').forEach(it => {
-                        beforeTops.set(it, it.getBoundingClientRect().top);
-                    });
-
+                    // No manual scroll manipulation: items simply collapse/expand in
+                    // place, so the list grows or shrinks downward. The browser's
+                    // native scroll anchoring (overflow-anchor) keeps the reader's
+                    // current view steady when items above the fold change height.
                     let visibleItemsCount = 0;
-                    const survivors = [];
 
                     publicationItems.forEach(item => {
                         const title = item.querySelector('.publication-title')?.textContent?.toLowerCase() || '';
                         const tags = item.dataset.tags || '';
                         const searchMatch = title.includes(searchQuery);
                         const tagMatch = selectedTag === 'all' || tags.includes(selectedTag);
-                        if (searchMatch && tagMatch) { expandIn(item); visibleItemsCount++; survivors.push(item); }
+                        if (searchMatch && tagMatch) { expandIn(item); visibleItemsCount++; }
                         else { collapseOut(item); }
                     });
 
@@ -3964,44 +3963,6 @@ const filterPublications = () => {
                     if (noResultsMessage) {
                         if (visibleItemsCount === 0) expandIn(noResultsMessage);
                         else collapseOut(noResultsMessage);
-                    }
-
-                    // Choose the surviving item that was nearest the viewport top
-                    // (at or just below VTOP) before the change, and hold it there.
-                    let anchorEl = null, anchorBeforeTop = 0, bestDist = Infinity;
-                    survivors.forEach(it => {
-                        const bt = beforeTops.get(it);
-                        if (bt == null) return;
-                        // prefer items at/below VTOP; distance from VTOP
-                        const dist = bt >= VTOP - 4 ? (bt - VTOP) : (VTOP - bt) * 3; // penalise items above
-                        if (dist < bestDist) { bestDist = dist; anchorEl = it; anchorBeforeTop = bt; }
-                    });
-
-                    if (anchorEl) {
-                        // Hold the anchor item's on-screen position across the eased
-                        // height animation (~0.5s) by correcting scroll each frame, so
-                        // the list only grows/shrinks below it and the reader's view
-                        // never jumps. Bail if the user scrolls or the anchor is gone.
-                        let cancelled = false;
-                        const cancel = () => { cancelled = true; };
-                        window.addEventListener('wheel', cancel, { passive: true });
-                        window.addEventListener('touchmove', cancel, { passive: true });
-                        let frames = 0;
-                        const tick = () => {
-                            if (cancelled || !anchorEl.isConnected || anchorEl.classList.contains('hidden-filter')) {
-                                window.removeEventListener('wheel', cancel);
-                                window.removeEventListener('touchmove', cancel);
-                                return;
-                            }
-                            const d = anchorEl.getBoundingClientRect().top - anchorBeforeTop;
-                            if (Math.abs(d) > 0.5) window.scrollBy(0, d);
-                            if (++frames < 42) requestAnimationFrame(tick);
-                            else {
-                                window.removeEventListener('wheel', cancel);
-                                window.removeEventListener('touchmove', cancel);
-                            }
-                        };
-                        requestAnimationFrame(tick);
                     }
                 };
 
@@ -4384,15 +4345,18 @@ const filterPublications = () => {
     // dragged card sprang back from. Runs only on release, never during drag.
     function wobble(el, dirX, dirY, delay) {
         if (!el) return;
-        var ax = (dirX * 7).toFixed(1), ay = (dirY * 7).toFixed(1);
+        // Soft "출렁~" swell: ease out gently, hold briefly, then ease back
+        // slowly — no springy overshoot, lower amplitude, longer duration.
+        var ax = (dirX * 5).toFixed(1), ay = (dirY * 5).toFixed(1);
         setTimeout(function () {
             var prevTransition = el.style.transition;
-            el.style.transition = 'transform 0.5s cubic-bezier(0.22, 1.4, 0.4, 1)';
+            el.style.transition = 'transform 0.55s cubic-bezier(0.25, 0.9, 0.3, 1)';
             el.style.transform = 'translate(' + ax + 'px,' + ay + 'px)';
             setTimeout(function () {
-                el.style.transform = '';
-                setTimeout(function () { el.style.transition = prevTransition || ''; }, 500);
-            }, 70);
+                el.style.transition = 'transform 0.85s cubic-bezier(0.25, 1, 0.4, 1)';
+                el.style.transform = 'translate(0px,0px)';
+                setTimeout(function () { el.style.transition = prevTransition || ''; }, 870);
+            }, 240);
         }, delay);
     }
 
