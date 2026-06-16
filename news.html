@@ -1540,7 +1540,7 @@ const applyNewsSearch = () => {
     }
     function wobble(el, dirX, dirY, delay) {
         if (!el) return;
-        var ax = (dirX * 5).toFixed(1), ay = (dirY * 5).toFixed(1);
+        var ax = (dirX * 8).toFixed(1), ay = (dirY * 8).toFixed(1);
         setTimeout(function () {
             var prev = el.style.transition;
             el.style.transition = 'transform 0.55s cubic-bezier(0.25, 0.9, 0.3, 1)';
@@ -1570,9 +1570,14 @@ const applyNewsSearch = () => {
         el.style.transform = 'translate(0px,0px) rotate(0deg) scale(1)';
         setTimeout(function () { el.style.transition = ''; el.style.transform = ''; el.style.zIndex = ''; }, 640);
         if (wasDrag) {
+            var cr = card.getBoundingClientRect();
+            var ccx = cr.left + cr.width / 2, ccy = cr.top + cr.height / 2;
             neighbours(card).forEach(function (n, i) {
                 var t = n.classList.contains('news-timeline-entry') ? (n.querySelector('.news-timeline-item') || n) : n;
-                wobble(t, ndx, ndy, 40 + i * 30);
+                var nr = n.getBoundingClientRect();
+                var vx = (nr.left + nr.width / 2) - ccx, vy = (nr.top + nr.height / 2) - ccy;
+                var m = Math.hypot(vx, vy) || 1;
+                wobble(t, vx / m, vy / m, 40 + i * 25);
             });
         }
         if (wasDrag && link) {

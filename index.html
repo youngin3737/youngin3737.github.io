@@ -1675,12 +1675,10 @@
         /* the abstract drawer keeps its own clip + animation (unchanged) */
         .abstract-container { overflow: hidden !important; }
 
-        /* Native scroll anchoring: when items above the viewport collapse or
-           expand during filtering, the browser keeps the currently-visible
-           content fixed in place — so the list only grows/shrinks downward and
-           the reader's position never jumps. (Explicitly enabled here.) */
-        html { overflow-anchor: auto; }
-        #publications, .year-section, .publication-item { overflow-anchor: auto; }
+        /* Position stability during filtering is handled in JS (pixel-based
+           anchor to the nearest surviving element). Disable native scroll
+           anchoring here so the two don't fight each other. */
+        #publications, .year-section, .publication-item { overflow-anchor: none; }
 
         /* (6) tight, uniform gap under each year heading */
         #publications .year-section > h3 { margin-bottom: 1rem !important; }
@@ -3939,30 +3937,73 @@ const filterPublications = () => {
                     const activeTagBtn = filterContainer?.querySelector('.tag-btn.active');
                     const selectedTag = activeTagBtn ? activeTagBtn.dataset.tag : 'all';
 
-                    // No manual scroll manipulation: items simply collapse/expand in
-                    // place, so the list grows or shrinks downward. The browser's
-                    // native scroll anchoring (overflow-anchor) keeps the reader's
-                    // current view steady when items above the fold change height.
-                    let visibleItemsCount = 0;
+                    // --- Pixel-based position lock (no ratios) ---
+                    // Record, for elements that will stay on screen, how far each one
+                    // sits from the top of the viewport right now. After filtering we
+                    // pick the element nearest the top that SURVIVED and restore that
+                    // exact pixel gap, so the reader keeps looking at the same place
+                    // and the list only grows/shrinks downward.
+                    const headerH = 80; // fixed top bar height
+                    const candidatesBefore = [];
+                    const record = (el, willSurvive) => {
+                        candidatesBefore.push({ el, top: el.getBoundingClientRect().top, willSurvive });
+                    };
 
-                    publicationItems.forEach(item => {
+                    // decide survival up front so we can record it
+                    const itemSurvives = (item) => {
                         const title = item.querySelector('.publication-title')?.textContent?.toLowerCase() || '';
                         const tags = item.dataset.tags || '';
                         const searchMatch = title.includes(searchQuery);
                         const tagMatch = selectedTag === 'all' || tags.includes(selectedTag);
-                        if (searchMatch && tagMatch) { expandIn(item); visibleItemsCount++; }
-                        else { collapseOut(item); }
+                        return searchMatch && tagMatch;
+                    };
+
+                    // record year headings (always survive if their year has any match)
+                    yearSections.forEach(sec => {
+                        const h = sec.querySelector('h3');
+                        const anyMatch = [...sec.querySelectorAll('.publication-item')].some(itemSurvives);
+                        if (h) record(h, anyMatch);
+                    });
+                    publicationItems.forEach(it => record(it, itemSurvives(it)));
+
+                    // choose anchor: the surviving element closest to (just below) the
+                    // header, i.e. nearest the top of what the reader currently sees.
+                    let anchorEl = null, anchorTopBefore = 0, best = Infinity;
+                    candidatesBefore.forEach(c => {
+                        if (!c.willSurvive) return;
+                        // prefer elements at/below the header line; small positive gap is best
+                        const gap = c.top - headerH;
+                        const score = gap >= -4 ? gap : (-gap) * 4 + 1000; // penalise ones above the header
+                        if (score < best) { best = score; anchorEl = c.el; anchorTopBefore = c.top; }
                     });
 
+                    let visibleItemsCount = 0;
+                    publicationItems.forEach(item => {
+                        if (itemSurvives(item)) { expandIn(item); visibleItemsCount++; }
+                        else { collapseOut(item); }
+                    });
                     yearSections.forEach(section => {
                         const visibleItems = section.querySelectorAll('.publication-item:not(.hidden-filter)');
                         if (visibleItems.length > 0) expandIn(section);
                         else collapseOut(section);
                     });
-
                     if (noResultsMessage) {
                         if (visibleItemsCount === 0) expandIn(noResultsMessage);
                         else collapseOut(noResultsMessage);
+                    }
+
+                    // Restore the anchor's screen position in absolute pixels, and keep
+                    // holding it while the height animation plays so it never drifts.
+                    if (anchorEl) {
+                        let frames = 0;
+                        const hold = () => {
+                            if (!anchorEl.isConnected) return;
+                            const now = anchorEl.getBoundingClientRect().top;
+                            const drift = now - anchorTopBefore;
+                            if (Math.abs(drift) >= 1) window.scrollTo(0, Math.max(0, window.scrollY + drift));
+                            if (++frames < 40) requestAnimationFrame(hold);
+                        };
+                        hold();
                     }
                 };
 
@@ -4345,9 +4386,9 @@ const filterPublications = () => {
     // dragged card sprang back from. Runs only on release, never during drag.
     function wobble(el, dirX, dirY, delay) {
         if (!el) return;
-        // Soft "출렁~" swell: ease out gently, hold briefly, then ease back
-        // slowly — no springy overshoot, lower amplitude, longer duration.
-        var ax = (dirX * 5).toFixed(1), ay = (dirY * 5).toFixed(1);
+        // Soft "출렁~" swell AWAY from the dragged card: ease out gently, hold
+        // briefly, then ease back slowly — no springy overshoot.
+        var ax = (dirX * 8).toFixed(1), ay = (dirY * 8).toFixed(1);
         setTimeout(function () {
             var prevTransition = el.style.transition;
             el.style.transition = 'transform 0.55s cubic-bezier(0.25, 0.9, 0.3, 1)';
@@ -4394,15 +4435,24 @@ const filterPublications = () => {
             if (section) section.classList.remove('yk-has-grab');
         }, 640);
 
-        // Ripple: neighbours wobble slightly in the same direction as the
-        // card's pull, but only on release (not while dragging).
+        // Ripple: on release, each neighbour swells AWAY from the dragged card
+        // (the one above moves up, below moves down; left moves left, etc.),
+        // as if the card pushed them as it settled back.
         if (wasDrag) {
             var nbrs = neighbours(card);
+            var cardRect = card.getBoundingClientRect();
+            var ccx = cardRect.left + cardRect.width / 2;
+            var ccy = cardRect.top + cardRect.height / 2;
             nbrs.forEach(function (n, i) {
-                // a news neighbour should wobble its inner pill, not the rail
                 var target = n.classList.contains('news-timeline-entry')
                     ? (n.querySelector('.news-timeline-item') || n) : n;
-                wobble(target, ndx, ndy, 40 + i * 30);
+                var nr = n.getBoundingClientRect();
+                var ncx = nr.left + nr.width / 2;
+                var ncy = nr.top + nr.height / 2;
+                // unit vector pointing FROM the dragged card TO the neighbour
+                var vx = ncx - ccx, vy = ncy - ccy;
+                var m = Math.hypot(vx, vy) || 1;
+                wobble(target, vx / m, vy / m, 40 + i * 25);
             });
         }
 
